@@ -1,0 +1,75 @@
+@extends('main_template/body')
+@section('body')
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>เพิ่ม สื่อสำหรับผู้พิการทางสายตา</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group row" >
+                            <div class="col-lg-3">
+                                <label class="control-label">ทะเบียนสื่อ</label>
+                                <input type="text" class="form-control form-control-sm"disabled value="123456">
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">หนังสือ</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">หมวดหมู่</label>
+                                <input type="text" class="form-control form-control-sm" disabled value="1516">
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">ประเภทสื่อ</label>
+                                <select class="form-control form-control-sm">
+                                    <option>อักษรเบลล์</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <label class="control-label">ระบบเสียง</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">จำนวนหน้าอักษรเบลล์</label>
+                                <input type="number" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">จำนวนเล่มจบ</label>
+                                <input type="number" class="form-control form-control-sm" >
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">แหล่งที่มา</label>
+                                <input type="text" class="form-control form-control-sm" >
+
+                            </div>
+
+                            <div class="col-lg-3">
+                                <label class="control-label">ผู้ที่แปลสื่อหรือพากย์เสียง</label>
+                                <input type="text" class="form-control form-control-sm" >
+
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="control-label">วันที่ทำการตรวจเช็ค</label>
+                                <input type="date" class="form-control form-control-sm" >
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-primary mx-2">
+                        <i class="fas fa-save"></i>
+                        บันทึก
+                    </button>
+                    <a href="{{ route('media_list') }}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i>
+                        ยกเลิก
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection()
