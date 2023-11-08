@@ -42,8 +42,14 @@
                                 <tbody>
                                     @for ($i=0; $i <=10;$i++)
                                     <tr>
-                                        <td class="text-center">1</td>
-                                        <td>xxxxxxx</td>
+                                        <td class="text-center">{{ $i+1 }}</td>
+                                        <td>@php
+                                            $isbn = "";
+                                            for ($num = 0; $num < 12; $num++) {
+                                                $isbn .= rand(0, 9);
+                                            };
+                                            echo $isbn;
+                                        @endphp</td>
                                         <td>xxxxxxx</td>
                                         <td>เจ้าหน้าที่ฝ่ายบริการ</td>
                                         <td>0883004952</td>

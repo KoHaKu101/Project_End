@@ -40,7 +40,7 @@
                                 <tbody>
                                     @for ($i=0; $i <=10;$i++)
                                     <tr>
-                                        <td class="text-center">1</td>
+                                        <td class="text-center">{{ $i+1 }}</td>
                                         <td>นิยาย</td>
 
                                         <td>

@@ -34,7 +34,7 @@
 
     <script src="{{ asset('assets/bootstrap-5.0.2-dist/js/bootstrap.bundle.js') }}"></script>
     <script src="{{ asset('assets/fontawesome-free-6.4.2/js/all.min.js') }}"></script>
-    <script src="{{ asset('assets//js/script.js') }}"></script>
+    <script src="{{ asset('assets/js/script.js') }}"></script>
 
 
 </body>

@@ -20,7 +20,7 @@
                             </div>
                             <div class="col-lg-1">
                                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                    data-bs-target="#modal_insert">
+                                    data-bs-target="#copy_book_insert">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มสำเนา
                                 </button>
@@ -42,9 +42,21 @@
                                 <tbody>
                                     @for ($i = 0; $i <= 10; $i++)
                                         <tr>
-                                            <td class="text-center">1</td>
+                                            <td class="text-center">{{ $i+1 }}</td>
                                             <td>นิยาย</td>
-                                            <td class="text-center ">10</td>
+                                            <td class="text-center ">
+                                                @php
+                                                    $num = rand(0,10);
+                                                    if($num == 0){
+                                                        $color = "bg-danger";
+                                                    }elseif ($num <= 5) {
+                                                        $color = "bg-warning";
+                                                    }else{
+                                                        $color = "bg-primary";
+                                                    }
+                                                    echo '<span class="badge '.$color.' " style="font-size:16px">'.$num.'</span>';
+                                                @endphp
+                                            </td>
 
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-warning">

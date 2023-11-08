@@ -42,22 +42,30 @@
                                 <tbody>
                                     @for ($i=0; $i <=10;$i++)
                                     <tr>
-                                        <td class="text-center">1</td>
+                                        <td class="text-center">{{ $i+1 }}</td>
                                         <td>เพรชสังหาร</td>
                                         <td>นิยาย</td>
                                         <td>อักษรเบลล์</td>
-                                        <td>ตรวจเช็คเรียบร้อย</td>
+                                        @php
+                                            $arr = array( "a"=>"กำลังผลิต", "b"=>"ตรวจเช็คเรียบร้อย");
+                                            shuffle($arr);
+                                            $color_status = array("กำลังผลิต"=>"bg-warning", "ตรวจเช็คเรียบร้อย"=>"bg-success");
+                                            echo '<td><span class="badge '.$color_status[$arr[0]].'">'.$arr[0].'</span></td>';
+                                        @endphp
+
                                         <td>
                                             <button type="button" class="btn btn-sm btn-warning">
                                                 <i class="fas fa-edit"></i>
-
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-primary">
+                                            @if (Str::is("กำลังผลิต",$arr[0]))
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#status_insert">
                                                 อัพเดพสถานะ
                                             </button>
+                                            @endif
+
                                         </td>
 
                                     </tr>
@@ -69,4 +77,5 @@
             </div>
         </div>
     </div>
+    @include('media.status')
 @endsection()

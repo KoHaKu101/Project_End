@@ -16,8 +16,8 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-xmark me-2"></i>ยกเลิก</button>
-          <button type="button" class="btn btn-success"><i class="fas fa-plus me-1"></i>เพิ่มรายการ</button>
+            <button type="button" class="btn btn-success"><i class="fas fa-plus me-1"></i>เพิ่มรายการ</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-xmark me-2"></i>ยกเลิก</button>
         </div>
       </div>
     </div>
