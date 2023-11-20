@@ -13,14 +13,13 @@ class AuthController extends Controller
         return view('login');
     }
     public function loginProcess(Request $request){
-        $credentials = $request->only('username', 'password');
         $request->validate([
             'username'=>'required',
             'password'=>'required'
         ]);
         $username = $request->username;
         $password = $request->password;
-        $dataEmp = Emp::select('username','password')->where('username',$username)->first();
+        $dataEmp = Emp::select('username','password','f_name')->where('username',$username)->first();
         if(is_Null($dataEmp)){
             dd('false');
             return redirect()->route('login');
@@ -30,6 +29,8 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
         Session::put('Logged', 'true');
+        Session::put('username', $dataEmp->username);
+        Session::put('FirstName', $dataEmp->f_name);
         return redirect()->route('dashboard_pd');
     }
     

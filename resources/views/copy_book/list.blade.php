@@ -1,4 +1,20 @@
 @extends('main_template/body')
+@section('css')
+    
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+@endsection
 @section('body')
     <div class="row">
         <div class="col-lg-12">
@@ -9,21 +25,17 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group row ">
-                            <div class="col-lg-11">
+                            <div class="col-lg-12">
                                 <form action="#">
                                     <div class="input-group ">
-                                        <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username" aria-describedby="basic-addon1" >
+                                        <span class="input-group-text" id="basic-addon1"><i
+                                                class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control form-control-sm"
+                                            placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username"
+                                            aria-describedby="basic-addon1">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                    data-bs-target="#copy_book_insert">
-                                    <i class="fas fa-plus"></i>
-                                    เพิ่มสำเนา
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -40,36 +52,36 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i = 0; $i <= 10; $i++)
+                                    @foreach ($data as $datalist)
                                         <tr>
-                                            <td class="text-center">{{ $i+1 }}</td>
-                                            <td>นิยาย</td>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{ $datalist->Book->name }}</td>
                                             <td class="text-center ">
                                                 @php
-                                                    $num = rand(0,10);
-                                                    if($num == 0){
-                                                        $color = "bg-danger";
-                                                    }elseif ($num <= 5) {
-                                                        $color = "bg-warning";
-                                                    }else{
-                                                        $color = "bg-primary";
+                                                    $num = $datalist->amount;
+                                                    if ($num == 0) {
+                                                        $color = 'bg-danger';
+                                                    } elseif ($num <= 5) {
+                                                        $color = 'bg-warning';
+                                                    } else {
+                                                        $color = 'bg-primary';
                                                     }
-                                                    echo '<span class="badge '.$color.' " style="font-size:16px">'.$num.'</span>';
                                                 @endphp
+                                                    <span class="badge {{$color}} " style="font-size:16px">{{$num}}</span>
                                             </td>
-
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i>
-
+                                                <button type="button" class="btn btn-sm btn-success"
+                                                    onclick="openModal('plus','{{ $datalist->copy_id }}','{{ $datalist->Book->name }}')">
+                                                    <i class="fas fa-plus"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="openModal('minus','{{ $datalist->copy_id }}','{{ $datalist->Book->name }}')">
+                                                    <i class="fas fa-minus"></i>
                                                 </button>
                                             </td>
 
                                         </tr>
-                                    @endfor
+                                    @endforeach
                             </table>
                         </div>
                     </div>
@@ -78,9 +90,40 @@
         </div>
     </div>
     @include('copy_book.insert')
-    {{-- <script>
+    <script>
         $(document).ready(function() {
-            $('#modal_insert').modal("show");
-        } );
-    </script> --}}
+            $('#increaseBtn').click(function() {
+                var currentValue = parseInt($('#amount').val());
+                $('#amount').val(currentValue + 1);
+            });
+            $('#decreaseBtn').click(function() {
+                var currentValue = parseInt($('#amount').val());
+                if (currentValue > 0) {
+                    $('#amount').val(currentValue - 1);
+                }
+            });
+        });
+        //ปุ่มแสดง modal สำหรับเพิ่มรายการ
+        function openModal(type, id, name) {
+            // url สำหรับอัพเดทข้อมูลตาม id
+            let urlcreate = "{{ route('book_copy.update', ['id' => ':id','math' => ':math']) }}";
+            urlcreate = urlcreate.replace(':id', id).replace(':math',type);
+            //ตัวแปรของ form
+            let formSubmit = $('#FormSubmit');
+            //เปลี่ยนคำบนหัว modal
+            if (type === 'minus') {
+                $('#modal-title').text('ลบสำเนา');
+            } else {
+                $('#modal-title').text('เพิ่มสำเนา');
+            }
+            // ลบค่าที่เคยกรอกไว้ทั้งหมด
+            formSubmit[0].reset();
+            //เอาชื่อหนังสือมาใส่ลงใน input
+            $('#Book_name').val(name);
+            //แก้ไข id ใน url modal
+            formSubmit.attr('action', urlcreate);
+            // เปิด Modal ขึ้นมา
+            $('#copy_BookCopy_insert').modal('show');
+        }
+    </script>
 @endsection()

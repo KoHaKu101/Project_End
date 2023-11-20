@@ -19,8 +19,7 @@
                                 </form>
                             </div>
                             <div class="col-lg-1">
-                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                    data-bs-target="#modal_insert">
+                                    <button type="button" class="btn btn-sm btn-success" onclick="createmodal()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มข้อมูล
                                 </button>
@@ -40,14 +39,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i = 0; $i <= 10; $i++)
+                                    @foreach ($data as $datalist )
                                         <tr>
-                                            <td class="text-center">{{ $i+1 }}</td>
-                                            <td>นิยาย</td>
-                                            <td>เป็นสื่อสำหรับฟังเสียง บลาๆๆๆๆๆ</td>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{$datalist->name}}</td>
+                                            <td>{{$datalist->desc}}</td>
 
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning">
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->getKey()}}')">
                                                     <i class="fas fa-edit"></i>
 
                                                 </button>
@@ -57,7 +56,7 @@
                                             </td>
 
                                         </tr>
-                                    @endfor
+                                    @endforeach 
                             </table>
                         </div>
                     </div>
@@ -66,9 +65,50 @@
         </div>
     </div>
     @include('type_media.insert')
-    {{-- <script>
-        $(document).ready(function() {
-            $('#modal_insert').modal("show");
-        } );
-    </script> --}}
+    <script>
+        //ปุ่มโหลด
+        function loadingSubmit() {
+            var button = $('#submitBTN');
+            var icon = $('#icon');
+            button.attr('disabled', 'disabled');
+            button.html('<i class="fas fa-arrows-rotate fa-spin me-2"></i>กำลังเพิ่มรายการ');
+            $('#FormSubmit').submit();
+        }
+        //ปุ่มแสดง modal สำหรับเพิ่มรายการ
+        function createmodal(){
+            let urlcreate = "{{route('media_type.create')}}";
+            $('#modal-title').text('เพิ่มประเภทสื่อ');
+            $('#name').val('');
+            $('#desc').val('');
+            $('#FormSubmit').attr('action',urlcreate);
+            $('#modal_TypeMedia_insert').modal('show');
+        }
+        //ปุ่มแสดง modal สำหรับเพิ่มแก้ไข
+        function editmodal(id) {
+            let urlUpdate = "{{route('media_type.update',['id'=>':id'])}}";
+            let urlFetch = "{{route('media_type.fetchData')}}";
+            $.ajax({
+                url: urlFetch,
+                method: 'GET',
+                data:{'id':id},
+                dataType: 'json',
+                success: function(data) {
+                    $('#name').val(data.name);
+                    $('#desc').val(data.desc);
+                    urlUpdate = urlUpdate.replace(':id', id);
+                    $('#FormSubmit').attr('action',urlUpdate);
+                    $('#modal-title').text('แก้ไขประเภทสื่อ');
+                    var button = $('#submitBTN');
+                    button.html('<i class="fas fa-save me-2"></i>บันทึก');
+                    $('#modal_TypeMedia_insert').modal('show');
+
+                },
+                error: function() {
+                    console.error('Error fetching data');
+                }
+            });
+            
+        }
+    </script>
+    
 @endsection()

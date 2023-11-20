@@ -8,6 +8,10 @@ class HomeController extends Controller
 {
     public function index()
     {
+
+        if (session()->get('Logged') != 'true') {
+            return redirect()->route('login');
+        }
         // if (Str::startsWith('http://127.0.0.1:8000/ser/dashboard', request()->url())){
             // return view('dashboard_ser');
         // }else{

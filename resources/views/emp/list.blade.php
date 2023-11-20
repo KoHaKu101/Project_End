@@ -12,17 +12,20 @@
                             <div class="col-lg-11">
                                 <form action="#">
                                     <div class="input-group ">
-                                        <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username" aria-describedby="basic-addon1" >
+                                        <span class="input-group-text" id="basic-addon1"><i
+                                                class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control form-control-sm"
+                                            placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username"
+                                            aria-describedby="basic-addon1">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
                             </div>
                             <div class="col-lg-1">
-                                <a href="{{ route('emp_insert') }}" class="btn btn-sm btn-success">
+                                <button type="button" class="btn btn-sm btn-success" onclick="createmodal()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มข้อมูล
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -33,38 +36,31 @@
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col" style="width: 15%">รหัสเจ้าหน้าที่</th>
-                                        <th scope="col" >ชื่อ-นามสกุล</th>
+                                        <th scope="col">ชื่อ-นามสกุล</th>
                                         <th scope="col" style="width: 15%">ตำแหน่ง</th>
                                         <th scope="col" style="width: 15%">เบอร์โทร</th>
                                         <th scope="col" style="width: 8%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i=0; $i <=10;$i++)
-                                    <tr>
-                                        <td class="text-center">{{ $i+1 }}</td>
-                                        <td>@php
-                                            $isbn = "";
-                                            for ($num = 0; $num < 12; $num++) {
-                                                $isbn .= rand(0, 9);
-                                            };
-                                            echo $isbn;
-                                        @endphp</td>
-                                        <td>xxxxxxx</td>
-                                        <td>เจ้าหน้าที่ฝ่ายบริการ</td>
-                                        <td>0883004952</td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-edit"></i>
+                                    @foreach ($data as $datalist)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{ $datalist->getKey() }}</td>
+                                            <td>{{ $datalist->f_name . ' ' . $datalist->l_name }}</td>
+                                            <td>{{ $statusArray[$datalist->status] }}</td>
+                                            <td>{{ $datalist->tel }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->getKey()}}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
 
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-
-                                    </tr>
-                                    @endfor
+                                        </tr>
+                                    @endforeach
                             </table>
                         </div>
                     </div>
@@ -72,4 +68,50 @@
             </div>
         </div>
     </div>
+    @include('emp.insert')
+    <script>
+        //ปุ่มโหลด
+        function loadingSubmit() {
+            var button = $('#submitBTN');
+            var icon = $('#icon');
+            button.attr('disabled', 'disabled');
+            button.html('<i class="fas fa-arrows-rotate fa-spin me-2"></i>กำลังบันทึก');
+            $('#FormSubmit').submit();
+        }
+        //ปุ่มแสดง modal สำหรับเพิ่มรายการ
+        function createmodal() {
+            let urlcreate = "{{ route('emp.create') }}";
+            let formSubmit = $('#FormSubmit');
+            $('#modal-title').text('เพิ่มข้อเจ้าหน้าที่');
+            formSubmit.attr('action', urlcreate);
+            $('#modal_Emp_insert').modal('show');
+            formSubmit[0].reset();
+        }
+        function editmodal(id) {
+            let urlUpdate = "{{route('emp.update',['id'=>':id'])}}";
+            let urlFetch = "{{route('emp.fetchData')}}";
+            $.ajax({
+                url: urlFetch,
+                method: 'GET',
+                data:{'id':id},
+                dataType: 'json',
+                success: function(data) {
+                    var fields = ['f_name', 'l_name', 'id_card', 'birthday', 'age', 'gender', 'status', 'tel', 'username', 'address'];
+                    fields.forEach(function(field) {
+                        if (data[field]) {
+                        $('#' + field).val(data[field]);
+                        }
+                    });
+                    urlUpdate = urlUpdate.replace(':id', id);
+                    $('#FormSubmit').attr('action',urlUpdate);
+                    $('#modal-title').text('แก้ไขข้อมูลเจ้าหน้าที่');
+                    $('#modal_Emp_insert').modal('show');
+                },
+                error: function() {
+                    console.error('Error fetching data');
+                }
+            });
+            
+        }
+    </script>
 @endsection()

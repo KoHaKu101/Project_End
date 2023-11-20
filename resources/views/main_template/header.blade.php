@@ -8,7 +8,7 @@
                 <i class="fas fa-bell"></i>
             </button>
             <button class="btn btn-block" type="button">
-                <i class="fas fa-user me-2"></i>Username<i class="fa-solid fa-chevron-down mx-2"></i>
+                <i class="fas fa-user me-2"></i>{{session()->get('FirstName')}}<i class="fa-solid fa-chevron-down mx-2"></i>
             </button>
         </div>
     </div>
