@@ -7,9 +7,10 @@ use App\Models\CopyBook;
 use App\Models\TypeBook;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
-
+use Illuminate\Support\Facades\Validator;
 class BookController extends Controller
 {
+    
     public function index()
     {
         $data = Book::orderby('created_at')->get();
@@ -18,6 +19,20 @@ class BookController extends Controller
     }
     public function create(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'type_book_id' => 'required',
+            'name' => 'required',
+            'author' => 'required',
+            'publisher' => 'required',
+            'edition' => 'required',
+            'year' => 'required',
+            'original_page' => 'required',
+            'isbn' => 'required'
+        ]);
+        if ($validator->fails()) {
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         $book_id = Book::generateID();
         Book::create([
             'book_id' => $book_id,
@@ -48,8 +63,23 @@ class BookController extends Controller
     }
     public function update(Request $request, $id)
     {
+        $validator = Validator::make($request->all(), [
+            'type_book_id' => 'required',
+            'name' => 'required',
+            'author' => 'required',
+            'publisher' => 'required',
+            'edition' => 'required',
+            'year' => 'required',
+            'original_page' => 'required',
+            'isbn' => 'required'
+        ]);
+        if ($validator->fails()) {
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         $data = Book::find($id);
         $data->update($request->all());
+        $data->update(['updated_at' => now()]);
         
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();

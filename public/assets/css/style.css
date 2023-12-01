@@ -1,22 +1,26 @@
 *,
 ::after,
-::before{
+::before {
     box-sizing: border-box;
 }
+
 a {
     cursor: pointer;
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
 }
-li{
+
+li {
     list-style: none;
 }
-.wrapper{
+
+.wrapper {
     align-items: stretch;
     display: flex;
     width: 100%;
 }
-#sidebar{
+
+#sidebar {
     background-color: #A29BFE;
     max-width: 264px;
     min-width: 264px;
@@ -24,7 +28,8 @@ li{
     box-shadow: 0 0 35px 0 rgba(49, 57, 66, 0.5);
     z-index: 1111;
 }
-.main{
+
+.main {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -32,6 +37,7 @@ li{
     overflow: hidden;
     transition: all 0.35s ease-in-out;
 }
+
 .sidebar-logo {
     display: block;
     margin-left: auto;
@@ -39,22 +45,27 @@ li{
     width: 50%;
     padding: 1.15rem 1.5rem;
 }
+
 .sidebar-logo a {
     color: #000000;
     font-size: 1.25rem;
     font-weight: 600;
 }
-.img-logo{
+
+.img-logo {
     width: 100px;
 }
+
 .sidebar-nav {
     padding: 0;
 }
+
 .sidebar-header {
     color: #000000;
     font-size: .75rem;
     padding: 1.5rem 1.5rem .375rem;
 }
+
 a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #000000;
@@ -62,6 +73,7 @@ a.sidebar-link {
     display: block;
     font-size: 1rem;
 }
+
 .sidebar-link[data-bs-toggle="collapse"]::after {
     border: solid;
     border-width: 0 .075rem .075rem 0;
@@ -74,21 +86,43 @@ a.sidebar-link {
     transform: rotate(-135deg);
     transition: all 1s ease-out;
 }
+
 .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all 1s ease-out;
 }
-.sidebar-item{
+
+.sidebar-item {
     background-color: #C0BBFF;
 }
+
 .content {
     flex: 1;
     max-width: 100%;
     width: 100%;
 }
-.list-unstyled{
+
+.list-unstyled {
     padding-left: 10% !important;
 }
-.form-group.row > div{
+
+.form-group.row>div {
     padding-bottom: calc(var(--bs-gutter-x) * .5);
+}
+
+.badge {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }

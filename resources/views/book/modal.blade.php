@@ -1,10 +1,10 @@
 <div class="modal fade" id="modal_Book_insert" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <form method="POST" id="FormSubmit">
+            <form method="POST" id="FormSubmitBook" action="#">
               @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-title">เพิ่มประเภทสื่อ</h5>
+                    <h5 class="modal-titleBook" id="modal-title">เพิ่มหนังสือ</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -16,8 +16,8 @@
                             <div class="col-lg-3">
                                 <label class="control-label">หมวดหมู่หนังสือ</label>
                                 <select class="form-select form-select-sm" id="type_book_id" name="type_book_id">
-                                    @foreach ($type_book as $type_book_option)
-                                        <option value="{{$type_book_option->getKey()}}">{{$type_book_option->name}}</option>
+                                    @foreach ($type_book as $type_book_select)
+                                        <option value="{{$type_book_select->type_book_id}}">{{$type_book_select->name}}</option>
                                     @endforeach
                                 </select>
                             </div>

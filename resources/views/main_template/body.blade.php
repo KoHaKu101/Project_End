@@ -13,6 +13,11 @@
 </head>
 
 <body>
+    @php
+        $username = session()->get('username');
+        $emp_data = App\Models\Emp::where('username', $username)->first();
+        $fullname = $emp_data->f_name  .' '. $emp_data->l_name               
+    @endphp
     @include('sweetalert::alert')
     <div class="wrapper">
         {{-- ส่วนเมนูด้านข้าง --}}

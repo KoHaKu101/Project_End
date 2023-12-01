@@ -1,17 +1,17 @@
-<div class="modal fade" id="modal_Book_insert" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal_media" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg   ">
         <div class="modal-content">
             <form method="POST" id="FormSubmit">
               @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modal-title">เพิ่มประเภทสื่อ</h5>
+                    <h5 class="modal-title" id="modal-title">เพิ่มสื่อ</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="form-group row" >
                             <div class="col-lg-4">
                                 <label class="control-label">ทะเบียนสื่อ</label>
-                                <input type="text" class="form-control form-control-sm"disabled value="123456">
+                                <input type="text" class="form-control form-control-sm" id="number" name="number" disabled value="-----">
                             </div>
                             <div class="col-lg-8">
                                 <label class="control-label">หนังสือ</label>
@@ -23,7 +23,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <label class="control-label">ประเภทสื่อ</label>
-                                <select class="form-select form-select-sm">
+                                <select class="form-select form-select-sm" id="type_media_id" name="type_media_id">
                                     @foreach ($dataMediaType as $MediaType)
                                         <option value="{{$MediaType->type_media_id}}">{{$MediaType->name}}</option>
                                     @endforeach
@@ -31,25 +31,25 @@
                             </div>
                             <div class="col-lg-4">
                                 <label class="control-label">ระบบเสียง</label>
-                                <input type="text" class="form-control form-control-sm" placeholder="กรอกข้อมูลระบบเสียง">
+                                <input type="text" class="form-control form-control-sm" id="sound_sys" name="sound_sys" placeholder="กรอกข้อมูลระบบเสียง">
                             </div>
                             <div class="col-lg-4">
                                 <label class="control-label">จำนวนหน้าอักษรเบลล์</label>
-                                <input type="number" class="form-control form-control-sm" placeholder="จำนวนหน้าอักษรเบลล์(ตัวเลข)">
+                                <input type="number" class="form-control form-control-sm" id="braille_page" name="braille_page" placeholder="จำนวนหน้าอักษรเบลล์(ตัวเลข)">
                             </div>
                             <div class="col-lg-4">
                                 <label class="control-label">จำนวนเล่มจบ</label>
-                                <input type="number" class="form-control form-control-sm"  placeholder="จำนวนเล่มจบ(ตัวเลข)">
+                                <input type="number" class="form-control form-control-sm" id="amount_end" name="amount_end"  placeholder="จำนวนเล่มจบ(ตัวเลข)">
                             </div>
                             <div class="col-lg-4">
                                 <label class="control-label">แหล่งที่มา</label>
-                                <input type="text" class="form-control form-control-sm"  placeholder="กรอกข้อมูลแหล่งที่มา">
+                                <input type="text" class="form-control form-control-sm" id="source" name="source" placeholder="กรอกข้อมูลแหล่งที่มา">
 
                             </div>
 
                             <div class="col-lg-12">
                                 <label class="control-label">ผู้ที่แปลสื่อหรือพากย์เสียง</label>
-                                <input type="text" class="form-control form-control-sm" >
+                                <input type="text" class="form-control form-control-sm" id="translator" name="translator" >
 
                             </div>
                         </div>

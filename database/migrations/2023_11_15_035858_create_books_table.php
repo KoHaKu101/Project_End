@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('isbn',13)->unique();
             $table->string('level',10)->nullable();
             $table->timestamps();
-
         });
         
     }

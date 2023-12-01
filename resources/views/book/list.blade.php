@@ -22,7 +22,7 @@
                                 </form>
                             </div>
                             <div class="col-lg-1">
-                                <button class="btn btn-sm btn-success" onclick="createmodal()">
+                                <button class="btn btn-sm btn-success" onclick="OpenModal()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มข้อมูล
                                 </button>
@@ -44,15 +44,20 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $datalist)
+                                    @php
+                                        $type_book_name = optional($datalist->TypeBook)->name ?? "" ;
+                                        $amount = optional($datalist->CopyBook)->amount ?? 0;
+                                        $copy_id = optional($datalist->CopyBook)->copy_id ?? "";
+                                    @endphp
                                         <tr>
                                             <td class="text-center">{{ $loop->index + 1 }}</td>
                                             <td>{{ $datalist->name }}</td>
-                                            <td>{{ $datalist->TypeBook->name }}</td>
+                                            <td>{{ $type_book_name }}</td>
                                             <td>{{ $datalist->isbn }}</td>
-                                            <td>
+                                            <td >
                                                 <span
-                                                    class="badge {{ $datalist->copyBook->amount > 0 ? 'bg-success' : 'bg-warning' }}">
-                                                    {{ $datalist->copyBook->amount > 0 ? 'มีสำเนา' : 'ยังไม่มี' }}
+                                                    class="badge {{ is_null($datalist->updated_at) ? 'bg-danger': ($amount > 0 ? 'bg-success' : 'bg-warning text-dark') }}" >
+                                                    {{ is_null($datalist->updated_at) ? 'ไม่มีข้อมูล': ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา') }} 
                                                 </span>
                                             </td>
                                             <td>
@@ -63,9 +68,9 @@
                                                 <button type="button" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
-                                                @if ($datalist->copyBook->amount == 0)
+                                                @if ($amount == 0)
                                                     <button type="button" class="btn btn-sm btn-primary"
-                                                        onclick="openModal('minus', '{{ $datalist->copyBook->copy_id }}', '{{ $datalist->name }}')">
+                                                        onclick="openModalCopy('plus', '{{ $copy_id }}', '{{ $datalist->name }}')">
                                                         <i class="fas fa-copy"></i>
                                                         เพิ่มสำเนา
                                                     </button>
@@ -81,16 +86,16 @@
         </div>
     </div>
     @include('copy_book.insert')
-    @include('book.insert')
+    @include('book.modal')
     <script>
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
-        function createmodal() {
-            let urlcreate = "{{ route('book.create') }}";
-            let formSubmit = $('#FormSubmit');
-            $('#modal-title').text('เพิ่มหนังสือ');
-            formSubmit.attr('action', urlcreate);
-            $('#modal_Book_insert').modal('show');
+        function OpenModal() {
+            var url = "{{ route('book.create') }}";
+            var formSubmit = $('#FormSubmitBook');
+            $('#modal-titleBook').text('เพิ่มหนังสือ');
+            formSubmit.attr('action', url);
             formSubmit[0].reset();
+            $('#modal_Book_insert').modal('show');
         }
         function editmodal(id) {
             let urlUpdate = "{{ route('book.update', ['id' => ':id']) }}";
@@ -112,17 +117,16 @@
                         }
                     });
                     urlUpdate = urlUpdate.replace(':id', id);
-                    $('#FormSubmit').attr('action', urlUpdate);
-                    $('#modal-title').text('แก้ไขข้อมูลหนังสือ');
+                    $('#FormSubmitBook').attr('action', urlUpdate);
                     $('#modal_Book_insert').modal('show');
+                    $('#modal-titleBook').text('แก้ไขข้อมูลหนังสือ');
                 },
                 error: function() {
                     console.error('Error fetching data');
                 }
             });
-
         }
-        $(document).ready(function() {
+        function plusMinusBTN(){
             $('#increaseBtn').click(function() {
                 var currentValue = parseInt($('#amount').val());
                 $('#amount').val(currentValue + 1);
@@ -133,9 +137,9 @@
                     $('#amount').val(currentValue - 1);
                 }
             });
-        });
-
-        function openModal(type, id, name) {
+        }
+        function openModalCopy(type, id, name) {
+            plusMinusBTN();
             // url สำหรับอัพเดทข้อมูลตาม id
             let urlcreate = "{{ route('book_copy.update', ['id' => ':id', 'math' => ':math']) }}";
             urlcreate = urlcreate.replace(':id', id).replace(':math', type);

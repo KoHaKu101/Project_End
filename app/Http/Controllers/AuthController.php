@@ -19,7 +19,7 @@ class AuthController extends Controller
         ]);
         $username = $request->username;
         $password = $request->password;
-        $dataEmp = Emp::select('username','password','f_name')->where('username',$username)->first();
+        $dataEmp = Emp::select('username','password','status')->where('username',$username)->first();
         if(is_Null($dataEmp)){
             dd('false');
             return redirect()->route('login');
@@ -30,8 +30,9 @@ class AuthController extends Controller
         }
         Session::put('Logged', 'true');
         Session::put('username', $dataEmp->username);
-        Session::put('FirstName', $dataEmp->f_name);
-        return redirect()->route('dashboard_pd');
+        Session::put('status', $dataEmp->status);
+        $route_name = $dataEmp->status == 1 ? 'dashboard_pd' : 'dashboard_ser';
+        return redirect()->route($route_name);
     }
     
 }

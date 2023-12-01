@@ -2,20 +2,6 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/select2-bootstrap-5-theme.css') }}">
-    
-    <style>
-        /* Chrome, Safari, Edge, Opera */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* Firefox */
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-    </style>
 @endsection
 @section('body')
     <div class="row">
@@ -61,37 +47,33 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i = 0; $i <= 10; $i++)
+                                    @foreach ($dataMedia as $dataMedialist)
                                         <tr>
-                                            <td class="text-center">{{ $i + 1 }}</td>
-                                            <td>เพรชสังหาร</td>
-                                            <td>นิยาย</td>
-                                            <td>อักษรเบลล์</td>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{ $dataMedialist->Book->name }}</td>
+                                            <td>{{ $dataMedialist->Book->TypeBook->name }}</td>
+                                            <td>{{ $dataMedialist->TypeMedia->name }}</td>
                                             @php
-                                                $arr = ['a' => 'กำลังผลิต', 'b' => 'ตรวจเช็คเรียบร้อย'];
-                                                shuffle($arr);
-                                                $color_status = ['กำลังผลิต' => 'bg-warning', 'ตรวจเช็คเรียบร้อย' => 'bg-success'];
-                                                echo '<td><span class="badge ' . $color_status[$arr[0]] . '">' . $arr[0] . '</span></td>';
+                                                $statusNumber = $dataMedialist->status;
+                                                $statusArray = [1 => 'กำลังผลิต', 2 => 'ตรวจเช็คเรียบร้อย'];
+                                                $color_status = [1 => 'bg-warning', 2 => 'bg-success'];
+                                                $statusBadge = '<span class="badge ' . $color_status[$statusNumber] . ' text-dark" >' . $statusArray[$statusNumber] . '</span>';
                                             @endphp
-
+                                            <td>{!! $statusBadge !!}</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                                @if (Str::is('กำลังผลิต', $arr[0]))
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#status_insert">
-                                                        อัพเดพสถานะ
-                                                    </button>
+                                                <button type="button" class="btn btn-sm btn-warning"
+                                                    onclick="editmodal('{{ $dataMedialist->media_id }}')"><i
+                                                        class="fas fa-edit"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger"><i
+                                                        class="fas fa-trash"></i></button>
+                                                @if ($statusNumber == 1)
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-primary"data-bs-toggle="modal"
+                                                        data-bs-target="#status_insert">อัพเดพสถานะ</button>
                                                 @endif
-
                                             </td>
-
                                         </tr>
-                                    @endfor
+                                    @endforeach
                             </table>
                         </div>
                     </div>
@@ -100,36 +82,112 @@
         </div>
     </div>
     @include('media.status')
-    @include('media.insert')
+    @include('media.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script>
-        $(document).ready(function () {
-            $('#modal_Book_insert').modal({backdrop: 'static', keyboard: false})  
+        $(document).ready(function() {
+            $('#modal_Book_insert').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
         });
+
         function createmodal() {
-            createSelect2();
-            let url = "{{ route('book.create') }}";
+            let url = "{{ route('media.create') }}";
             let formSubmit = $('#FormSubmit');
+            let input_book_id = $(`<select id="book_id" name="book_id" ></select>`);
             formSubmit.attr('action', url);
             formSubmit[0].reset();
+            $('#modal-title').text('เพิ่มสื่อ');
+            $('#modal_media').modal('show');
+            $('#book_id').replaceWith(input_book_id);
 
-            $('#modal-title').text('เพิ่มหนังสือ');
-            $('#modal_Book_insert').modal('show');
-        }
-        $('#book_id').on('change', function() {
-            let book_id = $('#book_id').val();
-            let url = `{{route('media.fetchData.bookType')}}`;
-            $.ajax({
-                type: "GET",
-                url: url,
-                data: {'book_id':book_id},
-                dataType: "json",
-                success: function (data) {
+            $('#type_media_id').prop('disabled', false);
+            createSelect2();
+            function fetchData(url, params, successCallback) {
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: params,
+                    dataType: "json",
+                    success: successCallback
+                });
+            }
+
+            function showBookType(book_id) {
+                let url = `{{ route('media.fetchData.bookType') }}`;
+                fetchData(url, {
+                    'book_id': book_id
+                }, function(data) {
                     $('#book_type').val(data.name);
+                });
+            }
+
+            function showNumber(book_id, type_media_id) {
+                let url = `{{ route('media.fetchData.number') }}`;
+                fetchData(url, {
+                    'book_id': book_id,
+                    'type_media_id': type_media_id
+                }, function(number) {
+                    $('#number').val(number);
+                });
+            }
+
+            $('#book_id').on('change', function() {
+                let book_id = $('#book_id').val();
+                let type_media_id = $('#type_media_id').val();
+                showBookType(book_id);
+                showNumber(book_id, type_media_id);
+            });
+
+            $('#type_media_id').on('change', function() {
+                let type_media_id = $('#type_media_id').val();
+                let book_id = $('#book_id').val();
+                showNumber(book_id, type_media_id);
+            });
+        }
+
+        function editmodal(id) {
+            let urlUpdate = "{{ route('media.update', ['id' => ':id']) }}";
+            let urlFetch = "{{ route('media.fetchData') }}";
+            $.ajax({
+                url: urlFetch,
+                method: 'GET',
+                data: {
+                    'id': id
+                },
+                dataType: 'json',
+                success: function(data) {
+                    createSelect2();
+                    $('#book_id').select2('destroy');
+                    let input_book_id = $(`<input type="text" class="form-control form-control-sm" id="book_id" name="book_id" disabled>`);
+                    $('#book_id').replaceWith(input_book_id);
+                    urlUpdate = urlUpdate.replace(':id', id);
+                    $('#type_media_id').prop('disabled', true);
+                    $('#modal-title').text('แก้ไขข้อมูลสื่อ');
+                    $('#FormSubmit').attr('action', urlUpdate);
+                    var fields = ['number', 'type_media_id', 'sound_sys', 'braille_page', 'amount_end',
+                        'source', 'translator'
+                    ];
+                    fields.forEach(function(field) {
+                        if (data.media_data[field]) {
+                            $('#' + field).val(data.media_data[field]);
+                        }
+                    });
+
+                    $('#modal_media').modal('show');
+
+                },
+                error: function() {
+                    console.error('Error fetching data');
                 }
             });
-        });
-        function createSelect2(){
+
+        }
+
+
+
+        function createSelect2() {
             let url = `{{ route('media.fetchData.book') }}`;
             $('#book_id').select2({
                 theme: 'bootstrap-5',
@@ -158,39 +216,9 @@
                     cache: true
                 },
                 placeholder: 'ค้นหาหนังสือ',
-                minimumInputLength: 1,
-                dropdownParent: '#modal_Book_insert',
+                // minimumInputLength: 1,
+                dropdownParent: '#modal_media',
             });
-        }
-        function editmodal(id) {
-            let urlUpdate = "{{ route('book.update', ['id' => ':id']) }}";
-            let urlFetch = "{{ route('book.fetchData') }}";
-            $.ajax({
-                url: urlFetch,
-                method: 'GET',
-                data: {
-                    'id': id
-                },
-                dataType: 'json',
-                success: function(data) {
-                    var fields = ['name', 'type_book_id', 'author', 'publisher', 'edition', 'year',
-                        'original_page', 'isbn', 'level'
-                    ];
-                    fields.forEach(function(field) {
-                        if (data[field]) {
-                            $('#' + field).val(data[field]);
-                        }
-                    });
-                    urlUpdate = urlUpdate.replace(':id', id);
-                    $('#FormSubmit').attr('action', urlUpdate);
-                    $('#modal-title').text('แก้ไขข้อมูลหนังสือ');
-                    $('#modal_Book_insert').modal('show');
-                },
-                error: function() {
-                    console.error('Error fetching data');
-                }
-            });
-
         }
     </script>
 @endsection()

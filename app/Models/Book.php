@@ -10,7 +10,8 @@ class Book extends Model
     use HasFactory;
     protected $primaryKey = 'book_id';
     public $incrementing = false;
-
+    public $timestamps = true;
+    const UPDATED_AT = null;
     public static function generateID()
     {
         $dataDB = self::select('book_id')->latest()->first();
@@ -22,11 +23,11 @@ class Book extends Model
         }
         return $id;
     }
-    public function typeBook()
+    public function TypeBook()
     {
         return $this->belongsTo(TypeBook::class, 'type_book_id');
     }
-    public function copyBook()
+    public function CopyBook()
     {
         return $this->hasOne(CopyBook::class, 'book_id');
     }
@@ -41,6 +42,10 @@ class Book extends Model
         'year',
         'original_page',
         'isbn',
-        'level'
+        'level',
+        'updated_at'
+    ];
+    protected $casts = [
+        'updated_at' => 'datetime',
     ];
 }

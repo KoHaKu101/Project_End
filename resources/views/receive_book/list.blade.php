@@ -1,0 +1,221 @@
+@extends('main_template/body')
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/select2-bootstrap-5-theme.css') }}">
+@endsection
+@section('body')
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>รายการ รับหนังสือ</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group row">
+                            <div class="col-lg-11">
+                                <form action="#">
+                                    <div class="input-group ">
+                                        <span class="input-group-text" id="basic-addon1"><i
+                                                class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control form-control-sm"
+                                            placeholder="ค้นหารายการรับหนังสือ" aria-label="Username"
+                                            aria-describedby="basic-addon1">
+                                        <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-lg-1">
+
+                                <button type="button" class="btn btn-sm btn-success"onclick='openModal()'>
+                                    <i class="fas fa-plus"></i>
+                                    รับหนังสือ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                        <th scope="col">ชื่อหนังสือ</th>
+                                        <th scope="col" style="width: 15%">ประเภทการรับ</th>
+                                        <th scope="col" style="width: 15%">วันที่รับ</th>
+                                        <th scope="col" style="width: 15%">เจ้าหน้าที่ที่รับ</th>
+                                        <th scope="col" style="width: 22%">รายละเอียดเพิ่มเติม</th>
+                                        <th scope="col" style="width: 8%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($data as $datalist)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{ $datalist->book_name }}</td>
+                                            @php
+                                                $add_type = [1 => 'บริจาค', 2 => 'ซื้อ', 3 => 'กระทรวงศึกษา'];
+                                                $carbonDate = Carbon\Carbon::parse($datalist->add_date);
+                                                $thaiYear = $carbonDate->addYears(543)->format('d/m/Y');
+                                                $emp = $datalist->Emp;
+                                                $fullname = $emp->f_name . ' ' . $emp->l_name;
+                                            @endphp
+                                            <td>{{ $add_type[$datalist->add_type] }}</td>
+                                            <td>{{ $thaiYear }}</td>
+                                            <td>{{ $fullname }}</td>
+                                            <td>{{ $datalist->desc }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-info"
+                                                    onclick="editmodal('{{ $datalist->recv_id }}')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="deleteshow('{{ $datalist->recv_id }}')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    @endforeach
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @include('receive_book.modal')
+    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+    <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
+
+    <script>
+        function openModal() {
+            var fields = ['book_name', 'add_type', 'desc'];
+            fields.forEach(function(field) {
+                $('#' + field).prop('disabled', false);
+            });
+            $('#btn_modal_receive').attr('hidden', false);
+            var form = $('#form_modal_receive');
+            form[0].reset();
+            $('#modal_receive').modal('show');
+            let input_book_name = $(`<select id="book_name" name="book_name" ></select>`);
+            $('#book_name').replaceWith(input_book_name);
+            createSelect2();
+        }
+
+        function SubmitForm() {
+            var btn = $('#btn_modal_receive');
+            var form = $('#form_modal_receive');
+            var url = `{{ route('receive.create') }}`;
+            form.attr('action', url);
+            loadingButton(btn);
+            form.submit();
+        }
+
+        function editmodal(id) {
+            var url = `{{ route('receive.fetchData') }}`;
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {
+                    'id': id
+                },
+                dataType: 'json',
+                success: function(data) {
+                    createSelect2();
+                    $('#book_name').select2('destroy');
+                    let input_book_name = $(`<input type="text" class="form-control form-control-sm" id="book_name" name="book_name" disabled>`);
+                    $('#book_name').replaceWith(input_book_name);
+                    
+                    var fields = ['book_name','add_date', 'add_type', 'desc'];
+                    
+                    fields.forEach(function(field) {
+                        if (data.receive[field]) {
+                            $('#' + field).prop('disabled', true);
+                            $('#' + field).val(data.receive[field]);
+                        }
+                    });
+                    $('#btn_modal_receive').attr('hidden', true);
+                    $('#emp').val(data.emp.f_name + ' ' + data.emp.l_name);
+                    $('#modal_receive').modal('show');
+                },
+                error: function() {
+                    console.error('Error fetching data');
+                }
+            });
+        }
+
+        function deleteshow(id) {
+            Swal.fire({
+                title: 'ต้องการลบจริงมั้ย ? ',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#157347',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = `{{ route('receive.delete', ['id' => ':id']) }}`;
+                    url = url.replace(':id', id);
+                    $.ajax({
+                        url: url,
+                        method: 'get',
+                        success: function(response) {
+                            if (response == true) {
+                                Swal.fire({
+                                    title: 'ลบรายการสำเร็จ',
+                                    icon: 'success',
+                                    confirmButtonColor: '#157347',
+                                    confirmButtonText: 'ยืนยัน',
+                                }).then((result) => {
+                                    location.reload();
+                                })
+                            } else {
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด!',
+                                    text: 'ไม่สามารถลบได้เนื่องจากมีหนังสือใช้งานอยู่',
+                                    icon: 'error',
+                                    confirmButtonText: 'รับทราบ'
+                                })
+                            }
+
+                        },
+                        error: function(xhr, status, error) {
+
+                        }
+                    });
+                }
+            });
+        }
+        function createSelect2() {
+            let url = `{{ route('media.fetchData.book') }}`;
+            $('#book_name').select2({
+                theme: 'bootstrap-5',
+                ajax: {
+                    url: url,
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: function(data) {
+                        return {
+                            results: data.map(function(item) {
+                                return {
+                                    id: item.book_id,
+                                    text: item.name
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                // cache: true,
+                tags: true,
+                // maximumSelectionLength:1,
+                placeholder: 'ชื่อหนังสือ',
+                // minimumInputLength: 1,
+                dropdownParent: '#modal_receive',
+            });
+        }
+    </script>
+@endsection()
