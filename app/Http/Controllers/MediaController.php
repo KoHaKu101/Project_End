@@ -52,6 +52,7 @@ class MediaController extends Controller
         return redirect()->back();
     }
     public function fetchData(Request $request){
+
         $mediaData = Media::find($request->id);
         $BookType = $mediaData->Book->TypeBook->name;
         $data = [
@@ -67,6 +68,7 @@ class MediaController extends Controller
         return redirect()->back();
     }
     public function fetchDataBook(Request $request){
+
         $term = $request->term;
         $books = Book::where('name', 'like', '%' . $term . '%')
         ->select('book_id', 'name')

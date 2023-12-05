@@ -30,55 +30,93 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-12">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                        <th scope="col">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 15%">หมวดหมู่หนังสือ</th>
-                                        <th scope="col" style="width: 15%">เลข ISBN</th>
-                                        <th scope="col" style="width: 15%">สถานะสำเนา</th>
-                                        <th scope="col" style="width: 15%"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($data as $datalist)
-                                    @php
-                                        $type_book_name = optional($datalist->TypeBook)->name ?? "" ;
-                                        $amount = optional($datalist->CopyBook)->amount ?? 0;
-                                        $copy_id = optional($datalist->CopyBook)->copy_id ?? "";
-                                    @endphp
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+                                    data-bs-target="#tab_book" type="button" role="tab" aria-controls="tab_book"
+                                    aria-selected="true">หนังสือทั่วไป</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab_newBook"
+                                    type="button" role="tab" aria-controls="tab_newBook"
+                                    aria-selected="false">หนังสือใหม่</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="ex1-content">
+                            <div class="tab-pane fade show active" id="tab_book"
+                                role="tabpanel"aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                                <th scope="col">ชื่อหนังสือ</th>
+                                                <th scope="col" style="width: 15%">หมวดหมู่หนังสือ</th>
+                                                <th scope="col" style="width: 15%">เลข ISBN</th>
+                                                <th scope="col" style="width: 15%">สถานะสำเนา</th>
+                                                <th scope="col" style="width: 15%"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($Book as $datalist)
+                                                @php
+                                                    $type_book_name = optional($datalist->TypeBook)->name ?? '';
+                                                    $amount = optional($datalist->CopyBook)->amount ?? 0;
+                                                    $copy_id = optional($datalist->CopyBook)->copy_id ?? '';
+                                                @endphp
+                                                <tr>
+                                                    <td class="text-center">{{ $loop->index + 1 }}</td>
+                                                    <td>{{ $datalist->name }}</td>
+                                                    <td>{{ $type_book_name }}</td>
+                                                    <td>{{ $datalist->isbn }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge {{ is_null($datalist->updated_at) ? 'bg-danger' : ($amount > 0 ? 'bg-success' : 'bg-warning text-dark') }}">
+                                                            {{ is_null($datalist->updated_at) ? 'ไม่มีข้อมูล' : ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา') }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-warning"
+                                                            onclick="editmodal('{{ $datalist->getKey() }}')">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                        @if ($amount == 0)
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                onclick="openModalCopy('plus', '{{ $copy_id }}', '{{ $datalist->name }}')">
+                                                                <i class="fas fa-copy"></i>
+                                                                เพิ่มสำเนา
+                                                            </button>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="tab_newBook" role="tabpanel" aria-labelledby="ex1-tab-1">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                            <th scope="col">ชื่อหนังสือ</th>
+                                            <th scope="col" style="width: 15%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($ReceiveBookDesc as $datalist)
                                         <tr>
                                             <td class="text-center">{{ $loop->index + 1 }}</td>
-                                            <td>{{ $datalist->name }}</td>
-                                            <td>{{ $type_book_name }}</td>
-                                            <td>{{ $datalist->isbn }}</td>
-                                            <td >
-                                                <span
-                                                    class="badge {{ is_null($datalist->updated_at) ? 'bg-danger': ($amount > 0 ? 'bg-success' : 'bg-warning text-dark') }}" >
-                                                    {{ is_null($datalist->updated_at) ? 'ไม่มีข้อมูล': ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา') }} 
-                                                </span>
-                                            </td>
+                                            <td>{{ $datalist->ReceiveBook->book_name }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning"
-                                                    onclick="editmodal('{{ $datalist->getKey() }}')">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                                @if ($amount == 0)
-                                                    <button type="button" class="btn btn-sm btn-primary"
-                                                        onclick="openModalCopy('plus', '{{ $copy_id }}', '{{ $datalist->name }}')">
-                                                        <i class="fas fa-copy"></i>
-                                                        เพิ่มสำเนา
-                                                    </button>
-                                                @endif
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="OpenModalBookNew('{{$datalist->recd_id}}','{{$datalist->ReceiveBook->book_name}}')"><i class="fas fa-plus"></i>เพิ่มข้อมูล</button>
                                             </td>
                                         </tr>
                                     @endforeach
-                            </table>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,6 +125,8 @@
     </div>
     @include('copy_book.insert')
     @include('book.modal')
+    @include('book.modalBookNew')
+
     <script>
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
@@ -97,6 +137,15 @@
             formSubmit[0].reset();
             $('#modal_Book_insert').modal('show');
         }
+        function OpenModalBookNew(id,name){
+            let urlcreate = "{{ route('bookNew.create', ['id' => ':id']) }}";
+            urlcreate = urlcreate.replace(':id', id);
+            let formSubmit = $('#FormNewBook');
+            formSubmit.attr('action', urlcreate);
+            $('#FormNewBook').find('input#name').val(name);
+            $('#modal_BookNew_insert').modal('show');
+        }
+
         function editmodal(id) {
             let urlUpdate = "{{ route('book.update', ['id' => ':id']) }}";
             let urlFetch = "{{ route('book.fetchData') }}";
@@ -126,7 +175,8 @@
                 }
             });
         }
-        function plusMinusBTN(){
+
+        function plusMinusBTN() {
             $('#increaseBtn').click(function() {
                 var currentValue = parseInt($('#amount').val());
                 $('#amount').val(currentValue + 1);
@@ -138,6 +188,7 @@
                 }
             });
         }
+
         function openModalCopy(type, id, name) {
             plusMinusBTN();
             // url สำหรับอัพเดทข้อมูลตาม id
@@ -159,6 +210,13 @@
             formSubmit.attr('action', urlcreate);
             // เปิด Modal ขึ้นมา
             $('#copy_BookCopy_insert').modal('show');
+        }
+        function SubmitForm(form) {
+            var form = $('#'+form);  
+            var btn = form.find('button#submitBTN');
+            loadingButton(btn);
+            form.submit();
+            
         }
     </script>
 @endsection()

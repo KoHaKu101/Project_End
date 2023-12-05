@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('translator',255)->nullable();
             $table->string('sound_sys',50)->nullable();
             $table->string('source',50)->nullable();
+            $table->string('file_location',255)->nullable();
             $table->timestamps();
         });
     }

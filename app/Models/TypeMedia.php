@@ -11,6 +11,7 @@ class TypeMedia extends Model
 
     protected $primaryKey = 'type_media_id';
     public $incrementing = false;
+    
 
     public static function generateID()
     {

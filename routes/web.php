@@ -34,6 +34,10 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('loginprocess', [AuthController::class, 'loginprocess'])->name('login.post');
 
+Route::middleware(['custom.auth','check.status:1,2'])->prefix('pd')->group(function () {
+    Route::get('media/fetchData/Book', [MediaController::class, 'fetchDataBook'])->name('media.fetchData.book');
+    
+});
 
 //Production Page หน้าต่างฝ่ายผลิต
 Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(function () {
@@ -49,12 +53,12 @@ Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(functio
     Route::post('media/create', [MediaController::class, 'create'])->name('media.create');
     Route::get('media/fetchData', [MediaController::class, 'fetchData'])->name('media.fetchData');
     Route::post('media/update/{id}', [MediaController::class, 'update'])->name('media.update');
-    Route::get('media/fetchData/Book', [MediaController::class, 'fetchDataBook'])->name('media.fetchData.book');
     Route::get('media/fetchData/BookType', [MediaController::class, 'fetchDataBookType'])->name('media.fetchData.bookType');
     Route::get('media/fetchData/number', [MediaController::class, 'fetchDataNumber'])->name('media.fetchData.number');
     //หนังสือ
     Route::get('book/list', [BookController::class, 'index'])->name('book_list');
     Route::post('book/create', [BookController::class, 'create'])->name('book.create');
+    Route::post('book/createBookNew/{id}', [BookController::class, 'createBookNew'])->name('bookNew.create');
     Route::get('book/fetchData', [BookController::class, 'fetchData'])->name('book.fetchData');
     Route::post('book/update/{id}', [BookController::class, 'update'])->name('book.update');
     //ประเภทสื่อ
@@ -94,12 +98,17 @@ Route::get('receive/list', [ReceiveBookController::class,'index'] )->name('recei
 Route::post('receive/create', [ReceiveBookController::class,'create'] )->name('receive.create');
 Route::get('receive/fetchData', [ReceiveBookController::class,'fetchData'] )->name('receive.fetchData');
 Route::get('receive/delete/{id}', [ReceiveBookController::class,'delete'] )->name('receive.delete');
+//รับคำขอสื่อ
+Route::get('requestMedia/list', [RequestMediaController::class,'index'] )->name('requestMedia.list');
+Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::class,'fetchDataTable'] )->name('requestMedia.fetchDataTable');
+Route::get('requestMedia/fetchStatus', [RequestMediaController::class,'fetchStatus'] )->name('requestMedia.fetchStatus');
+Route::get('requestMedia/fetchUser', [RequestMediaController::class,'fetchUser'] )->name('requestMedia.fetchUser');
+Route::get('requestMedia/fetchUserLastName', [RequestMediaController::class,'fetchUserLastName'] )->name('requestMedia.fetchUserLastName');
 
-Route::get('media/fetchData/Book', [MediaController::class, 'fetchDataBook'])->name('media.fetchData.book');
+Route::post('requestMedia/create', [RequestMediaController::class,'create'] )->name('requestMedia.create');
 
 
 
-Route::get('requestMedia/list', [RequestMediaController::class,'index'] )->name('requestMedia_list');
 Route::get('media/out/list', [MediaOutController::class,'index'] )->name('mediaOut_list');
 Route::get('order/list', [OrderController::class,'index'] )->name('order_list');
 Route::get('requestUser/list', [RequestUserController::class,'index'] )->name('requestUser_list');

@@ -90,7 +90,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="{{ route('requestMedia_list') }}" class="sidebar-link ">
+                    <a href="{{ route('requestMedia.list') }}" class="sidebar-link ">
                         <i class="fa-solid fa-clipboard-list pe-2"></i>
                         รับคำขอสื่อ
                     </a>

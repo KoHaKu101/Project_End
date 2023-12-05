@@ -13,13 +13,13 @@ class CheckStatus
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next,$allowedStatus): Response
+    public function handle(Request $request, Closure $next,...$allowedStatus): Response
     {
         $status = session()->get('status');
-        // ตรวจสอบว่า status ตรงกับที่อนุญาตหรือไม่
-        if ($status == $allowedStatus) {
+        if (in_array($status, $allowedStatus)) {
             return $next($request);
         }
+        
     
         abort(403, 'Unauthorized action.');
     }

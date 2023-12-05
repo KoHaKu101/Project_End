@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('receive_books', function (Blueprint $table) {
-            //
-            $table->string('book_name',255)->after('emp_id');
-
+            $table->string('book_name', 255)->after('emp_id');
         });
     }
 
@@ -24,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('receive_books', function (Blueprint $table) {
-            //
             $table->dropColumn('book_name');
         });
     }

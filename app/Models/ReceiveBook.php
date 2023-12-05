@@ -27,13 +27,13 @@ class ReceiveBook extends Model
     {
         return $this->belongsTo(Emp::class, 'emp_id');
     }
+    
     protected $fillable = [
         'recv_id',
         'emp_id',
         'book_name',
         'add_date',
         'add_type',
-        'desc',
     ];
 
 }

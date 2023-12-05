@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreign('emp_id')->references('emp_id')->on('emps');
             $table->date('add_date');
             $table->tinyInteger('add_type',false)->unsigned();
-            $table->text('desc');
             $table->timestamps();
         });
     }

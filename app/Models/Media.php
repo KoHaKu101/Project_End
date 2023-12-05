@@ -51,6 +51,7 @@ class Media extends Model
         'check_date',
         'translator',
         'sound_sys',
+        'file_location',
         'source'
     ];
     

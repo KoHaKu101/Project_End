@@ -52,15 +52,15 @@
                                     @foreach ($data as $datalist)
                                         <tr>
                                             <td class="text-center">{{ $loop->index + 1 }}</td>
-                                            <td>{{ $datalist->book_name }}</td>
+                                            <td>{{ $datalist->ReceiveBook->book_name }}</td>
                                             @php
                                                 $add_type = [1 => 'บริจาค', 2 => 'ซื้อ', 3 => 'กระทรวงศึกษา'];
-                                                $carbonDate = Carbon\Carbon::parse($datalist->add_date);
+                                                $carbonDate = Carbon\Carbon::parse($datalist->ReceiveBook->add_date);
                                                 $thaiYear = $carbonDate->addYears(543)->format('d/m/Y');
-                                                $emp = $datalist->Emp;
+                                                $emp = $datalist->ReceiveBook->Emp;
                                                 $fullname = $emp->f_name . ' ' . $emp->l_name;
                                             @endphp
-                                            <td>{{ $add_type[$datalist->add_type] }}</td>
+                                            <td>{{ $add_type[$datalist->ReceiveBook->add_type] }}</td>
                                             <td>{{ $thaiYear }}</td>
                                             <td>{{ $fullname }}</td>
                                             <td>{{ $datalist->desc }}</td>
@@ -96,18 +96,20 @@
             });
             $('#btn_modal_receive').attr('hidden', false);
             var form = $('#form_modal_receive');
-            form[0].reset();
-            $('#modal_receive').modal('show');
+            var url = `{{ route('receive.create') }}`;
             let input_book_name = $(`<select id="book_name" name="book_name" ></select>`);
+            form[0].reset();
+
+            form.attr('action', url);
             $('#book_name').replaceWith(input_book_name);
             createSelect2();
+            $('#modal_receive').modal('show');
+
         }
 
         function SubmitForm() {
             var btn = $('#btn_modal_receive');
             var form = $('#form_modal_receive');
-            var url = `{{ route('receive.create') }}`;
-            form.attr('action', url);
             loadingButton(btn);
             form.submit();
         }
@@ -128,7 +130,7 @@
                     let input_book_name = $(`<input type="text" class="form-control form-control-sm" id="book_name" name="book_name" disabled>`);
                     $('#book_name').replaceWith(input_book_name);
                     
-                    var fields = ['book_name','add_date', 'add_type', 'desc'];
+                    var fields = ['book_name','add_date', 'add_type'];
                     
                     fields.forEach(function(field) {
                         if (data.receive[field]) {
@@ -136,6 +138,7 @@
                             $('#' + field).val(data.receive[field]);
                         }
                     });
+                    $('#desc').val(data.desc);
                     $('#btn_modal_receive').attr('hidden', true);
                     $('#emp').val(data.emp.f_name + ' ' + data.emp.l_name);
                     $('#modal_receive').modal('show');
