@@ -104,8 +104,14 @@ Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::clas
 Route::get('requestMedia/fetchStatus', [RequestMediaController::class,'fetchStatus'] )->name('requestMedia.fetchStatus');
 Route::get('requestMedia/fetchUser', [RequestMediaController::class,'fetchUser'] )->name('requestMedia.fetchUser');
 Route::get('requestMedia/fetchUserLastName', [RequestMediaController::class,'fetchUserLastName'] )->name('requestMedia.fetchUserLastName');
+Route::get('requestMedia/fetchDataEdit', [RequestMediaController::class,'fetchDataEdit'] )->name('requestMedia.fetchDataEdit');
+
 
 Route::post('requestMedia/create', [RequestMediaController::class,'create'] )->name('requestMedia.create');
+Route::post('requestMedia/update/{id}', [RequestMediaController::class,'update'] )->name('requestMedia.update');
+Route::get('requestMedia/delete/{id}', [RequestMediaController::class,'delete'] )->name('requestMedia.delete');
+
+
 
 
 

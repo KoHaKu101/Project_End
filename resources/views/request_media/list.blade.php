@@ -38,23 +38,23 @@
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                                    data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order" onclick="tabsShow('new_order')" 
-                                    aria-selected="true">สั่งผลิตสื่อ</button>
+                                    data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
+                                    onclick="tabsShow('new_order')" aria-selected="true">สั่งผลิตสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#wait_order" onclick="tabsShow('wait_order')"
-                                    type="button" role="tab" aria-controls="wait_order"
-                                    aria-selected="false">รอผลิตสื่อ</button>
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#wait_order"
+                                    onclick="tabsShow('wait_order')" type="button" role="tab"
+                                    aria-controls="wait_order" aria-selected="false">รอผลิตสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out" onclick="tabsShow('ready_out')"
-                                    type="button" role="tab" aria-controls="ready_out"
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out"
+                                    onclick="tabsShow('ready_out')" type="button" role="tab" aria-controls="ready_out"
                                     aria-selected="false">พร้อมจ่าย</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#out_success"onclick="tabsShow('out_success')"
-                                    type="button" role="tab" aria-controls="out_success"
-                                    aria-selected="false">จ่ายเรียบร้อย</button>
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#out_success"onclick="tabsShow('out_success')" type="button"
+                                    role="tab" aria-controls="out_success" aria-selected="false">จ่ายเรียบร้อย</button>
                             </li>
                         </ul>
                     </div>
@@ -77,46 +77,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="tableData">
-                                            @foreach ($dataRequestMedia->where('status', 1) as $datalist)
-                                                <tr>
-                                                    <td class="text-center">{{ $loop->index + 1 }}</td>
-                                                    <td>{{ $datalist->Book->name }}</td>
-                                                    <td>{{ $datalist->TypeMedia->name }}</td>
-                                                    <td>{{ $datalist->request_date }}</td>
-                                                    <td>{{ $datalist->Emp->f_name . ' ' . $datalist->Emp->l_name }}</td>
-                                                    <td>{{ $datalist->RequestUser->f_name . ' ' . $datalist->RequestUser->l_name }}
-                                                    </td>
-                                                    @php
-                                                        $text = [1 => 'สั่งผลิต', 2 => 'พร้อมจ่ายสื่อ', 3 => 'รอผลิต', 4 => 'จ่ายสื่อเรียบร้อย'];
-                                                        echo '<td>' . $text[$datalist->status] . '</td>';
-                                                    @endphp
-                                                    <td>
-                                                        <button type="button" class="btn btn-sm btn-warning">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-primary"
-                                                            data-bs-toggle="modal" data-bs-target="#order_insert">
-                                                            สั่งผลิต
-                                                        </button>
-                                                        {{-- @if ($arr[0] == 'สั่งผลิต')
-                                                            
-                                                        @elseif ($arr[0] == 'รอผลิต')
-                                                            <button type="button" class="btn btn-sm btn-secondary" disabled>
-                                                                กำลังดำเนินการ
-                                                            </button>
-                                                        @elseif ($arr[0] == 'พร้อมจ่ายสื่อ')
-                                                            <button type="button" class="btn btn-sm btn-success"
-                                                                data-bs-toggle="modal" data-bs-target="#media_out_insert">
-                                                                จ่ายสื่อ
-                                                            </button>
-                                                        @else
-                                                        @endif --}}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -131,124 +92,164 @@
     @include('media_out.insert')
     @include('order.insert')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
     <script>
-        function tabsShow(tabName){
-            if(tabName==='new_order'){
-                fetchDataTable(1);
-            }else if(tabName === 'ready_out'){
-                fetchDataTable(2);
-            }else if(tabName === 'wait_order'){
-                fetchDataTable(3);
-            }else if(tabName === 'out_success'){
-                fetchDataTable(4);
-            }
-            
-            
-
-        }
-        function fetchDataTable(status){
-            let url = `{{route('requestMedia.fetchDataTable', ['status' => ':status'])}}`;
-            url = url.replace(':status', status);
-
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "JSON",
-                success: function (response) {
-                    $('#tableData').html(response);
-                }
-            });
-        }
-        function openModal() {
+        $(document).ready(function() {
             let modalSelect = $('#request_media_modal');
+            modalSelect.modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            fetchDataTable(1);
+        });
+        const modalSelect = $('#request_media_modal');
+        const bookIdSelect = $('#book_id');
+        const typeMediaIdSelect = $('#type_media_id');
+        const fNameSelect = $('#f_name');
+        const form = $('#FormRequestMedia');
+        bookIdSelect.add(typeMediaIdSelect).on('change', fetchStatus);
+        fNameSelect.on('change', fetchLastName);
+
+        function setupDefaultModal(title) {
             select2_BookId(modalSelect);
             select2_User(modalSelect);
+            $('#titleModal').html(title);
             modalSelect.modal('show');
         }
 
-        function fetchStatus() {
-            let book_id = $('#book_id').val();
-            let type_media_id = $('#type_media_id').val();
-            if (book_id !== null) {
-                let url = `{{ route('requestMedia.fetchStatus') }}`;
-                $.ajax({
+        async function editModal(id) {
+            const url = `{{ route('requestMedia.fetchDataEdit') }}`;
+            const urlupdate = `{{ route('requestMedia.update', ['id' => ':id']) }}`.replace(':id', id);
+            form.attr('action',urlupdate);
+            loadingButtonEdit('start');
+            try {
+                const data = await $.ajax({
                     type: "GET",
-                    url: url,
+                    url,
                     data: {
-                        book_id: book_id,
-                        type_media_id: type_media_id,
+                        id
                     },
-                    dataType: "JSON",
-                    success: function(response) {
-                        if (response.result === 'true') {
-                            $('#status').val('พร้อมจ่าย');
-                        } else {
-                            $('#status').val('สั่งผลิต');
-                        }
-
-                    }
+                    dataType: "JSON"
                 });
+                console.log(data);
+                const [selectUser, selectBook] = [fNameSelect, bookIdSelect];
+                $('#tel').val(data.requestUser.tel);
+                console.log(data.book.name);
+
+                await Promise.all([
+                    setSelected2(selectUser, data.requestUser.f_name, data.requestUser.requesters_id),
+                    setSelected2(selectBook, data.book.name, data.book.book_id),
+                    fetchLastName(),
+                    fetchStatus()
+                ]);
+
+                setupDefaultModal('แก้ไขข้อมูล');
+                $(document).on('click', (e) => e.target.closest('.modal-content') || e.stopPropagation());
+                loadingButtonEdit('success');
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
         }
 
-        function fetchLastName() {
-            let requesters_id = $('#f_name').val();
-            if (book_id !== null) {
-                let url = `{{ route('requestMedia.fetchUserLastName') }}`;
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    data: {
-                        requesters_id: requesters_id,
-                    },
-                    dataType: "JSON",
-                    success: function(response) {
-                        if (response.l_name !== null) {
-                            $('#l_name').val(response.l_name);
-                        } else {
-                            $('#l_name').val('');
-                        }
+        modalSelect.on('hidden.bs.modal', function() {
+            $('#book_id, #f_name').empty().select2('destroy').val(null).trigger('change');
+            form[0].reset();
+        });
 
-                    }
-                });
+        async function fetchLastName() {
+            try {
+                const requesters_id = fNameSelect.val();
+                if (requesters_id !== null) {
+                    const url = `{{ route('requestMedia.fetchUserLastName') }}`;
+                    const response = await $.ajax({
+                        type: "GET",
+                        url,
+                        data: {
+                            requesters_id
+                        },
+                        dataType: "JSON"
+                    });
+
+                    $('#l_name').val(response.l_name || '');
+                    $('#tel').val(response.tel || '');
+                }
+            } catch (error) {
+                console.error('Error fetching last name:', error);
             }
         }
-        $('#book_id').on('change', function() {
-            fetchStatus();
-        });
-        $('#type_media_id').on('change', function() {
-            fetchStatus();
-        });
-        $('#f_name').on('change', function() {
-            fetchLastName();
-        });
 
-        function select2_BookId(modalSelect) {
-            let url = `{{ route('media.fetchData.book') }}`;
-            $('#book_id').select2({
+        async function fetchStatus() {
+            try {
+                const [book_id, type_media_id] = [bookIdSelect.val(), typeMediaIdSelect.val()];
+
+                if (book_id !== null) {
+                    const url = `{{ route('requestMedia.fetchStatus') }}`;
+                    const response = await $.ajax({
+                        type: "GET",
+                        url,
+                        data: {
+                            book_id,
+                            type_media_id
+                        },
+                        dataType: "JSON"
+                    });
+
+                    $('#status').val(response.result === 'true' ? 'พร้อมจ่าย' : 'สั่งผลิต');
+                }
+            } catch (error) {
+                console.error('Error fetching status:', error);
+            }
+        }
+
+        function openModal() {
+            const url = `{{ route('requestMedia.create') }}`;
+            form.attr('action',url);
+            setupDefaultModal('รับคำขอสื่อ');
+        }
+
+        function tabsShow(tabName) {
+            const statusMapping = {
+                'new_order': 1,
+                'ready_out': 2,
+                'wait_order': 3,
+                'out_success': 4
+            };
+            fetchDataTable(statusMapping[tabName]);
+        }
+
+        function fetchDataTable(status) {
+            const url = `{{ route('requestMedia.fetchDataTable', ['status' => ':status']) }}`.replace(':status', status);
+
+            $.ajax({
+                type: "GET",
+                url,
+                dataType: "JSON",
+                success: (response) => $('#tableData').html(response)
+            });
+        }
+
+        function select2_BookId() {
+            const url = `{{ route('media.fetchData.book') }}`;
+            bookIdSelect.select2({
                 theme: 'bootstrap-5',
                 containerCssClass: "select2--small",
                 dropdownCssClass: "select2--small",
                 ajax: {
-                    url: url,
+                    url,
                     dataType: 'json',
                     delay: 250,
-                    data: function(params) {
-                        return {
-                            term: params.term,
-                            page: params.page
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.map(function(item) {
-                                return {
-                                    id: item.book_id,
-                                    text: item.name
-                                };
-                            })
-                        };
-                    },
+                    data: (params) => ({
+                        term: params.term,
+                        page: params.page
+                    }),
+                    processResults: (data) => ({
+                        results: data.map((item) => ({
+                            id: item.book_id,
+                            text: item.name
+                        }))
+                    }),
                     cache: true
                 },
                 placeholder: 'ค้นหาหนังสือ',
@@ -257,24 +258,20 @@
             });
         }
 
-        function select2_User(modalSelect) {
-            let url = `{{ route('requestMedia.fetchUser') }}`;
-            $('#f_name').select2({
+        function select2_User() {
+            const url = `{{ route('requestMedia.fetchUser') }}`;
+            fNameSelect.select2({
                 theme: 'bootstrap-5',
                 ajax: {
-                    url: url,
+                    url,
                     dataType: 'json',
                     delay: 250,
-                    processResults: function(data) {
-                        return {
-                            results: data.map(function(item) {
-                                return {
-                                    id: item.requesters_id,
-                                    text: item.f_name
-                                };
-                            })
-                        };
-                    },
+                    processResults: (data) => ({
+                        results: data.map((item) => ({
+                            id: item.requesters_id,
+                            text: item.f_name
+                        }))
+                    }),
                     cache: true
                 },
                 placeholder: 'กรอกชื่อผู้ขอรับสื่อ',
@@ -284,12 +281,70 @@
             });
         }
 
-        function SubmitForm(form) {
-            var form = $('#' + form);
-            var btn = form.find('button#submitBTN');
-            loadingButton(btn);
-            form.submit();
+        function setSelected2(selectId, name, id) {
+            const optionExists = selectId.find(":contains('" + name + "')").length > 0;
+            selectId.val(name).trigger('change');
 
+            if (!optionExists) {
+                const newOption = new Option(name, id, true, true);
+                selectId.append(newOption).trigger('change');
+            }
+        }
+
+        function SubmitForm(form) {
+            const formElement = $('#' + form);
+            const btn = formElement.find('button#submitBTN');
+            loadingButton(btn);
+            formElement.submit();
+        }
+
+        function loadingButtonEdit(status) {
+            const btn = $('#btn_edit');
+            btn.attr('disabled', status === 'start').html(status === 'start' ?
+                '<i class="fas fa-arrows-rotate fa-spin me-2"></i>' : '<i class="fas fa-edit"></i>');
+        }
+        function deleteshow(id) {
+            Swal.fire({
+                title: 'ต้องการลบจริงมั้ย ? ',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#157347',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = `{{ route('requestMedia.delete', ['id' => ':id']) }}`;
+                    url = url.replace(':id', id);
+                    $.ajax({
+                        url: url,
+                        method: 'get',
+                        success: function(response) {
+                            if (response == true) {
+                                Swal.fire({
+                                    title: 'ลบรายการสำเร็จ',
+                                    icon: 'success',
+                                    confirmButtonColor: '#157347',
+                                    confirmButtonText: 'ยืนยัน',
+                                }).then((result) => {
+                                    location.reload();
+                                })
+                            } else {
+                                Swal.fire({
+                                    title: 'เกิดข้อผิดพลาด!',
+                                    text: 'ไม่สามารถลบได้เนื่องจากมีหนังสือใช้งานอยู่',
+                                    icon: 'error',
+                                    confirmButtonText: 'รับทราบ'
+                                })
+                            }
+
+                        },
+                        error: function(xhr, status, error) {
+
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection()

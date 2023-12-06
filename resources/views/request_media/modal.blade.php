@@ -6,13 +6,13 @@
 <div class="modal fade" id="request_media_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="FormRequestMedia" action="{{ route('requestMedia.create') }}" method="POST">
+            <form id="FormRequestMedia" method="POST">
+                @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">รับคำขอสื่อ</h5>
+                    <h5 class="modal-title" id="titleModal">รับคำขอสื่อ</h5>
                     {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
                 </div>
                 <div class="modal-body">
-                    @csrf
                     <div class="row">
                         <div class="col-lg-12">
                             <label>ชื่อหนังสือ</label>
@@ -44,11 +44,9 @@
                             <input type="text" class="form-control" id="tel" name="tel"
                                 placeholder="กรอกเบอร์โทรศัพท์">
                         </div>
-
-
                         <div class="col-lg-12">
                             <label>เจ้าหน้าที่ </label>
-                            <input type="text" class="form-control" value="{{ $fullname }}" disabled>
+                            <input type="text" class="form-control" id="emp_name" value="{{ $fullname }}" disabled>
                         </div>
                     </div>
 
