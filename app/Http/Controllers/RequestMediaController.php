@@ -23,7 +23,17 @@ class RequestMediaController extends Controller
     }
     public function create(Request $request)
     {
-        $requesters_id  = RequestUser::generateID();
+        $RequestUser = RequestUser::where('requesters_id',$request->f_name)->first();
+        $requesters_id = $RequestUser->requesters_id;
+        if(is_null($RequestUser)){
+            $requesters_id  = RequestUser::generateID();
+            RequestUser::create([
+                'requesters_id' => $requesters_id,
+                'f_name' => $request->f_name,
+                'l_name' => $request->l_name,
+                'tel' => $request->tel,
+            ]);
+        }
         $request_id = RequestMedia::generateID();
         $type_media_id = $request->type_media_id;
         $book_id = $request->book_id;
@@ -31,12 +41,6 @@ class RequestMediaController extends Controller
         $emp_id = $emp->emp_id;
         $Media = Media::where('book_id', $book_id)->where('type_media_id', $type_media_id)->first();
         $status = is_null($Media) ? 1 : 2;
-        RequestUser::create([
-            'requesters_id' => $requesters_id,
-            'f_name' => $request->f_name,
-            'l_name' => $request->l_name,
-            'tel' => $request->tel,
-        ]);
         RequestMedia::create([
             'request_id' => $request_id,
             'emp_id' => $emp_id,
@@ -69,9 +73,12 @@ class RequestMediaController extends Controller
             ]);
         }else{
             $tel = $request->tel;
-            $requestUser->update([
-                'tel' => $tel
-            ]);
+            if($tel != $requestUser->tel){
+                $requestUser->update([
+                    'tel' => $tel
+                ]);
+            }
+
         }
         $data->update([
             'emp_id' => $emp_id,
@@ -99,7 +106,7 @@ class RequestMediaController extends Controller
         $number = 1;
         $text = [1 => 'สั่งผลิต', 2 => 'พร้อมจ่ายสื่อ', 3 => 'รอผลิต', 4 => 'จ่ายสื่อเรียบร้อย'];
         foreach ($RequestMedia as $datalist) {
-            
+
             $date = Carbon::parse($datalist->request_date)->format('d/m/Y');
             $table .= "<tr>
                         <td class='text-center'>{$number}</td>
@@ -114,15 +121,19 @@ class RequestMediaController extends Controller
             // Define button array with corresponding conditions
             $request_id = $datalist->request_id;
             $buttons = [
-                1 => "<button type='button' class='btn btn-sm btn-primary' >สั่งผลิต</button>",
+                1 => "<button type='button' class='btn btn-sm btn-primary' onclick='createModal_order(`".$request_id."`)'>สั่งผลิต</button>",
                 2 => "<button type='button' class='btn btn-sm btn-success' data-bs-toggle='modal' data-bs-target='#media_out_insert'>จ่ายสื่อ</button>",
-                3 => "<button type='button' class='btn btn-sm btn-secondary' data-bs-toggle='modal' data-bs-target='#media_out_insert'>กำลังดำเนินการ</button>",
+                3 => "<button type='button' class='btn btn-sm btn-secondary' disabled>กำลังดำเนินการ</button>",
                 4 => '',
             ];
-
+            if($datalist->status != 3){
+                $table .= " <button type='button' class='btn btn-sm btn-warning' id='btn_edit' onclick='editModal_requestMedia(`" . $request_id . "`)'><i class='fas fa-edit'></i></button>
+                            <button type='button' class='btn btn-sm btn-danger me-1' onclick='deleteshow(`" . $request_id . "`)'><i class='fas fa-trash'></i></button>";
+            }else{
+                $table .= " <button type='button' class='btn btn-sm btn-info me-1' id='btn_edit' onclick='createModal_order(`" . $request_id . "`)'><i class='fas fa-eye'></i></button>";
+            }
             // Add edit and delete buttons
-            $table .= "<button type='button' class='btn btn-sm btn-warning' id='btn_edit' onclick='editModal(`" . $request_id . "`)'><i class='fas fa-edit'></i></button>
-                        <button type='button' class='btn btn-sm btn-danger me-1' onclick='deleteshow(`" . $request_id . "`)'><i class='fas fa-trash'></i></button>";
+
 
             // Add conditionally rendered button
             $table .=  $buttons[$status];

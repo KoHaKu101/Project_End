@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-lg-1">
 
-                                <button type="button" class="btn btn-sm btn-success" onclick="openModal()">
+                                <button type="button" class="btn btn-sm btn-success" onclick="createModal_requestMedia()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
                                 </button>
@@ -60,8 +60,6 @@
                     </div>
                     <div class="row">
                         <div class="tab-content" id="ex1-content">
-                            <div class="tab-pane fade show active" id="new_order"
-                                role="tabpanel"aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
                                     <table class="table">
                                         <thead>
@@ -90,38 +88,51 @@
     </div>
     @include('request_media.modal')
     @include('media_out.insert')
-    @include('order.insert')
+    @include('order.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
 
     <script>
+        const modalSelect_requestMedia = $('#request_media_modal');
+        const modalSelect_order = $('#order_modal');
+        const bookIdSelect = $('#book_id');
+        const typeMediaIdSelect = $('#type_media_id');
+        const fNameSelect = $('#f_name');
+        const form = $('#FormRequestMedia');
+
         $(document).ready(function() {
-            let modalSelect = $('#request_media_modal');
-            modalSelect.modal({
+            modalSelect_requestMedia.modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+            modalSelect_order.modal({
                 backdrop: 'static',
                 keyboard: false
             })
             fetchDataTable(1);
         });
-        const modalSelect = $('#request_media_modal');
-        const bookIdSelect = $('#book_id');
-        const typeMediaIdSelect = $('#type_media_id');
-        const fNameSelect = $('#f_name');
-        const form = $('#FormRequestMedia');
         bookIdSelect.add(typeMediaIdSelect).on('change', fetchStatus);
         fNameSelect.on('change', fetchLastName);
 
-        function setupDefaultModal(title) {
-            select2_BookId(modalSelect);
-            select2_User(modalSelect);
-            $('#titleModal').html(title);
-            modalSelect.modal('show');
+        function createModal_requestMedia() {
+            const url = `{{ route('requestMedia.create') }}`;
+            form.attr('action', url);
+            $('#submitBTN').html(`<i class="fas fa-plus me-1"></i>เพิ่มรายการ`);
+            modal_requestMedia('รับคำขอสื่อ');
         }
 
-        async function editModal(id) {
+        function modal_requestMedia(title) {
+            select2_BookId(modalSelect_requestMedia);
+            select2_User(modalSelect_requestMedia);
+            $('#titleModal').html(title);
+            modalSelect_requestMedia.modal('show');
+        }
+
+        async function editModal_requestMedia(id) {
             const url = `{{ route('requestMedia.fetchDataEdit') }}`;
             const urlupdate = `{{ route('requestMedia.update', ['id' => ':id']) }}`.replace(':id', id);
-            form.attr('action',urlupdate);
+
+            form.attr('action', urlupdate);
             loadingButtonEdit('start');
             try {
                 const data = await $.ajax({
@@ -132,10 +143,10 @@
                     },
                     dataType: "JSON"
                 });
-                console.log(data);
                 const [selectUser, selectBook] = [fNameSelect, bookIdSelect];
                 $('#tel').val(data.requestUser.tel);
-                console.log(data.book.name);
+                typeMediaIdSelect.val(data.typeMedia);
+                $('#emp_name').val(data.emp.f_name + ' ' + data.emp.l_name);
 
                 await Promise.all([
                     setSelected2(selectUser, data.requestUser.f_name, data.requestUser.requesters_id),
@@ -144,16 +155,17 @@
                     fetchStatus()
                 ]);
 
-                setupDefaultModal('แก้ไขข้อมูล');
+                modal_requestMedia('แก้ไขข้อมูล');
                 $(document).on('click', (e) => e.target.closest('.modal-content') || e.stopPropagation());
+                $('#submitBTN').html(`<i class='fas fa-save'></i> บันทึก`);
                 loadingButtonEdit('success');
-                
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         }
 
-        modalSelect.on('hidden.bs.modal', function() {
+        modalSelect_requestMedia.on('hidden.bs.modal', function() {
             $('#book_id, #f_name').empty().select2('destroy').val(null).trigger('change');
             form[0].reset();
         });
@@ -179,7 +191,6 @@
                 console.error('Error fetching last name:', error);
             }
         }
-
         async function fetchStatus() {
             try {
                 const [book_id, type_media_id] = [bookIdSelect.val(), typeMediaIdSelect.val()];
@@ -202,13 +213,6 @@
                 console.error('Error fetching status:', error);
             }
         }
-
-        function openModal() {
-            const url = `{{ route('requestMedia.create') }}`;
-            form.attr('action',url);
-            setupDefaultModal('รับคำขอสื่อ');
-        }
-
         function tabsShow(tabName) {
             const statusMapping = {
                 'new_order': 1,
@@ -218,7 +222,6 @@
             };
             fetchDataTable(statusMapping[tabName]);
         }
-
         function fetchDataTable(status) {
             const url = `{{ route('requestMedia.fetchDataTable', ['status' => ':status']) }}`.replace(':status', status);
 
@@ -229,7 +232,6 @@
                 success: (response) => $('#tableData').html(response)
             });
         }
-
         function select2_BookId() {
             const url = `{{ route('media.fetchData.book') }}`;
             bookIdSelect.select2({
@@ -254,10 +256,9 @@
                 },
                 placeholder: 'ค้นหาหนังสือ',
                 minimumInputLength: 1,
-                dropdownParent: modalSelect,
+                dropdownParent: modalSelect_requestMedia,
             });
         }
-
         function select2_User() {
             const url = `{{ route('requestMedia.fetchUser') }}`;
             fNameSelect.select2({
@@ -276,11 +277,10 @@
                 },
                 placeholder: 'กรอกชื่อผู้ขอรับสื่อ',
                 minimumInputLength: 1,
-                dropdownParent: modalSelect,
+                dropdownParent: modalSelect_requestMedia,
                 tags: true,
             });
         }
-
         function setSelected2(selectId, name, id) {
             const optionExists = selectId.find(":contains('" + name + "')").length > 0;
             selectId.val(name).trigger('change');
@@ -289,13 +289,6 @@
                 const newOption = new Option(name, id, true, true);
                 selectId.append(newOption).trigger('change');
             }
-        }
-
-        function SubmitForm(form) {
-            const formElement = $('#' + form);
-            const btn = formElement.find('button#submitBTN');
-            loadingButton(btn);
-            formElement.submit();
         }
 
         function loadingButtonEdit(status) {
@@ -345,6 +338,24 @@
                     });
                 }
             });
+        }
+        function createModal_order(id) {
+            const url = `{{ route('order.fetchRequestMedia') }}`;
+            $.ajax({
+                type: "GET",
+                url,
+                data: {id:id},
+                dataType: "JSON",
+                success: function(response) {
+                    if(response.status == 3){
+                        $('#btn_form_order').attr('hidden',true);
+                    }else{
+                        $('#btn_form_order').attr('hidden',false);
+                    }
+                    $('#order_modal_body').html(response.html);
+                }
+            });
+            modalSelect_order.modal('show');
         }
     </script>
 @endsection()

@@ -42,9 +42,8 @@
                                     aria-selected="false">หนังสือใหม่</button>
                             </li>
                         </ul>
-                        <div class="tab-content" id="ex1-content">
-                            <div class="tab-pane fade show active" id="tab_book"
-                                role="tabpanel"aria-labelledby="ex1-tab-1">
+                        <div class="tab-content" >
+                            <div class="tab-pane fade show active" id="tab_book"role="tabpanel"aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
                                     <table class="table">
                                         <thead>
@@ -212,11 +211,11 @@
             $('#copy_BookCopy_insert').modal('show');
         }
         function SubmitForm(form) {
-            var form = $('#'+form);  
+            var form = $('#'+form);
             var btn = form.find('button#submitBTN');
             loadingButton(btn);
             form.submit();
-            
+
         }
     </script>
 @endsection()

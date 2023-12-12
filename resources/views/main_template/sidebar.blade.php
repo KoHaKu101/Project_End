@@ -102,7 +102,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="{{ route('order_list') }}" class="sidebar-link " >
+                    <a href="{{ route('order.list') }}" class="sidebar-link " >
                         <i class="fa-solid fa-industry pe-2"></i>
                         สั่งผลิตสื่อ
                     </a>
@@ -121,7 +121,7 @@
                     </a>
                 </li>
             </ul>
-            
+
             @endif
 
 

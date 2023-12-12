@@ -23,7 +23,7 @@ class Media extends Model
         }
         return $id;
     }
-    public static function generateNumber($book_id,$type_media_id)
+    public static function generateNumber($type_media_id)
     {
         $dataDB = self::select('number','type_media_id')->where('type_media_id',$type_media_id)->latest()->first();
         $number = '1';
@@ -54,5 +54,5 @@ class Media extends Model
         'file_location',
         'source'
     ];
-    
+
 }

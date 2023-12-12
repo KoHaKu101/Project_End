@@ -36,12 +36,12 @@ Route::post('loginprocess', [AuthController::class, 'loginprocess'])->name('logi
 
 Route::middleware(['custom.auth','check.status:1,2'])->prefix('pd')->group(function () {
     Route::get('media/fetchData/Book', [MediaController::class, 'fetchDataBook'])->name('media.fetchData.book');
-    
+    Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::class,'fetchDataTable'] )->name('requestMedia.fetchDataTable');
 });
 
 //Production Page หน้าต่างฝ่ายผลิต
 Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(function () {
-    
+
     Route::get('dashboard', [HomeController::class, 'index'])->name('dashboard_pd');
     //เจ้าหน้าที่
     Route::get('emp/list', [EmpController::class, 'index'])->name('emp_list');
@@ -51,10 +51,12 @@ Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(functio
     //สื่อ
     Route::get('media/list', [MediaController::class, 'index'])->name('media_list');
     Route::post('media/create', [MediaController::class, 'create'])->name('media.create');
-    Route::get('media/fetchData', [MediaController::class, 'fetchData'])->name('media.fetchData');
     Route::post('media/update/{id}', [MediaController::class, 'update'])->name('media.update');
-    Route::get('media/fetchData/BookType', [MediaController::class, 'fetchDataBookType'])->name('media.fetchData.bookType');
-    Route::get('media/fetchData/number', [MediaController::class, 'fetchDataNumber'])->name('media.fetchData.number');
+
+    Route::get('media/fetchData', [MediaController::class, 'fetchData'])->name('media.fetchData');
+    Route::get('media/fetchDataInput', [MediaController::class, 'fetchDataInput'])->name('media.fetchDataInput');
+    Route::get('media/fetchDataTable/{status}', [MediaController::class,'fetchDataTable'] )->name('media.fetchDataTable');
+
     //หนังสือ
     Route::get('book/list', [BookController::class, 'index'])->name('book_list');
     Route::post('book/create', [BookController::class, 'create'])->name('book.create');
@@ -88,7 +90,7 @@ Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(functio
     Route::fallback(function () {
         return view('login');
     });
-    
+
 });
 //Services Page หน้าต่างฝ่ายบริการ
 Route::middleware(['custom.auth','check.status:2'])->prefix('ser')->group(function () {
@@ -100,7 +102,6 @@ Route::get('receive/fetchData', [ReceiveBookController::class,'fetchData'] )->na
 Route::get('receive/delete/{id}', [ReceiveBookController::class,'delete'] )->name('receive.delete');
 //รับคำขอสื่อ
 Route::get('requestMedia/list', [RequestMediaController::class,'index'] )->name('requestMedia.list');
-Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::class,'fetchDataTable'] )->name('requestMedia.fetchDataTable');
 Route::get('requestMedia/fetchStatus', [RequestMediaController::class,'fetchStatus'] )->name('requestMedia.fetchStatus');
 Route::get('requestMedia/fetchUser', [RequestMediaController::class,'fetchUser'] )->name('requestMedia.fetchUser');
 Route::get('requestMedia/fetchUserLastName', [RequestMediaController::class,'fetchUserLastName'] )->name('requestMedia.fetchUserLastName');
@@ -111,12 +112,16 @@ Route::post('requestMedia/create', [RequestMediaController::class,'create'] )->n
 Route::post('requestMedia/update/{id}', [RequestMediaController::class,'update'] )->name('requestMedia.update');
 Route::get('requestMedia/delete/{id}', [RequestMediaController::class,'delete'] )->name('requestMedia.delete');
 
-
-
-
-
 Route::get('media/out/list', [MediaOutController::class,'index'] )->name('mediaOut_list');
-Route::get('order/list', [OrderController::class,'index'] )->name('order_list');
+Route::get('order/list', [OrderController::class,'index'] )->name('order.list');
+Route::get('order/tableData', [OrderController::class,'tableData'] )->name('order.tableData');
+Route::get('order/fetchRequestMedia', [OrderController::class,'fetchRequestMedia'] )->name('order.fetchRequestMedia');
+
+
+Route::post('order/create/{id}', [OrderController::class,'create'] )->name('order.create');
+
+
+
 Route::get('requestUser/list', [RequestUserController::class,'index'] )->name('requestUser_list');
 Route::get('report/list', [ReportController::class,'index'] )->name('report_ser');
 });

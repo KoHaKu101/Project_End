@@ -34,49 +34,67 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-12">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                        <th scope="col">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 15%">หมวดหมู่หนังสือ</th>
-                                        <th scope="col" style="width: 15%">ประเภทสื่อ</th>
-                                        <th scope="col" style="width: 15%">สถานะการผลิต</th>
-                                        <th scope="col" style="width: 15%"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($dataMedia as $dataMedialist)
-                                        <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
-                                            <td>{{ $dataMedialist->Book->name }}</td>
-                                            <td>{{ $dataMedialist->Book->TypeBook->name }}</td>
-                                            <td>{{ $dataMedialist->TypeMedia->name }}</td>
-                                            @php
-                                                $statusNumber = $dataMedialist->status;
-                                                $statusArray = [1 => 'กำลังผลิต', 2 => 'ตรวจเช็คเรียบร้อย'];
-                                                $color_status = [1 => 'bg-warning', 2 => 'bg-success'];
-                                                $statusBadge = '<span class="badge ' . $color_status[$statusNumber] . ' text-dark" >' . $statusArray[$statusNumber] . '</span>';
-                                            @endphp
-                                            <td>{!! $statusBadge !!}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-warning"
-                                                    onclick="editmodal('{{ $dataMedialist->media_id }}')"><i
-                                                        class="fas fa-edit"></i></button>
-                                                <button type="button" class="btn btn-sm btn-danger"><i
-                                                        class="fas fa-trash"></i></button>
-                                                @if ($statusNumber == 1)
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-primary"data-bs-toggle="modal"
-                                                        data-bs-target="#status_insert">อัพเดพสถานะ</button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                            </table>
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+                                    data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
+                                    onclick="tabsShowRequestMedia('new_order')" aria-selected="true">รายการสั่งผลิตสื่อ</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#process_order"
+                                    onclick="tabShowMedia('process_order')" type="button" role="tab"
+                                    aria-controls="wait_order" aria-selected="false">รายการสื่อกำลังผลิต</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#process_order"onclick="tabShowMedia('success_order')" type="button"
+                                    role="tab" aria-controls="process_order"
+                                    aria-selected="false">รายการสื่อผลิตเสร็จ</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row">
+                        <div class="tab-content" id="ex1-content">
+                            <div class="tab-pane fade show active" id="new_order"role="tabpanel"aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                                <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
+                                                <th scope="col" style="width: 8%">ประเภทสื่อ</th>
+                                                <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
+                                                <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
+                                                <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
+                                                <th scope="col">สถานะ</th>
+                                                <th scope="col"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableDataRequestMedia">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade show" id="process_order"role="tabpanel"aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                                <th scope="col">ชื่อหนังสือ</th>
+                                                <th scope="col" style="width: 15%">หมวดหมู่หนังสือ</th>
+                                                <th scope="col" style="width: 15%">ประเภทสื่อ</th>
+                                                <th scope="col" style="width: 15%">สถานะการผลิต</th>
+                                                <th scope="col" style="width: 15%"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableDataMedia">
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -85,71 +103,32 @@
     @include('media.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script>
+        const formSubmit = $('#FormSubmit');
+        const modal_title = $('#modal-title');
+        const modal_media = $('#modal_media');
+        const input_type_media_id = $('#type_media_id');
+
         $(document).ready(function() {
-            $('#modal_Book_insert').modal({
+            modal_media.modal({
                 backdrop: 'static',
                 keyboard: false
             })
+            tabsShowRequestMedia();
         });
+        function tabsShow(){
 
-        function createmodal() {
-            let url = "{{ route('media.create') }}";
-            let formSubmit = $('#FormSubmit');
-            let input_book_id = $(`<select id="book_id" name="book_id" ></select>`);
-            formSubmit.attr('action', url);
-            formSubmit[0].reset();
-            $('#modal-title').text('เพิ่มสื่อ');
-            $('#modal_media').modal('show');
-            $('#book_id').replaceWith(input_book_id);
-
-            $('#type_media_id').prop('disabled', false);
-            createSelect2();
-            function fetchData(url, params, successCallback) {
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    data: params,
-                    dataType: "json",
-                    success: successCallback
-                });
-            }
-
-            function showBookType(book_id) {
-                let url = `{{ route('media.fetchData.bookType') }}`;
-                fetchData(url, {
-                    'book_id': book_id
-                }, function(data) {
-                    $('#book_type').val(data.name);
-                });
-            }
-
-            function showNumber(book_id, type_media_id) {
-                let url = `{{ route('media.fetchData.number') }}`;
-                fetchData(url, {
-                    'book_id': book_id,
-                    'type_media_id': type_media_id
-                }, function(number) {
-                    $('#number').val(number);
-                });
-            }
-
-            $('#book_id').on('change', function() {
-                let book_id = $('#book_id').val();
-                let type_media_id = $('#type_media_id').val();
-                showBookType(book_id);
-                showNumber(book_id, type_media_id);
-            });
-
-            $('#type_media_id').on('change', function() {
-                let type_media_id = $('#type_media_id').val();
-                let book_id = $('#book_id').val();
-                showNumber(book_id, type_media_id);
-            });
         }
-
-        function editmodal(id) {
+        function createmodal_media() {
+            const url = "{{ route('media.create') }}";
+            const input_change = '<select id="book_id" name="book_id" ></select>';
+            changeInput(input_change, false);
+            setModal_Media('เพิ่มสื่อ', url);
+            Select2_book();
+            modal_media.modal('show');
+        }
+        function editmodal_media(id) {
             let urlUpdate = "{{ route('media.update', ['id' => ':id']) }}";
-            let urlFetch = "{{ route('media.fetchData') }}";
+            const urlFetch = "{{ route('media.fetchData') }}";
             $.ajax({
                 url: urlFetch,
                 method: 'GET',
@@ -158,14 +137,16 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    createSelect2();
-                    $('#book_id').select2('destroy');
-                    let input_book_id = $(`<input type="text" class="form-control form-control-sm" id="book_id" name="book_id" disabled>`);
-                    $('#book_id').replaceWith(input_book_id);
+                    //ตั้งค่าต่างๆ
                     urlUpdate = urlUpdate.replace(':id', id);
-                    $('#type_media_id').prop('disabled', true);
-                    $('#modal-title').text('แก้ไขข้อมูลสื่อ');
-                    $('#FormSubmit').attr('action', urlUpdate);
+                    setModal_Media('แก้ไขข้อมูลสื่อ', urlUpdate);
+                    Select2_book();
+                    $('#book_id').select2('destroy');
+                    const input_change = $(
+                        `<input type="text" class="form-control form-control-sm" id="book_id" name="book_id" disabled>`
+                    );
+                    changeInput(input_change, true);
+                    //เริ่มกรอกข้อมูล
                     var fields = ['number', 'type_media_id', 'sound_sys', 'braille_page', 'amount_end',
                         'source', 'translator'
                     ];
@@ -174,9 +155,9 @@
                             $('#' + field).val(data.media_data[field]);
                         }
                     });
-
-                    $('#modal_media').modal('show');
-
+                    $('#book_type').val(data.book_type);
+                    $('#book_id').val(data.book_name);
+                    modal_media.modal('show');
                 },
                 error: function() {
                     console.error('Error fetching data');
@@ -184,10 +165,67 @@
             });
 
         }
+        function modal_reciveOrder(id){
 
+        }
+        function setModal_Media(title, url) {
+            formSubmit.attr('action', url);
+            formSubmit[0].reset();
+            modal_title.text(title);
+        }
 
+        function changeInput(html, status) {
+            const input_book = $('#book_id');
+            input_book.replaceWith(html);
+            input_type_media_id.attr('disabled', status);
+        }
 
-        function createSelect2() {
+        $(document).on('change', '#book_id, #type_media_id', fetchDataInput);
+
+        function fetchDataInput() {
+            const [book_id, type_media_id] = [$('#book_id').val(), $('#type_media_id').val()];
+            const url = `{{ route('media.fetchDataInput') }}`;
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {
+                    book_id,
+                    type_media_id
+                },
+                dataType: "JSON",
+                success: function(data) {
+                    $('#book_type').val(data.typeBook)
+                    $('#number').val(data.number)
+                }
+            });
+        }
+        //start funtion table
+        function tabsShowRequestMedia(){
+
+            const url = `{{ route('requestMedia.fetchDataTable', ['status' => 1]) }}`;
+            $.ajax({
+                type: "GET",
+                url,
+                dataType: "JSON",
+                success: (response) => $('#tableDataRequestMedia').html(response)
+            });
+        }
+        function tabShowMedia(tabName){
+            const statusMapping = {
+                'process_order': 1,
+                'success_order': 2,
+            };
+            const status = statusMapping[tabName];
+            let url = "{{ route('media.fetchDataTable', ['status' => ':status']) }}".replace(':status',status);
+            $.ajax({
+                type: "GET",
+                url,
+                dataType: "JSON",
+                success: (response) => $('#tableDataMedia').html(response)
+            });
+        }
+        //start function select2
+        function Select2_book() {
             let url = `{{ route('media.fetchData.book') }}`;
             $('#book_id').select2({
                 theme: 'bootstrap-5',
@@ -216,7 +254,7 @@
                     cache: true
                 },
                 placeholder: 'ค้นหาหนังสือ',
-                // minimumInputLength: 1,
+                minimumInputLength: 1,
                 dropdownParent: '#modal_media',
             });
         }
