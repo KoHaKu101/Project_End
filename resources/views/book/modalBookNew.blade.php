@@ -11,7 +11,7 @@
                         <div class="form-group row" >
                             <div class="col-lg-3">
                                 <label class="control-label">ชื่อหนังสือ</label>
-                                <input type="text" class="form-control form-control-sm" id="name" name="name">
+                                <input type="text" class="form-control form-control-sm" id="name" name="name" readonly>
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">หมวดหมู่หนังสือ</label>

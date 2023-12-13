@@ -79,7 +79,7 @@
                                                             onclick="editmodal('{{ $datalist->getKey() }}')">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-sm btn-danger">
+                                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{ $datalist->getKey() }}')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                         @if ($amount == 0)
@@ -216,6 +216,10 @@
             loadingButton(btn);
             form.submit();
 
+        }
+        function confirm_delete(id){
+            let url = `{{route('book.delete',['id'=>':id'])}}`.replace(':id',id); ;
+            alertConfirmDelete(url,'{{ csrf_token() }}');
         }
     </script>
 @endsection()

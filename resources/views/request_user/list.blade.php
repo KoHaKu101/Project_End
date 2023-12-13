@@ -20,8 +20,7 @@
                             </div>
                             <div class="col-lg-1">
 
-                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                    data-bs-target="#requestUser_insert">
+                                <button type="button" class="btn btn-sm btn-success" >
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
                                 </button>
@@ -44,27 +43,32 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for ($i=0; $i <=10;$i++)
+                                    @foreach ($data as $index => $datalist)
+                                    @php
+                                        $successNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->count();
+                                        $orderNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->where('status','!=',4)->count();
+
+                                    @endphp
                                     <tr>
-                                        <td class="text-center">{{ $i+1 }}</td>
-                                        <td>นายพิชิตชัย ธรรมชัย</td>
-                                        <td class="text-center">ชาย</td>
-                                        <td class="text-center">21</td>
-                                        <td class="text-center">0883004952</td>
-                                        <td class="text-center">{{ rand(1,100) }} รายการ</td>
-                                        <td class="text-center">{{ rand(1,100) }} รายการ</td>
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td>{{$datalist->f_name .' '. $datalist->l_name}} </td>
+                                        <td class="text-center">{{$datalist->gender}}</td>
+                                        <td class="text-center">{{$datalist->age}}</td>
+                                        <td class="text-center">{{$datalist->tel}}</td>
+                                        <td class="text-center">{{ $orderNumber }} รายการ</td>
+                                        <td class="text-center">{{$successNumber}} รายการ</td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-warning">
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="editModal('{{$datalist->requesters_id}}')">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-danger">
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{$datalist->requesters_id}}')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
 
                                         </td>
-
                                     </tr>
-                                    @endfor
+                                    @endforeach
+
                             </table>
                         </div>
                     </div>
@@ -72,6 +76,42 @@
             </div>
         </div>
     </div>
-    @include('request_user.insert')
+    @include('request_user.modal')
+    <script>
+        const modal_user = $('#requestUser_insert');
+        const form_user = $('#form_requestUser');
+        function createModal(){
+            const urlCreate = `{{route('requestUser.create')}}`;
+            form_user.attr('action',urlCreate);
+            modal_user.modal('show');
+        }
+        function editModal(id){
+            const url = `{{route('requestUser.fetchData',['id'=>':id'])}}`.replace(':id',id);
+            const urlUpdate = `{{route('requestUser.update',['id'=>':id'])}}`.replace(':id',id);
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "JSON",
+                success: function (response) {
+                    var fields = ['id_card', 'f_name', 'l_name', 'birthday', 'age', 'gender', 'tel'];
+                    fields.forEach(function(field) {
+                        if (response[field]) {
+                        $('#' + field).val(response[field]);
+                        }
+                    });
+                    form_user.attr('action',urlUpdate);
+                    modal_user.modal('show');
+                }
+            });
+        }
 
+        function confirm_delete(id){
+            let url = `{{route('requestUser.delete',['id'=>':id'])}}`.replace(':id',id);
+            alertConfirmDelete(url,'{{ csrf_token() }}');
+        }
+
+        modal_user.on('hidden.bs.modal', function() {
+            form_user[0].reset();
+        });
+    </script>
 @endsection()

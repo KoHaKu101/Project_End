@@ -60,37 +60,37 @@
                     </div>
                     <div class="row">
                         <div class="tab-content" id="ex1-content">
-                                <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
-                                                <th scope="col" style="width: 8%">ประเภทสื่อ</th>
-                                                <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
-                                                <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
-                                                <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
-                                                <th scope="col">สถานะ</th>
-                                                <th scope="col"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tableData">
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div class="col-lg-12">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
+                                            <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
+                                            <th scope="col" style="width: 8%">ประเภทสื่อ</th>
+                                            <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
+                                            <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
+                                            <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
+                                            <th scope="col">สถานะ</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableData">
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
             </div>
         </div>
+    </div>
     </div>
     @include('request_media.modal')
     @include('media_out.insert')
     @include('order.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
 
     <script>
         const modalSelect_requestMedia = $('#request_media_modal');
@@ -131,9 +131,9 @@
         async function editModal_requestMedia(id) {
             const url = `{{ route('requestMedia.fetchDataEdit') }}`;
             const urlupdate = `{{ route('requestMedia.update', ['id' => ':id']) }}`.replace(':id', id);
-
+            let btn = $('#btn_edit_'+id);
             form.attr('action', urlupdate);
-            loadingButtonEdit('start');
+            loadingButtonEdit('start',btn);
             try {
                 const data = await $.ajax({
                     type: "GET",
@@ -158,7 +158,7 @@
                 modal_requestMedia('แก้ไขข้อมูล');
                 $(document).on('click', (e) => e.target.closest('.modal-content') || e.stopPropagation());
                 $('#submitBTN').html(`<i class='fas fa-save'></i> บันทึก`);
-                loadingButtonEdit('success');
+                loadingButtonEdit('success',btn);
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -207,12 +207,13 @@
                         dataType: "JSON"
                     });
 
-                    $('#status').val(response.result === 'true' ? 'พร้อมจ่าย' : 'สั่งผลิต');
+                    $('#status').val(response);
                 }
             } catch (error) {
                 console.error('Error fetching status:', error);
             }
         }
+
         function tabsShow(tabName) {
             const statusMapping = {
                 'new_order': 1,
@@ -222,6 +223,7 @@
             };
             fetchDataTable(statusMapping[tabName]);
         }
+
         function fetchDataTable(status) {
             const url = `{{ route('requestMedia.fetchDataTable', ['status' => ':status']) }}`.replace(':status', status);
 
@@ -232,6 +234,7 @@
                 success: (response) => $('#tableData').html(response)
             });
         }
+
         function select2_BookId() {
             const url = `{{ route('media.fetchData.book') }}`;
             bookIdSelect.select2({
@@ -259,6 +262,7 @@
                 dropdownParent: modalSelect_requestMedia,
             });
         }
+
         function select2_User() {
             const url = `{{ route('requestMedia.fetchUser') }}`;
             fNameSelect.select2({
@@ -270,7 +274,7 @@
                     processResults: (data) => ({
                         results: data.map((item) => ({
                             id: item.requesters_id,
-                            text: item.f_name
+                            text: item.f_name + ' ' + item.l_name
                         }))
                     }),
                     cache: true
@@ -279,8 +283,23 @@
                 minimumInputLength: 1,
                 dropdownParent: modalSelect_requestMedia,
                 tags: true,
+                templateResult: formatResult,
+                templateSelection: formatSelection
             });
+
+            function formatResult(result) {
+                if (!result.id) {
+                    return result.text;
+                }
+                return $('<span>' + result.text + '</span>');
+            }
+
+            // Custom function to format selections (input value)
+            function formatSelection(selection) {
+                return selection.text.split(' ')[0]; // Display only the first name
+            }
         }
+
         function setSelected2(selectId, name, id) {
             const optionExists = selectId.find(":contains('" + name + "')").length > 0;
             selectId.val(name).trigger('change');
@@ -291,11 +310,11 @@
             }
         }
 
-        function loadingButtonEdit(status) {
-            const btn = $('#btn_edit');
-            btn.attr('disabled', status === 'start').html(status === 'start' ?
-                '<i class="fas fa-arrows-rotate fa-spin me-2"></i>' : '<i class="fas fa-edit"></i>');
+        function loadingButtonEdit(status,btn) {
+            // const btn = $('#btn_edit');
+            btn.attr('disabled', status === 'start').html(status === 'start' ? '<i class="fas fa-arrows-rotate fa-spin me-2"></i>' : '<i class="fas fa-edit"></i>');
         }
+
         function deleteshow(id) {
             Swal.fire({
                 title: 'ต้องการลบจริงมั้ย ? ',
@@ -339,18 +358,21 @@
                 }
             });
         }
+
         function createModal_order(id) {
             const url = `{{ route('order.fetchRequestMedia') }}`;
             $.ajax({
                 type: "GET",
                 url,
-                data: {id:id},
+                data: {
+                    id: id
+                },
                 dataType: "JSON",
                 success: function(response) {
-                    if(response.status == 3){
-                        $('#btn_form_order').attr('hidden',true);
-                    }else{
-                        $('#btn_form_order').attr('hidden',false);
+                    if (response.status == 3) {
+                        $('#btn_form_order').attr('hidden', true);
+                    } else {
+                        $('#btn_form_order').attr('hidden', false);
                     }
                     $('#order_modal_body').html(response.html);
                 }

@@ -16,7 +16,7 @@
     @php
         $username = session()->get('username');
         $emp_data = App\Models\Emp::where('username', $username)->first();
-        $fullname = $emp_data->f_name  .' '. $emp_data->l_name               
+        $fullname = $emp_data->f_name  .' '. $emp_data->l_name
     @endphp
     @include('sweetalert::alert')
     <div class="wrapper">
@@ -33,14 +33,13 @@
                     @yield('body')
                 </div>
             </div>
-
-
         </div>
 
     </div>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="{{ asset('assets/bootstrap-5.0.2-dist/js/bootstrap.bundle.js') }}"></script>
     <script src="{{ asset('assets/fontawesome-free-6.4.2/js/all.min.js') }}"></script>
+    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
     @yield('js')
 
 

@@ -45,10 +45,8 @@
                                     <option selected>กรุณาเลือกตำแหน่ง</option>
                                     <option value="1">ฝ่ายผลิต</option>
                                     <option value="2">ฝ่ายบริการ</option>
-
                                 </select>
                             </div>
-                            
                             <div class="col-lg-2">
                                 <label class="control-label">เบอร์โทร</label>
                                 <input type="text" class="form-control form-control-sm" id="tel" name="tel"
@@ -72,7 +70,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" id="submitBTN" onclick="loadingSubmit()"><i
+                    <button type="submit" class="btn btn-success" id="submitBTN" onclick="SubmitForm('FormSubmit')"><i
                             class="fas fa-save me-1" id="icon"></i>บันทึก</button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i
                             class="fas fa-xmark me-2"></i>ยกเลิก</button>

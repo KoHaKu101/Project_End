@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use RealRashid\SweetAlert\Facades\Alert;
-use App\Models\ReceiveBook;
+use Carbon\Carbon;
 use App\Models\Emp;
 use App\Models\Book;
-use Carbon\Carbon;
+use App\Models\ReceiveBook;
+use Illuminate\Http\Request;
 use App\Models\ReceiveBookDesc;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use RealRashid\SweetAlert\Facades\Alert;
+
 class ReceiveBookController extends Controller
 {
     //
@@ -17,16 +20,23 @@ class ReceiveBookController extends Controller
         return view('receive_book.list',compact('data'));
     }
     public function create(Request $request){
-        $book = Book::where('name',$request->book_name)->first();
+        $book = Book::where('book_id',$request->book_name)->first();
+        if(is_null($book)){
+            $book_name = $request->book_name;
+            $book_id = null;
+        }else{
+            $book_id = $book->book_id;
+            $book_name = $book->name;
+        }
         $recv_id = ReceiveBook::generateID();
         $emp = Emp::where('username',session()->get('username'))->first();
         $emp_id = $emp->emp_id;
         $add_date = Carbon::now()->format('Y-m-d');
-        $book_id = is_null($book) ? null : $book->book_id;
+
         ReceiveBook::create([
             'recv_id'=> $recv_id,
             'emp_id'=> $emp_id,
-            'book_name'=>$request->book_name,
+            'book_name'=>$book_name,
             'add_date'=> $add_date,
             'add_type'=> $request->add_type,
         ]);
@@ -49,11 +59,26 @@ class ReceiveBookController extends Controller
 
     }
     public function delete($id){
-        $ReceiveBook = ReceiveBook::find($id);
-        $ReceiveBookDesc = ReceiveBookDesc::where('recv_id',$ReceiveBook->recv_id)->first();
-        $ReceiveBookDesc->delete();
-        $ReceiveBook->delete();
-        $check = true;
-        return response()->json($check);
+        try {
+            DB::beginTransaction();
+            $receiveBook = ReceiveBook::find($id);
+            $receiveBookDesc = ReceiveBookDesc::where('recv_id',$receiveBook->recv_id)->first();
+            // คำสั่งลบ
+            $receiveBookDesc->delete();
+            $receiveBook->delete();
+            DB::commit();
+            // แสดงค่าลบรายการสำเร็จ
+            return response()->json(['message' => 'ลบรายการสำเร็จ']);
+        } catch (QueryException $e) {
+            //ไว้สำหรับลบข้อมูลไม่สำเร็จและข้อมูลไม่หายไป
+            DB::rollBack();
+            // เช็คค่าหากมี fk ที่ใช้อยู่จะแจ้งเตือน
+            if ($e->getCode() == 23000) {
+                // Display a SweetAlert with a custom error message
+                return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
+            }
+            // หากเกิด error อื่นๆขึ้น
+            return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
+        }
     }
 }

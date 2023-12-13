@@ -54,7 +54,7 @@
                                                 <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->getKey()}}')">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger">
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{$datalist->getKey()}}')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
@@ -68,28 +68,25 @@
             </div>
         </div>
     </div>
-    @include('emp.insert')
+    @include('emp.modal')
     <script>
-        //ปุ่มโหลด
-        function loadingSubmit() {
-            var button = $('#submitBTN');
-            var icon = $('#icon');
-            button.attr('disabled', 'disabled');
-            button.html('<i class="fas fa-arrows-rotate fa-spin me-2"></i>กำลังบันทึก');
-            $('#FormSubmit').submit();
-        }
-        //ปุ่มแสดง modal สำหรับเพิ่มรายการ
+        const modal_emp = $('#modal_Emp_insert');
+        const modal_title = $('#modal-title');
+        const username = $('#username');
+        const password = $('#password');
+        const formSubmit = $('#FormSubmit');
+
+
+        //funtion open modal
         function createmodal() {
-            let urlcreate = "{{ route('emp.create') }}";
-            let formSubmit = $('#FormSubmit');
-            $('#modal-title').text('เพิ่มข้อเจ้าหน้าที่');
-            formSubmit.attr('action', urlcreate);
-            $('#modal_Emp_insert').modal('show');
-            formSubmit[0].reset();
+            const url = "{{ route('emp.create') }}";
+            disableInput(false);
+            set_modal('เพิ่มข้อเจ้าหน้าที่',url);
         }
         function editmodal(id) {
-            let urlUpdate = "{{route('emp.update',['id'=>':id'])}}";
-            let urlFetch = "{{route('emp.fetchData')}}";
+            const urlFetch = "{{route('emp.fetchData')}}";
+            let urlUpdate = "{{route('emp.update',['id'=>':id'])}}".replace(':id', id);
+
             $.ajax({
                 url: urlFetch,
                 method: 'GET',
@@ -102,16 +99,30 @@
                         $('#' + field).val(data[field]);
                         }
                     });
-                    urlUpdate = urlUpdate.replace(':id', id);
-                    $('#FormSubmit').attr('action',urlUpdate);
-                    $('#modal-title').text('แก้ไขข้อมูลเจ้าหน้าที่');
-                    $('#modal_Emp_insert').modal('show');
+                    disableInput(true);
+                    set_modal('แก้ไขข้อมูลเจ้าหน้าที่',urlUpdate);
                 },
                 error: function() {
                     console.error('Error fetching data');
                 }
             });
-            
+
+        }
+        function confirm_delete(id){
+            let url = `{{route('emp.delete',['id'=>':id'])}}`.replace(':id',id);
+            alertConfirmDelete(url,'{{ csrf_token() }}');
+        }
+        //function setting
+        function set_modal(title,url){
+            modal_title.text(title);
+            formSubmit.attr('action', url);
+            formSubmit[0].reset();
+            modal_emp.modal('show');
+        }
+        function disableInput(status){
+            username.prop('disabled',status);
+            password.prop('disabled',status);
+
         }
     </script>
 @endsection()

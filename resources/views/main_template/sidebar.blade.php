@@ -109,7 +109,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a href="{{ route('requestUser_list') }}" class="sidebar-link " >
+                    <a href="{{ route('requestUser.list') }}" class="sidebar-link " >
                         <i class="fa-solid fa-users pe-2"></i>
                         ข้อมูลผู้ขอรับสื่อ
                     </a>

@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="submitBTN" onclick="loadingSubmit()"></button>
+                    <button type="button" class="btn btn-success" id="submitBTN" onclick="SubmitForm('FormSubmit')"></button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-xmark me-2"></i>ยกเลิก</button>
                 </div>
             </form>

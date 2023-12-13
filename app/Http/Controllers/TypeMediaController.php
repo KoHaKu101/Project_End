@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\TypeMedia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+
 class TypeMediaController extends Controller
 {
     public function index()
@@ -40,4 +43,27 @@ class TypeMediaController extends Controller
         $data->save();
         return redirect()->back();
     }
+    public function delete($id){
+        try {
+            DB::beginTransaction();
+            $data = TypeMedia::find($id);
+            // คำสั่งลบ
+            $data->delete();
+            DB::commit();
+            // แสดงค่าลบรายการสำเร็จ
+            return response()->json(['message' => 'ลบรายการสำเร็จ']);
+        } catch (QueryException $e) {
+            //ไว้สำหรับลบข้อมูลไม่สำเร็จและข้อมูลไม่หายไป
+            DB::rollBack();
+            // เช็คค่าหากมี fk ที่ใช้อยู่จะแจ้งเตือน
+            if ($e->getCode() == 23000) {
+                // Display a SweetAlert with a custom error message
+                return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
+            }
+            // หากเกิด error อื่นๆขึ้น
+            return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
+        }
+    }
+
+
 }

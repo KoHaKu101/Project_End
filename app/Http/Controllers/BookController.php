@@ -6,9 +6,11 @@ use App\Models\Book;
 use App\Models\CopyBook;
 use App\Models\TypeBook;
 use Illuminate\Http\Request;
+use App\Models\ReceiveBookDesc;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-use App\Models\ReceiveBookDesc;
 
 class BookController extends Controller
 {
@@ -30,7 +32,7 @@ class BookController extends Controller
             'edition' => 'required',
             'year' => 'required',
             'original_page' => 'required',
-            'isbn' => 'required'
+            'isbn' => 'required|unique:books,isbn'
         ]);
     }
     public function createData($request){
@@ -59,7 +61,7 @@ class BookController extends Controller
     public function create(Request $request){
         $validator = $this->validateBookRequest($request);
         if ($validator->fails()) {
-            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน หรือ เลข isbn ซ้ำ');
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $this->createData($request);
@@ -70,7 +72,7 @@ class BookController extends Controller
     {
         $validator = $this->validateBookRequest($request);
         if ($validator->fails()) {
-            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน หรือ เลข isbn ซ้ำ');
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $book_id = $this->createData($request);
@@ -99,4 +101,28 @@ class BookController extends Controller
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
+    public function delete($id){
+        try {
+            DB::beginTransaction();
+            $book = Book::find($id);
+            $copyBook = CopyBook::where('book_id',$id)->first();
+            // คำสั่งลบ
+            $copyBook->delete();
+            $book->delete();
+            DB::commit();
+            // แสดงค่าลบรายการสำเร็จ
+            return response()->json(['message' => 'ลบรายการสำเร็จ']);
+        } catch (QueryException $e) {
+            //ไว้สำหรับลบข้อมูลไม่สำเร็จและข้อมูลไม่หายไป
+            DB::rollBack();
+            // เช็คค่าหากมี fk ที่ใช้อยู่จะแจ้งเตือน
+            if ($e->getCode() == 23000) {
+                // Display a SweetAlert with a custom error message
+                return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
+            }
+            // หากเกิด error อื่นๆขึ้น
+            return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
+        }
+    }
+
 }

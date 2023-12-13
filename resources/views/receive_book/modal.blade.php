@@ -43,7 +43,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="btn_modal_receive" onclick="SubmitForm()"><i class="fas fa-check me-1"></i>ยืนยัน</button>
+                <button type="button" class="btn btn-success" id="submitBTN" onclick="SubmitForm('form_modal_receive')"><i class="fas fa-check me-1"></i>ยืนยัน</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i
                         class="fas fa-xmark me-2"></i>ยกเลิก</button>
             </div>

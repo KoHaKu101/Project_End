@@ -98,7 +98,7 @@
     @include('order.modal')
     @include('request_media.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
 
     <script>
         //เริ่มตั้งค่าตัวแปร

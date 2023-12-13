@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Emp;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
+
 class AuthController extends Controller
 {
     function loginForm(){
@@ -20,13 +21,10 @@ class AuthController extends Controller
         $username = $request->username;
         $password = $request->password;
         $dataEmp = Emp::select('username','password','status')->where('username',$username)->first();
-        if(is_Null($dataEmp)){
-            dd('false');
-            return redirect()->route('login');
-        }
-        if(!Hash::check($password,$dataEmp->password)){
-            dd('false2');
-            return redirect()->route('login');
+
+        if(is_Null($dataEmp) || !Hash::check($password,$dataEmp->password)){
+            Alert::error('username หรือ Password ไม่ถูกต้อง');
+            return redirect()->back();
         }
         Session::put('Logged', 'true');
         Session::put('username', $dataEmp->username);
@@ -34,5 +32,5 @@ class AuthController extends Controller
         $route_name = $dataEmp->status == 1 ? 'dashboard_pd' : 'dashboard_ser';
         return redirect()->route($route_name);
     }
-    
+
 }

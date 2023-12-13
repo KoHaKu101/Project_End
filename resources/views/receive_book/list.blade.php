@@ -70,7 +70,7 @@
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger"
-                                                    onclick="deleteshow('{{ $datalist->recv_id }}')">
+                                                    onclick="confirm_delete('{{ $datalist->recv_id }}')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
@@ -85,7 +85,7 @@
         </div>
     </div>
     @include('receive_book.modal')
-    <script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
 
     <script>
@@ -94,29 +94,19 @@
             fields.forEach(function(field) {
                 $('#' + field).prop('disabled', false);
             });
-            $('#btn_modal_receive').attr('hidden', false);
+            $('#submitBTN').attr('hidden', false);
             var form = $('#form_modal_receive');
             var url = `{{ route('receive.create') }}`;
             let input_book_name = $(`<select id="book_name" name="book_name" ></select>`);
             form[0].reset();
-
             form.attr('action', url);
             $('#book_name').replaceWith(input_book_name);
             createSelect2();
             $('#modal_receive').modal('show');
 
         }
-
-        function SubmitForm() {
-            var btn = $('#btn_modal_receive');
-            var form = $('#form_modal_receive');
-            loadingButton(btn);
-            form.submit();
-        }
-
         function editmodal(id) {
             var url = `{{ route('receive.fetchData') }}`;
-
             $.ajax({
                 url: url,
                 method: 'GET',
@@ -129,17 +119,18 @@
                     $('#book_name').select2('destroy');
                     let input_book_name = $(`<input type="text" class="form-control form-control-sm" id="book_name" name="book_name" disabled>`);
                     $('#book_name').replaceWith(input_book_name);
-                    
+
                     var fields = ['book_name','add_date', 'add_type'];
-                    
+
                     fields.forEach(function(field) {
                         if (data.receive[field]) {
                             $('#' + field).prop('disabled', true);
                             $('#' + field).val(data.receive[field]);
                         }
                     });
+                    $('#desc').prop('disabled', true);
                     $('#desc').val(data.desc);
-                    $('#btn_modal_receive').attr('hidden', true);
+                    $('#submitBTN').attr('hidden', true);
                     $('#emp').val(data.emp.f_name + ' ' + data.emp.l_name);
                     $('#modal_receive').modal('show');
                 },
@@ -149,48 +140,9 @@
             });
         }
 
-        function deleteshow(id) {
-            Swal.fire({
-                title: 'ต้องการลบจริงมั้ย ? ',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#157347',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'ใช่',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var url = `{{ route('receive.delete', ['id' => ':id']) }}`;
-                    url = url.replace(':id', id);
-                    $.ajax({
-                        url: url,
-                        method: 'get',
-                        success: function(response) {
-                            if (response == true) {
-                                Swal.fire({
-                                    title: 'ลบรายการสำเร็จ',
-                                    icon: 'success',
-                                    confirmButtonColor: '#157347',
-                                    confirmButtonText: 'ยืนยัน',
-                                }).then((result) => {
-                                    location.reload();
-                                })
-                            } else {
-                                Swal.fire({
-                                    title: 'เกิดข้อผิดพลาด!',
-                                    text: 'ไม่สามารถลบได้เนื่องจากมีหนังสือใช้งานอยู่',
-                                    icon: 'error',
-                                    confirmButtonText: 'รับทราบ'
-                                })
-                            }
-
-                        },
-                        error: function(xhr, status, error) {
-
-                        }
-                    });
-                }
-            });
+        function confirm_delete(id){
+            let url = `{{route('receive.delete',['id'=>':id'])}}`.replace(':id',id); ;
+            alertConfirmDelete(url,'{{ csrf_token() }}');
         }
         function createSelect2() {
             let url = `{{ route('media.fetchData.book') }}`;

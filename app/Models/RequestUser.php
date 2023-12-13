@@ -21,6 +21,7 @@ class RequestUser extends Model
         }
         return $id;
     }
+
     protected $fillable = [
         'requesters_id',
         'f_name',

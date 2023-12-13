@@ -11,6 +11,10 @@ class TypeBook extends Model
     protected $primaryKey = 'type_book_id';
     public $incrementing = false;
 
+    public function Book()
+    {
+        return $this->hasOne(Book::class, 'type_book_id');
+    }
     public static function generateID()
     {
         $dataDB = self::select('type_book_id')->latest()->first();

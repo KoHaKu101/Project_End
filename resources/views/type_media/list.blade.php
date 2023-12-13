@@ -50,13 +50,13 @@
                                                     <i class="fas fa-edit"></i>
 
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger">
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{$datalist->getKey()}}')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </td>
 
                                         </tr>
-                                    @endforeach 
+                                    @endforeach
                             </table>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
             </div>
         </div>
     </div>
-    @include('type_media.insert')
+    @include('type_media.modal')
     <script>
         //ปุ่มโหลด
         function loadingSubmit() {
@@ -107,8 +107,12 @@
                     console.error('Error fetching data');
                 }
             });
-            
+
+        }
+        function confirm_delete(id){
+            let url = `{{route('media_type.delete',['id'=>':id'])}}`.replace(':id',id); ;
+            alertConfirmDelete(url,'{{ csrf_token() }}');
         }
     </script>
-    
+
 @endsection()

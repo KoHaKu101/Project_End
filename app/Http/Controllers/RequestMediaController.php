@@ -24,7 +24,7 @@ class RequestMediaController extends Controller
     public function create(Request $request)
     {
         $RequestUser = RequestUser::where('requesters_id',$request->f_name)->first();
-        $requesters_id = $RequestUser->requesters_id;
+
         if(is_null($RequestUser)){
             $requesters_id  = RequestUser::generateID();
             RequestUser::create([
@@ -33,14 +33,35 @@ class RequestMediaController extends Controller
                 'l_name' => $request->l_name,
                 'tel' => $request->tel,
             ]);
+        }else{
+            $data = RequestUser::where('f_name',$RequestUser->f_name)->get();
+            $newUser = true;
+            foreach($data as $datalist){
+                if($datalist->l_name == $request->l_name){
+                    $RequestUser = RequestUser::where('requesters_id',$datalist->requesters_id)->first();
+                    $newUser = false;
+                    break;
+                }
+            }
+            if($newUser){
+                $requesters_id  = RequestUser::generateID();
+                RequestUser::create([
+                    'requesters_id' => $requesters_id,
+                    'f_name' => $RequestUser->f_name,
+                    'l_name' => $request->l_name,
+                    'tel' => $request->tel,
+                ]);
+            }else{
+                $requesters_id = $RequestUser->requesters_id;
+            }
         }
         $request_id = RequestMedia::generateID();
         $type_media_id = $request->type_media_id;
         $book_id = $request->book_id;
         $emp = Emp::where('username', session()->get('username'))->first();
         $emp_id = $emp->emp_id;
-        $Media = Media::where('book_id', $book_id)->where('type_media_id', $type_media_id)->first();
-        $status = is_null($Media) ? 1 : 2;
+        $media = Media::where('book_id', $request->book_id)->where('type_media_id', $request->type_media_id);
+        $status = $media->where('status',1)->count() > 0 ? 3 : ($media->where('status',2)->count() > 0 ? 2 : 1);
         RequestMedia::create([
             'request_id' => $request_id,
             'emp_id' => $emp_id,
@@ -127,7 +148,7 @@ class RequestMediaController extends Controller
                 4 => '',
             ];
             if($datalist->status != 3){
-                $table .= " <button type='button' class='btn btn-sm btn-warning' id='btn_edit' onclick='editModal_requestMedia(`" . $request_id . "`)'><i class='fas fa-edit'></i></button>
+                $table .= " <button type='button' class='btn btn-sm btn-warning' id='btn_edit_$request_id' onclick='editModal_requestMedia(`" . $request_id . "`)'><i class='fas fa-edit'></i></button>
                             <button type='button' class='btn btn-sm btn-danger me-1' onclick='deleteshow(`" . $request_id . "`)'><i class='fas fa-trash'></i></button>";
             }else{
                 $table .= " <button type='button' class='btn btn-sm btn-info me-1' id='btn_edit' onclick='createModal_order(`" . $request_id . "`)'><i class='fas fa-eye'></i></button>";
@@ -158,20 +179,17 @@ class RequestMediaController extends Controller
 
     public function fetchStatus(Request $request)
     {
-        $media = Media::where('book_id', $request->book_id)
-            ->where('type_media_id', $request->type_media_id)
-            ->first();
 
-        $result = is_null($media) ? 'false' : 'true';
-
-        return response()->json(['result' => $result]);
+        $media = Media::where('book_id', $request->book_id)->where('type_media_id', $request->type_media_id);
+        $result = $media->where('status',1)->count() > 0 ? 'กำลังผลิต' : ($media->where('status',2)->count() > 0 ? 'พร้อมจ่าย' : 'สั่งผลิต');
+        return response()->json($result);
     }
 
     public function fetchUser(Request $request)
     {
         $term = $request->term;
         $data = RequestUser::where('f_name', 'like', "%$term%")
-            ->select('requesters_id', 'f_name')
+            ->select('requesters_id', 'f_name','l_name')
             ->get();
 
         return response()->json($data);

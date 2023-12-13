@@ -37,6 +37,10 @@ class RequestMedia extends Model
     {
         return $this->belongsTo(RequestUser::class, 'requesters_id');
     }
+    public function OrderMedia()
+    {
+        return $this->hasOne(OrderMedia::class, 'order_id');
+    }
     protected $fillable = [
         'request_id',
         'emp_id',
