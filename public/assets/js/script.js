@@ -1,6 +1,7 @@
-const toggler = document.querySelector(".btn-sidebar-toggle");
+const toggler = document.querySelector("#btnSideBarToggle");
+const sidebar = document.querySelector("#sidebar");
 toggler.addEventListener("click", function () {
-    document.querySelector("#sidebar").classList.toggle("collapse");
+    sidebar.classList.toggle("collapseCustom");
 });
 
 function loadingButton(btn) {
@@ -47,3 +48,8 @@ function alertConfirmDelete(url, _token) {
         }
     })
 }
+
+// $('#dropdownUser').on('click',function(){
+//     $(this).dropdown('toggle');
+// });
+

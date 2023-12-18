@@ -79,13 +79,14 @@
 
         //funtion open modal
         function createmodal() {
-            const url = "{{ route('emp.create') }}";
+            const url = "{{ route('emp.create') }}"; formSubmit[0].reset();
             disableInput(false);
             set_modal('เพิ่มข้อเจ้าหน้าที่',url);
         }
         function editmodal(id) {
             const urlFetch = "{{route('emp.fetchData')}}";
             let urlUpdate = "{{route('emp.update',['id'=>':id'])}}".replace(':id', id);
+
 
             $.ajax({
                 url: urlFetch,
@@ -116,7 +117,7 @@
         function set_modal(title,url){
             modal_title.text(title);
             formSubmit.attr('action', url);
-            formSubmit[0].reset();
+
             modal_emp.modal('show');
         }
         function disableInput(status){

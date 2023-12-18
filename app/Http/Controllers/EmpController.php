@@ -61,7 +61,6 @@ class EmpController extends Controller
     public function update(Request $request,$id){
         $data = Emp::find($id);
             if(is_Null($request->password)){
-                    $data->username = $request->username;
                     $data->f_name = $request->f_name;
                     $data->l_name = $request->l_name;
                     $data->gender = $request->gender;

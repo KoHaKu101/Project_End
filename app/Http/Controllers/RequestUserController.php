@@ -36,7 +36,7 @@ class RequestUserController extends Controller
             "gender" => $request->gender,
             "tel" => $request->tel,
         ]);
-        Alert::error('บันทึกรายการสำเร็จ');
+        Alert::success('บันทึกรายการสำเร็จ');
         return redirect()->back();
     }
     public function update($id,Request $request){

@@ -22,7 +22,7 @@ class SettingPageController extends Controller
         }
         if ($request->hasFile('ImgLogo')) {
             $file = $request->file('ImgLogo');
-            $newFileName = 'LogoImg.' . $file->getClientOriginalExtension();
+            $newFileName = 'LogoImg.' . 'png';
             $path = public_path('assets/images/logo');
             if (!File::isDirectory($path)) {
                 File::makeDirectory($path, 0777, true, true);
@@ -31,6 +31,6 @@ class SettingPageController extends Controller
             Alert::success('อัพโหลดสำเร็จ');
             return redirect()->back();
         }
-        
+
     }
 }

@@ -19,15 +19,12 @@ li {
     display: flex;
     width: 100%;
 }
-
-#sidebar {
-    background-color: #A29BFE;
-    max-width: 264px;
-    min-width: 264px;
-    transition: all 0.35s ease-in-out;
-    box-shadow: 0 0 35px 0 rgba(49, 57, 66, 0.5);
-    z-index: 1111;
+.content {
+    flex: 1;
+    max-width: 100%;
+    width: 100%;
 }
+
 
 .main {
     display: flex;
@@ -37,35 +34,39 @@ li {
     overflow: hidden;
     transition: all 0.35s ease-in-out;
 }
-
-.sidebar-logo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+/* ส่วนของ sidebar */
+.sidebar {
+    background-color: #A29BFE;
+    max-width: 264px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 35px 0 rgba(49, 57, 66, 0.5);
+    z-index: 1111;
+}
+.sidebar.collapseCustom {
+    transition: width 0.3s ease;
+    width: 64px ;
+ }
+.sidebar .sidebar-logo {
+    text-align: center;
+    margin: auto;
     width: 50%;
     padding: 1.15rem 1.5rem;
 }
 
-.sidebar-logo a {
-    color: #000000;
-    font-size: 1.25rem;
-    font-weight: 600;
+.sidebar .sidebar-logo .img-logo {
+    width: 150%; /* Set width to 150% for enlargement */
+    max-width: none;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    transform: translateX(-15%); /* Adjust the horizontal positioning */
 }
-
-.img-logo {
-    width: 100px;
-}
-
 .sidebar-nav {
     padding: 0;
 }
-
-.sidebar-header {
-    color: #000000;
-    font-size: .75rem;
-    padding: 1.5rem 1.5rem .375rem;
+.sidebar .sidebar-item {
+    background-color: #C0BBFF;
 }
-
 a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #000000;
@@ -74,37 +75,21 @@ a.sidebar-link {
     font-size: 1rem;
 }
 
-.sidebar-link[data-bs-toggle="collapse"]::after {
-    border: solid;
-    border-width: 0 .075rem .075rem 0;
-    content: "";
-    display: inline-block;
-    padding: 2px;
-    position: absolute;
-    right: 1.5rem;
-    top: 1.4rem;
-    transform: rotate(-135deg);
-    transition: all 1s ease-out;
-}
-
-.sidebar-link[data-bs-toggle="collapse"].collapsed::after {
-    transform: rotate(45deg);
-    transition: all 1s ease-out;
-}
-
-.sidebar-item {
-    background-color: #C0BBFF;
-}
-
-.content {
-    flex: 1;
-    max-width: 100%;
-    width: 100%;
-}
-
 .list-unstyled {
     padding-left: 10% !important;
 }
+
+.sidebar.collapseCustom a.sidebar-link .text-sideBar {
+    display: none;
+}
+.sidebar.collapseCustom img.img-logo {
+    display: none;
+}
+.sidebar.collapseCustom .sidebar-logo{
+    height: 162.75px;
+}
+
+/* ส่วนของ sidebar */
 
 .form-group.row>div {
     padding-bottom: calc(var(--bs-gutter-x) * .5);

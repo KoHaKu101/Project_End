@@ -85,7 +85,7 @@ class MediaController extends Controller
                 $count_data += 1;
             }
         }
-        if($dataRequestMedia->count() > 1){
+        if($count_data > 0){
             foreach($dataRequestMedia as $datalist){
                 $dataOrderMedia = OrderMedia::where('request_id',$datalist->request_id)->where('status',1)->first();
                 if(!is_null($dataOrderMedia)){

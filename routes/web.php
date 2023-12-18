@@ -33,7 +33,7 @@ use App\Http\Controllers\SettingPageController;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('loginprocess', [AuthController::class, 'loginprocess'])->name('login.post');
-
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['custom.auth','check.status:1,2'])->group(function () {
     Route::get('pd/media/fetchData/Book', [MediaController::class, 'fetchDataBook'])->name('media.fetchData.book');
 });

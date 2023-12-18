@@ -1,39 +1,37 @@
     <!-- sidebar -->
-    <aside id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="h-100">
             <div class="sidebar-logo">
                 <a href="{{ route('dashboard_pd') }}">
-                    <img src="{{asset('assets/images/logo/LogoImg.png')}}" class="img-logo" alt="" width="100px" height="100px">
+                    <img src="{{asset('assets/images/logo/LogoImg.png')}}" class="img-logo" alt="" >
                 </a>
             </div>
             @if (session()->get('status') === 1)
             <!-- ของฝ่ายผลิต  -->
             <ul class="sidebar-nav">
-                <li class="sidebar-header">
-                </li>
                 <li class="sidebar-item">
                     <a href="{{ route('dashboard_pd') }}" class="sidebar-link">
                         <i class="fa-solid fa-home pe-2"></i>
-                        หน้าหลัก
+                        <span class="text-sideBar">หน้าหลัก</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="{{ route('media_list') }}" class="sidebar-link ">
                         <i class="fa-solid fa-photo-film pe-1"></i>
-                        สื่อผู้พิการทางสายตา
+                        <span class="text-sideBar">สื่อผู้พิการทางสายตา</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="{{ route('book_list') }}" class="sidebar-link ">
                         <i class="fa-solid fa-book pe-2"></i>
-                        ข้อมูลหนังสือทั่วไป
+                        <span class="text-sideBar">ข้อมูลหนังสือทั่วไป</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#manage_data"
                         aria-expanded="false" aria-controls="manage_data">
                         <i class="fa-solid fa-sliders pe-2"></i>
-                        จัดการข้อมูลพื้นฐาน
+                        <span class="text-sideBar">จัดการข้อมูลพื้นฐาน</span>
                     </a>
                     <ul id="manage_data" class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar">
                         <li class="sidebar-item">
@@ -54,7 +52,7 @@
                     <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#copy_media"
                         aria-expanded="false" aria-controls="copy_media">
                         <i class="fa-solid fa-copy pe-2"></i>
-                        สำเนา
+                        <span class="text-sideBar">สำเนา</span>
                     </a>
                     <ul id="copy_media" class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar">
                         <li class="sidebar-item">
@@ -68,14 +66,13 @@
                 <li class="sidebar-item">
                     <a href="{{ route('report_pd') }}" class="sidebar-link ">
                         <i class="fa-regular fa-file-lines pe-2"></i>
-                        รายงาน
+                        <span class="text-sideBar">รายงาน</span>
                     </a>
                 </li>
             </ul>
             @elseif (session()->get('status') === 2)
             <!-- ของฝ่ายบริการ  -->
             <ul class="sidebar-nav">
-                <li class="sidebar-header"></li>
                 <li class="sidebar-item">
                     <a href="{{ route('dashboard_ser') }}" class="sidebar-link">
                         <i class="fa-solid fa-home pe-2"></i>
@@ -121,12 +118,8 @@
                     </a>
                 </li>
             </ul>
-
             @endif
-
-
         </div>
     </aside>
-    <!-- main Componet-->
 
 

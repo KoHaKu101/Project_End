@@ -20,7 +20,7 @@
                             </div>
                             <div class="col-lg-1">
 
-                                <button type="button" class="btn btn-sm btn-success" >
+                                <button type="button" class="btn btn-sm btn-success" onclick="createModal()" >
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
                                 </button>
