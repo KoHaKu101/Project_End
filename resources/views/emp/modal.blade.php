@@ -19,8 +19,8 @@
                             </div>
                             <div class="col-lg-2">
                                 <label class="control-label">รหัสประจำตัวประชาชน</label>
-                                <input type="text" class="form-control form-control-sm" id="id_card" name="id_card"
-                                    maxlength="13"required>
+                                <input type="text" class="form-control form-control-sm" id="id_card" name="id_card" maxlength="13" required
+                                oninput="InputOnlyNumber(this)">
                             </div>
                             <div class="col-lg-2">
                                 <label class="control-label">วันเดือนปีเกิด</label>
@@ -30,7 +30,7 @@
                             <div class="col-lg-2">
                                 <label class="control-label">อายุ</label>
                                 <input type="text" class="form-control form-control-sm" id="age" name="age"
-                                    maxlength="3"required>
+                                    maxlength="3"required oninput="InputOnlyNumber(this)">
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">เพศ</label>
@@ -50,7 +50,7 @@
                             <div class="col-lg-2">
                                 <label class="control-label">เบอร์โทร</label>
                                 <input type="text" class="form-control form-control-sm" id="tel" name="tel"
-                                    maxlength="10"required>
+                                    maxlength="10"required oninput="InputOnlyNumber(this)">
                             </div>
                             <div class="col-lg-2">
                                 <label class="control-label">Username</label>

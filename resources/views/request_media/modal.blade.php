@@ -42,7 +42,7 @@
                         <div class="col-lg-12">
                             <label>เบอร์โทรศัพท์</label>
                             <input type="text" class="form-control" id="tel" name="tel"
-                                placeholder="กรอกเบอร์โทรศัพท์">
+                                placeholder="กรอกเบอร์โทรศัพท์" oninput="InputOnlyNumber(this)">
                         </div>
                         <div class="col-lg-12">
                             <label>เจ้าหน้าที่ </label>

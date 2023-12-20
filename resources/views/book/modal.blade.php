@@ -35,23 +35,31 @@
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">พิมพ์ครั้งที่</label>
-                                <input type="text" class="form-control form-control-sm" id="edition"
-                                    name="edition">
+                                <div class="input-group input-group-sm ">
+                                    <span class="input-group-text">ครั้งที่</span>
+                                    <input type="text" class="form-control form-control-sm" id="edition" name="edition" oninput="InputOnlyNumber(this)">
+                                  </div>
+
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">ปีที่พิมพ์</label>
-                                <input type="text" class="form-control form-control-sm" id="year"
-                                    name="year">
+                                <div class="input-group input-group-sm ">
+                                    <span class="input-group-text">พ.ศ.</span>
+                                    <input type="text" class="form-control form-control-sm" id="year" name="year"oninput="InputOnlyNumber(this)">
+                                  </div>
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">จำนวนหน้าทั้งหมด</label>
-                                <input type="number" class="form-control form-control-sm" id="original_page"
-                                    name="original_page">
+                                <div class="input-group input-group-sm ">
+                                    <input type="number" class="form-control form-control-sm" id="original_page" name="original_page" oninput="InputOnlyNumber(this)">
+                                    <span class="input-group-text">หน้า</span>
+                                  </div>
+
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">เลข ISBN</label>
                                 <input type="text" class="form-control form-control-sm" id="isbn" name="isbn"
-                                    maxlength="13">
+                                    maxlength="13" oninput="InputOnlyNumber(this)">
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">ลำดับชั้นปี</label>

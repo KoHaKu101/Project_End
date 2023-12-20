@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Media;
-use App\Models\RequestMedia;
-use App\Models\RequestUser;
-use App\Models\TypeMedia;
-use App\Models\Book;
-
-use Illuminate\Http\Request;
 use App\Models\Emp;
+use App\Models\Book;
+use App\Models\Media;
+use App\Models\TypeMedia;
+use App\Models\RequestUser;
+
+use App\Models\RequestMedia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
+
 class RequestMediaController extends Controller
 {
     //
@@ -21,46 +23,62 @@ class RequestMediaController extends Controller
         $dataRequestMedia = RequestMedia::orderby('created_at')->get();
         return view('request_media.list', compact('dataSelect', 'dataRequestMedia'));
     }
-    public function create(Request $request)
-    {
-        $RequestUser = RequestUser::where('requesters_id',$request->f_name)->first();
-
-        if(is_null($RequestUser)){
-            $requesters_id  = RequestUser::generateID();
-            RequestUser::create([
-                'requesters_id' => $requesters_id,
-                'f_name' => $request->f_name,
-                'l_name' => $request->l_name,
-                'tel' => $request->tel,
-            ]);
+    private function createRequestUser($data){
+        RequestUser::create($data);
+    }
+    private function checkRequestUser($requestUser,$request){
+        $l_name = $request->l_name;
+        $f_name = $requestUser->f_name;
+        $tel = $request->tel;
+        $requesters_id  = RequestUser::generateID();
+        $dataInsert = [
+            'requesters_id' => $requesters_id,
+            'f_name' => $f_name,
+            'l_name' => $l_name,
+            'tel' => $tel,
+        ];
+        if(is_null($requestUser)){
+            //ถ้าไม่พบข้อมู,ให้สร้างใหม่
+            $this->createRequestUser($dataInsert);
         }else{
-            $data = RequestUser::where('f_name',$RequestUser->f_name)->get();
-            $newUser = true;
-            foreach($data as $datalist){
-                if($datalist->l_name == $request->l_name){
-                    $RequestUser = RequestUser::where('requesters_id',$datalist->requesters_id)->first();
-                    $newUser = false;
-                    break;
+            $data = RequestUser::where('f_name',$requestUser->f_name)->where('l_name', $l_name)->first();
+            if (!is_null($data)) {
+                $existingUser = $data;
+                if($existingUser->tel != $tel ){
+                    $requestUser->update([
+                        'tel' => $tel
+                    ]);
                 }
-            }
-            if($newUser){
-                $requesters_id  = RequestUser::generateID();
-                RequestUser::create([
-                    'requesters_id' => $requesters_id,
-                    'f_name' => $RequestUser->f_name,
-                    'l_name' => $request->l_name,
-                    'tel' => $request->tel,
-                ]);
+                $requesters_id = $existingUser->requesters_id;
             }else{
-                $requesters_id = $RequestUser->requesters_id;
+                $this->createRequestUser($dataInsert);
             }
+
+            return $requesters_id;
         }
+    }
+    public function create(Request $request){
+        $validator = Validator::make($request->all(), [
+            'f_name' => 'required',
+            'l_name' => 'required',
+            'tel' => 'required',
+            'book_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back();
+        }
+        $requestUser = RequestUser::where('requesters_id',$request->f_name)->first();
+        $requesters_id = $this->checkRequestUser($requestUser,$request);
+
         $request_id = RequestMedia::generateID();
-        $type_media_id = $request->type_media_id;
         $book_id = $request->book_id;
+        $type_media_id = $request->type_media_id;
+
         $emp = Emp::where('username', session()->get('username'))->first();
+        $media = Media::where('book_id', $book_id)->where('type_media_id', $request->type_media_id);
+
         $emp_id = $emp->emp_id;
-        $media = Media::where('book_id', $request->book_id)->where('type_media_id', $request->type_media_id);
         $status = $media->where('status',1)->count() > 0 ? 3 : ($media->where('status',2)->count() > 0 ? 2 : 1);
         RequestMedia::create([
             'request_id' => $request_id,
@@ -75,32 +93,31 @@ class RequestMediaController extends Controller
         return redirect()->back();
     }
     public function update($id,Request $request){
-        $data = RequestMedia::find($id);
-        $requestUser = RequestUser::find($request->f_name);
-        $requesters_id = $request->f_name;
-        $emp = Emp::where('username', session()->get('username'))->first();
-        $emp_id = $emp->emp_id;
-        $type_media_id = $request->type_media_id;
-        $book_id = $request->book_id;
-        $Media = Media::where('book_id', $book_id)->where('type_media_id', $type_media_id)->first();
-        $status = is_null($Media) ? 1 : 2;
-        if(is_null($requestUser)){
-            $requesters_id  = RequestUser::generateID();
-            RequestUser::create([
-                'requesters_id' => $requesters_id,
-                'f_name' => $request->f_name,
-                'l_name' => $request->l_name,
-                'tel' => $request->tel,
-            ]);
-        }else{
-            $tel = $request->tel;
-            if($tel != $requestUser->tel){
-                $requestUser->update([
-                    'tel' => $tel
-                ]);
-            }
-
+        $validator = Validator::make($request->all(), [
+            'f_name' => 'required',
+            'l_name' => 'required',
+            'tel' => 'required',
+            'book_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back();
         }
+
+        $book_id = $request->book_id;
+        $type_media_id = $request->type_media_id;
+        $requesters_id = $request->f_name;
+
+        $data = RequestMedia::find($id);
+        $requestUser = RequestUser::find($requesters_id);
+        $emp = Emp::where('username', session()->get('username'))->first();
+        $media = Media::where('book_id', $book_id)->where('type_media_id', $request->type_media_id);
+
+        $emp_id = $emp->emp_id;
+        $status = $media->where('status',1)->count() > 0 ? 3 : ($media->where('status',2)->count() > 0 ? 2 : 1);
+
+        $requesters_id = $this->checkRequestUser($requestUser,$request);
+
         $data->update([
             'emp_id' => $emp_id,
             'type_media_id' => $type_media_id,
@@ -120,8 +137,7 @@ class RequestMediaController extends Controller
         return response()->json($check);
 
     }
-    public function fetchDataTable($status)
-    {
+    public function fetchDataTable($status){
         $RequestMedia = RequestMedia::where('status', $status)->orderBy('created_at')->get();
         $table = '';
         $number = 1;

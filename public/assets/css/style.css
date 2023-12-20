@@ -32,37 +32,55 @@ li {
     min-height: 100vh;
     width: 100%;
     overflow: hidden;
-    transition: all 0.35s ease-in-out;
 }
-/* ส่วนของ sidebar */
+/* เริ่ม ส่วนของ sidebar */
 .sidebar {
     background-color: #A29BFE;
-    max-width: 264px;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 35px 0 rgba(49, 57, 66, 0.5);
-    z-index: 1111;
+    width: 26vh;
+    max-width: 25vh;
+    transition: all 0.35s ease-in-out;
+
 }
 .sidebar.collapseCustom {
-    transition: width 0.3s ease;
-    width: 64px ;
- }
-.sidebar .sidebar-logo {
-    text-align: center;
-    margin: auto;
-    width: 50%;
-    padding: 1.15rem 1.5rem;
+    width: 7vh;
 }
 
-.sidebar .sidebar-logo .img-logo {
-    width: 150%; /* Set width to 150% for enlargement */
-    max-width: none;
+.sidebar.collapseCustom .sidebar-logo{
+    height: 15vh;
+}
+.sidebar.collapseCustom a.sidebar-link .text-sideBar {
+    opacity: 0;
+    }
+.sidebar a.sidebar-link .text-sideBar{
+
+    position:absolute;
+    opacity: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition:opacity 0.35s ease;
+}
+
+.sidebar .sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 15vh;
+    width: 100%;
+    max-height: 15vh;
+}
+
+.sidebar .sidebar-logo a img.img-logo {
+    max-width: 50%;
     height: auto;
     display: block;
-    margin: 0 auto;
-    transform: translateX(-15%); /* Adjust the horizontal positioning */
+    margin: auto;
+    transition:all 0.35s ease-in-out;
+}
+.sidebar .sidebar-menu {
+    height: auto;
 }
 .sidebar-nav {
-    padding: 0;
+    padding-left: 0;
 }
 .sidebar .sidebar-item {
     background-color: #C0BBFF;
@@ -78,18 +96,20 @@ a.sidebar-link {
 .list-unstyled {
     padding-left: 10% !important;
 }
+a.sidebar-link:hover{
+    background-color: #5c4ae6;
+    color:#ffffff;
+}
+a.sidebar-link.active{
+    background-color: #5c4ae6;
+    color:#ffffff;
+}
+ul.sidebar-dropdown a.sidebar-link.active{
+    background-color: #8679eb;
+    color:#ffffff;
+}
 
-.sidebar.collapseCustom a.sidebar-link .text-sideBar {
-    display: none;
-}
-.sidebar.collapseCustom img.img-logo {
-    display: none;
-}
-.sidebar.collapseCustom .sidebar-logo{
-    height: 162.75px;
-}
-
-/* ส่วนของ sidebar */
+/*สิ้นสุด ส่วนของ sidebar */
 
 .form-group.row>div {
     padding-bottom: calc(var(--bs-gutter-x) * .5);
@@ -110,4 +130,17 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+.bg-grayCustom{
+    background:#e4e4e4
+}
+.tab-content{
+    padding-left: 0% !important;
+}
+table.table-bordered {
+    border:1px solid #c7c7c7;
+  }
+.badge.bg-warning{
+    color: #000000 !important;
 }

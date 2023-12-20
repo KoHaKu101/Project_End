@@ -29,8 +29,8 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered border-black" >
+                                <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col" style="width: 45%">ชื่อ - นามสกุล</th>
@@ -47,15 +47,16 @@
                                     @php
                                         $successNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->count();
                                         $orderNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->where('status','!=',4)->count();
+                                        $gender = $datalist->gender == "M" ? 'ชาย' : ($datalist->gender == "F" ? 'หญิง' : '');
 
                                     @endphp
                                     <tr>
                                         <td class="text-center">{{ $index + 1 }}</td>
                                         <td>{{$datalist->f_name .' '. $datalist->l_name}} </td>
-                                        <td class="text-center">{{$datalist->gender}}</td>
+                                        <td class="text-center">{{$gender}}</td>
                                         <td class="text-center">{{$datalist->age}}</td>
                                         <td class="text-center">{{$datalist->tel}}</td>
-                                        <td class="text-center">{{ $orderNumber }} รายการ</td>
+                                        <td class="text-center">{{$orderNumber}} รายการ</td>
                                         <td class="text-center">{{$successNumber}} รายการ</td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-warning" onclick="editModal('{{$datalist->requesters_id}}')">
@@ -104,12 +105,10 @@
                 }
             });
         }
-
         function confirm_delete(id){
             let url = `{{route('requestUser.delete',['id'=>':id'])}}`.replace(':id',id);
             alertConfirmDelete(url,'{{ csrf_token() }}');
         }
-
         modal_user.on('hidden.bs.modal', function() {
             form_user[0].reset();
         });

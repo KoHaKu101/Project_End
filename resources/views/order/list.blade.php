@@ -54,8 +54,8 @@
                         <div class="tab-content" id="ex1-content">
                             <div class="tab-pane fade show active" id="order"role="tabpanel"aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table table-bordered border-black" >
+                                        <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
@@ -74,8 +74,8 @@
                             </div>
                             <div class="tab-pane fade show" id="process_order"role="tabpanel"aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table table-bordered border-black" >
+                                        <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col" style="width: 35%">ชื่อหนังสือ</th>

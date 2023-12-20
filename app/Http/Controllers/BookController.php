@@ -22,8 +22,7 @@ class BookController extends Controller
         $type_book = TypeBook::all();
         return view('book/list', compact('type_book', 'ReceiveBookDesc', 'Book'));
     }
-    private function validateBookRequest($request)
-    {
+    private function validateBookRequest($request){
         return Validator::make($request->all(), [
             'type_book_id' => 'required',
             'name' => 'required',
@@ -32,11 +31,10 @@ class BookController extends Controller
             'edition' => 'required',
             'year' => 'required',
             'original_page' => 'required',
-            'isbn' => 'required|unique:books,isbn'
+
         ]);
     }
-    public function createData($request){
-
+    public function createFunction($request){
         $book_id = Book::generateID();
         Book::create([
             'book_id' => $book_id,
@@ -58,46 +56,51 @@ class BookController extends Controller
         ]);
         return $book_id;
     }
-    public function create(Request $request){
-        $validator = $this->validateBookRequest($request);
-        if ($validator->fails()) {
-            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน หรือ เลข isbn ซ้ำ');
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $this->createData($request);
-        Alert::success('บันทึกสำเร็จ');
-        return redirect()->back();
-    }
-    public function createBookNew($id, Request $request)
-    {
-        $validator = $this->validateBookRequest($request);
-        if ($validator->fails()) {
-            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน หรือ เลข isbn ซ้ำ');
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $book_id = $this->createData($request);
-        ReceiveBookDesc::find($id)->update(['book_id' => $book_id]);
-        Alert::success('บันทึกสำเร็จ');
-        return redirect()->back();
-    }
-    public function fetchData(Request $request)
-    {
 
-        $id = $request->input('id');
-        $data = Book::find($id);
-        return response()->json($data);
-    }
-    public function update(Request $request, $id)
-    {
+    public function create(Request $request){
         $validator = $this->validateBookRequest($request);
         if ($validator->fails()) {
             Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        if(Book::where('isbn',$request->isbn)->count() > 0 ){
+            Alert::error('Error', 'เลข isbn ซ้ำ');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $this->createFunction($request);
+        Alert::success('บันทึกสำเร็จ');
+        return redirect()->back();
+    }
+    public function createBookNew($id, Request $request){
+        $validator = $this->validateBookRequest($request);
+        if ($validator->fails()) {
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        if(Book::where('isbn',$request->isbn)->count() > 0 ){
+            Alert::error('Error', 'เลข isbn ซ้ำ');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $book_id = $this->createFunction($request);
+        ReceiveBookDesc::find($id)->update(['book_id' => $book_id]);
+        Alert::success('บันทึกสำเร็จ');
+        return redirect()->back();
+    }
+
+    public function update($id,Request $request){
+        $validator = $this->validateBookRequest($request);
+        if ($validator->fails()) {
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $dataExits = Book::where('isbn',$request->isbn)->where('book_id','!=',$id)->exists();
+        if($dataExits){
+            Alert::error('Error', 'เลข isbn ซ้ำ');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         $data = Book::find($id);
         $data->update($request->all());
         $data->update(['updated_at' => now()]);
-
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
@@ -124,5 +127,61 @@ class BookController extends Controller
             return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
         }
     }
-
+    public function fetchData(Request $request){
+        $id = $request->input('id');
+        $data = Book::find($id);
+        return response()->json($data);
+    }
+    public function fetchDataTableBook(Request $request){
+        $html = '';
+        $Book = Book::orderby('created_at')->get();
+        foreach($Book as $index => $datalist){
+                $type_book_name = optional($datalist->TypeBook)->name ?? '';
+                $amount = optional($datalist->CopyBook)->amount ?? 0;
+                $copy_id = optional($datalist->CopyBook)->copy_id ?? '';
+                $badge = is_null($datalist->updated_at) ? 'bg-danger' : ($amount > 0 ? 'bg-success' : 'bg-warning text-dark');
+                $textBadge = is_null($datalist->updated_at) ? 'ไม่มีข้อมูล' : ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา');
+                $number = $index + 1;
+                $html.= "<tr>
+                            <td class='text-center'>{$number}</td>
+                            <td>{$datalist->name}</td>
+                            <td>{$type_book_name}</td>
+                            <td>{$datalist->isbn}</td>
+                            <td><span class='badge {$badge}'> {$textBadge} </span></td>
+                            <td>
+                                <button type='button' class='btn btn-sm btn-warning'
+                                    onclick='editmodal(`{$datalist->getKey()}`)'>
+                                    <i class='fas fa-edit'></i>
+                                </button>
+                                <button type='button' class='btn btn-sm btn-danger' onclick='confirm_delete(`{$datalist->getKey()}`)'>
+                                    <i class='fas fa-trash'></i>
+                                </button>";
+                if($amount == 0){
+                    $html.= "<button type='button' class='btn btn-sm btn-primary'
+                                onclick='openModalCopy(`plus`, `{$copy_id}`, `{$datalist->name}`)'>
+                                <i class='fas fa-copy'></i>
+                                เพิ่มสำเนา
+                            </button>";
+                }
+                $html.="</td>
+                        </tr>";
+        }
+        return response()->json($html);
+    }
+    public function fetchDataTableBookNew(Request $request){
+        $html = '';
+        $ReceiveBookDesc = ReceiveBookDesc::where('book_id', null)->orderby('created_at')->get();
+        foreach($ReceiveBookDesc as $index => $datalist){
+            $number = $index + 1;
+            $html.= "<tr>
+                    <td class='text-center'>{$number}</td>
+                    <td>{$datalist->ReceiveBook->book_name}</td>
+                    <td>
+                        <button type='button' class='btn btn-success btn-sm' onclick='OpenModalBookNew(`{$datalist->recd_id}`,`{$datalist->ReceiveBook->book_name}`)'>
+                        <i class='fas fa-plus me-1'></i>เพิ่มข้อมูล</button>
+                    </td>
+                </tr>";
+        }
+        return response()->json($html);
+    }
 }

@@ -6,6 +6,8 @@ use App\Models\TypeMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
 
 class TypeMediaController extends Controller
 {
@@ -16,10 +18,19 @@ class TypeMediaController extends Controller
     }
     public function create(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'desc'=>'required|string'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'desc'=>'required'
         ]);
+        if ($validator->fails()) {
+            Alert::error('เกิดข้อผิดพลาด', 'กรอกข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        if(TypeMedia::where('name',$request->name)->count() > 0){
+            Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
+                return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $id = TypeMedia::generateID();
         TypeMedia::create([
             'type_media_id' => $id,
@@ -27,21 +38,24 @@ class TypeMediaController extends Controller
             'desc' => $request->desc
 
         ]);
+        Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
-    public function fetchData(Request $request)
-    {
-        $id = $request->input('id');
-        $data = TypeMedia::find($id);
-        return response()->json($data);
-    }
+
     public function update(Request $request, $id)
     {
-        $data = TypeMedia::find($id);
-        $data->name = $request->name;
-        $data->desc = $request->desc;
-        $data->save();
+        $dataExists = TypeMedia::where('name', $request->name)->where('type_media_id', '!=', $id)->exists();
+        if(!$dataExists){
+            $data = TypeMedia::find($id);
+            $data->name = $request->name;
+            $data->desc = $request->desc;
+            $data->save();
+            Alert::success('บันทึกสำเร็จ');
+            return redirect()->back();
+        }
+        Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
         return redirect()->back();
+
     }
     public function delete($id){
         try {
@@ -63,6 +77,13 @@ class TypeMediaController extends Controller
             // หากเกิด error อื่นๆขึ้น
             return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
         }
+    }
+
+    public function fetchData(Request $request)
+    {
+        $id = $request->input('id');
+        $data = TypeMedia::find($id);
+        return response()->json($data);
     }
 
 

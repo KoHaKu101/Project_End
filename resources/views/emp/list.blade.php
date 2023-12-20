@@ -31,8 +31,8 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <table class="table">
-                                <thead>
+                            <table class="table table-bordered border-black" >
+                                <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col" style="width: 15%">รหัสเจ้าหน้าที่</th>

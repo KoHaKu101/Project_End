@@ -21,8 +21,13 @@ class CopyBookController extends Controller
         return response()->json($data);
     }
     public function update(Request $request,$id,$math){
+        if($request->amount == 0){
+            Alert::error('เกิดข้อผิดพลาด','กรุณาระบุตัวเลขให้ถูกต้อง');
+            return redirect()->back();
+        }
         $data = CopyBook::find($id);
         $amount = ($math == 'plus') ? ($data->amount + $request->amount) : ($data->amount - $request->amount);
+
         if($amount < 0){
             Alert::error('เกิดข้อผิดพลาด','ไม่สามารถบันทึกได้ เนื่องจากตัวเลขติดลบ');
             return redirect()->back();

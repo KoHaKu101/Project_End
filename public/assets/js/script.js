@@ -1,9 +1,30 @@
 const toggler = document.querySelector("#btnSideBarToggle");
-const sidebar = document.querySelector("#sidebar");
+const sidebar = document.querySelector(".sidebar");
+const sidebar_link_collapsed = $('a.sidebar-link.dropdown-list');
+const sidebar_dropdown = $('.sidebar-dropdown.list-unstyled');
 toggler.addEventListener("click", function () {
     sidebar.classList.toggle("collapseCustom");
+    sidebar_dropdown.removeClass('show');
 });
 
+$(document).ready(function () {
+    if($('#manage_data_list').hasClass('active')){
+        $('#manage_data').addClass('show');
+    }
+
+    if($('#copy_media_list').hasClass('active')){
+        $('#copy_media').addClass('show');
+    }
+
+});
+sidebar_link_collapsed.click(function () {
+    if (sidebar.classList.contains('collapseCustom')) {
+        toggler.click();
+    }
+});
+// sidebar_link_collapsed.addEventListener("click", function () {
+
+// });
 function loadingButton(btn) {
     btn.attr('disabled', 'disabled');
     btn.html('<i class="fas fa-arrows-rotate fa-spin me-2"></i>กำลังบันทึก');
@@ -29,11 +50,11 @@ function alertConfirmDelete(url, _token) {
                 type: "DELETE",
                 url: url,
                 dataType: "JSON",
-                data:{
-                    _token:_token
+                data: {
+                    _token: _token
                 },
                 success: function (response) {
-                    Swal.fire('Success', response.message, 'success').then((result) => {location.reload()});
+                    Swal.fire('Success', response.message, 'success').then((result) => { location.reload() });
                 },
                 error: function (xhr) {
                     // Display error message using SweetAlert for specific error cases
@@ -48,8 +69,12 @@ function alertConfirmDelete(url, _token) {
         }
     })
 }
-
+function InputOnlyNumber(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+  }
 // $('#dropdownUser').on('click',function(){
 //     $(this).dropdown('toggle');
 // });
+
+
 

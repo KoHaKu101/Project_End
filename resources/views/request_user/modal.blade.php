@@ -12,7 +12,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <label>รหัสบัตรประจำตัวประชาชน </label>
-                    <input type="text" class="form-control " id="id_card" name="id_card" maxlength="13"required>
+                    <input type="text" class="form-control " id="id_card" name="id_card" maxlength="13"required oninput="InputOnlyNumber(this)">
                 </div>
                 <div class="col-lg-6">
                     <label>ชื่อ</label>
@@ -28,7 +28,10 @@
                 </div>
                 <div class="col-lg-6">
                     <label>อายุ</label>
-                    <input type="text" class="form-control " id="age" name="age"maxlength="3"required>
+                    <div class="input-group input-group-sm ">
+                        <input type="text" class="form-control " id="age" name="age"maxlength="3"required oninput="InputOnlyNumber(this)">
+                        <span class="input-group-text">ปี</span>
+                      </div>
                 </div>
                 <div class="col-lg-6">
                     <label>เพศ</label>
@@ -39,7 +42,7 @@
                 </div>
                 <div class="col-lg-6">
                     <label>เบอร์โทร</label>
-                    <input type="text" class="form-control form-control-sm" id="tel" name="tel" maxlength="10" required>
+                    <input type="text" class="form-control form-control-sm" id="tel" name="tel" maxlength="10" required oninput="InputOnlyNumber(this)">
                 </div>
             </div>
           </form>

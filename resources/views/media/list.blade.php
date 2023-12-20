@@ -29,7 +29,7 @@
                     </div>
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
+                            <li class="nav-item " role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
                                     data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
                                     onclick="tabsShowOrder()" aria-selected="true">รายการสั่งผลิตสื่อ</button>
@@ -51,8 +51,8 @@
                         <div class="tab-content" id="ex1-content">
                             <div class="tab-pane fade show active" id="new_order" role="tabpanel" aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table table-bordered border-black">
+                                        <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col" >ชื่อหนังสือ</th>
@@ -69,8 +69,8 @@
                             </div>
                             <div class="tab-pane fade show" id="process_order" role="tabpanel" aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table table-bordered border-black" >
+                                        <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col">ชื่อหนังสือ</th>
@@ -158,8 +158,7 @@
             });
 
         }
-
-        function show_dataOrder(id){
+        function show_ConfirmDataOrder(id){
             const url = `{{ route('media.fetchDataConfirmOrder') }}`;
             $.ajax({
                 type: "GET",
@@ -179,13 +178,11 @@
             formSubmit[0].reset();
             modal_title.text(title);
         }
-
         function changeInput(html, status) {
             const input_book = $('#book_id');
             input_book.replaceWith(html);
             input_type_media_id.attr('disabled', status);
         }
-
         $(document).on('change', '#book_id, #type_media_id', fetchDataInput);
 
         function fetchDataInput() {

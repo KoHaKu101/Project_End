@@ -23,25 +23,24 @@ class MediaController extends Controller
         $dataMedia = Media::orderby('created_at')->get();
         return view('media/list', compact('dataMediaType', 'dataMedia'));
     }
-    public function create(Request $request)
-    {
+    public function create(Request $request){
         $validator = Validator::make($request->all(), [
             'book_id' => 'required',
             'type_media_id' => 'required',
         ]);
         if ($validator->fails()) {
-            Alert::error('Error', 'เกิดข้อผิดพลาดกรุณาลองใหม่');
+            Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $book_id = $request->book_id;
         $type_media_id = $request->type_media_id;
         $media_id = Media::generateID();
         $dataMedia = Media::where('book_id', $book_id)->where('type_media_id', $type_media_id)->first();
-        if (!is_Null($dataMedia)) {
+        if (!is_null($dataMedia)) {
             Alert::error('Error', 'รายการนี้มีแล้ว');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $number = Media::generateNumber($book_id, $type_media_id);
+        $number = Media::generateNumber($book_id,$type_media_id);
         Media::create([
             'media_id' => $media_id,
             'book_id' => $book_id,
@@ -176,14 +175,12 @@ class MediaController extends Controller
                         <td>{$datalist->order_date}</td>
                         <td>{$emp}</td>
                         <td>
-                            <button type='button' class='btn btn-sm btn-primary' onclick='show_dataOrder(`{$datalist->order_id}`)'><i class='fas fa-check me-1'></i>รับคำสั่งผลิต</button>
-                            <button type='button' class='btn btn-sm btn-danger'><i class='fas fa-xmark me-1'></i>ยกเลิกคำสั่ง</button>
+                            <button type='button' class='btn btn-sm btn-primary' onclick='show_ConfirmDataOrder(`{$datalist->order_id}`)'><i class='fas fa-eye me-1'></i>ตรวจสอบรายการสั่งผลิต</button>
                         </td>
                     </tr>";
         }
         return response()->json($html);
     }
-
     public function fetchDataTable($status){
         $dataMedia = Media::where('status',$status)->orderby('created_at')->get();
         $html = '';

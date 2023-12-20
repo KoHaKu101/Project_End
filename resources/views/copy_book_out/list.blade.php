@@ -46,8 +46,8 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered border-black" >
+                                <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 3%" class="text-center">ลำดับ</th>
                                         <th scope="col" style="width: 10%">ชื่อหนังสือ</th>
@@ -72,7 +72,7 @@
                                         </td>
                                         <td>
                                             @if($datalist->status === 1)
-                                                <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->copyout_id}}')">รับคืน</button>
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->copyout_id}}')"><i class="fa-solid fa-hand-holding fa-xl me-1"></i>รับคืน</button>
                                                 <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                             @endif
                                         </td>
@@ -90,7 +90,7 @@
     <script>
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
-            // สร้างช่องใส่ bookid 
+            // สร้างช่องใส่ bookid
             let input_book_id = $(`<select id="book_id" name="book_id" ></select>`);
             $('#book_id').replaceWith(input_book_id);
             createSelect2();
@@ -145,7 +145,7 @@
             let btn = $('#submitBTN');
             btn.removeClass('btn-warning');
             btn.html('<i class="fas fa-plus me-2"></i>เพิ่มรายการ');
-            
+
         }
         function createSelect2() {
             let url = `{{ route('media.fetchData.book') }}`;

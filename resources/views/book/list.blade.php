@@ -33,20 +33,20 @@
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                                    data-bs-target="#tab_book" type="button" role="tab" aria-controls="tab_book"
+                                    data-bs-target="#tab_book" type="button" role="tab" aria-controls="tab_book" onclick="showTableBook()"
                                     aria-selected="true">หนังสือทั่วไป</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab_newBook"
-                                    type="button" role="tab" aria-controls="tab_newBook"
+                                    type="button" role="tab" aria-controls="tab_newBook"  onclick="showTableBookNew()"
                                     aria-selected="false">หนังสือใหม่</button>
                             </li>
                         </ul>
                         <div class="tab-content" >
                             <div class="tab-pane fade show active" id="tab_book"role="tabpanel"aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table">
-                                        <thead>
+                                    <table class="table table-bordered border-black" >
+                                        <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col">ชื่อหนังสือ</th>
@@ -56,56 +56,22 @@
                                                 <th scope="col" style="width: 15%"></th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @foreach ($Book as $datalist)
-                                                @php
-                                                    $type_book_name = optional($datalist->TypeBook)->name ?? '';
-                                                    $amount = optional($datalist->CopyBook)->amount ?? 0;
-                                                    $copy_id = optional($datalist->CopyBook)->copy_id ?? '';
-                                                @endphp
-                                                <tr>
-                                                    <td class="text-center">{{ $loop->index + 1 }}</td>
-                                                    <td>{{ $datalist->name }}</td>
-                                                    <td>{{ $type_book_name }}</td>
-                                                    <td>{{ $datalist->isbn }}</td>
-                                                    <td>
-                                                        <span
-                                                            class="badge {{ is_null($datalist->updated_at) ? 'bg-danger' : ($amount > 0 ? 'bg-success' : 'bg-warning text-dark') }}">
-                                                            {{ is_null($datalist->updated_at) ? 'ไม่มีข้อมูล' : ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา') }}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-sm btn-warning"
-                                                            onclick="editmodal('{{ $datalist->getKey() }}')">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{ $datalist->getKey() }}')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        @if ($amount == 0)
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                onclick="openModalCopy('plus', '{{ $copy_id }}', '{{ $datalist->name }}')">
-                                                                <i class="fas fa-copy"></i>
-                                                                เพิ่มสำเนา
-                                                            </button>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                        <tbody id="TableBook">
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
                             <div class="tab-pane fade " id="tab_newBook" role="tabpanel" aria-labelledby="ex1-tab-1">
-                                <table class="table">
-                                    <thead>
+                                <table class="table table-bordered border-black" >
+                                    <thead class="bg-grayCustom">
                                         <tr>
                                             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                             <th scope="col">ชื่อหนังสือ</th>
                                             <th scope="col" style="width: 15%"></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        @foreach ($ReceiveBookDesc as $datalist)
+                                    <tbody id="TableBookNew">
+                                        {{-- @foreach ($ReceiveBookDesc as $datalist)
                                         <tr>
                                             <td class="text-center">{{ $loop->index + 1 }}</td>
                                             <td>{{ $datalist->ReceiveBook->book_name }}</td>
@@ -113,7 +79,7 @@
                                                 <button type="button" class="btn btn-primary btn-sm" onclick="OpenModalBookNew('{{$datalist->recd_id}}','{{$datalist->ReceiveBook->book_name}}')"><i class="fas fa-plus"></i>เพิ่มข้อมูล</button>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @endforeach --}}
                                 </table>
                             </div>
                         </div>
@@ -127,6 +93,9 @@
     @include('book.modalBookNew')
 
     <script>
+        $(document).ready(function () {
+            showTableBook();
+        });
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
             var url = "{{ route('book.create') }}";
@@ -220,6 +189,28 @@
         function confirm_delete(id){
             let url = `{{route('book.delete',['id'=>':id'])}}`.replace(':id',id); ;
             alertConfirmDelete(url,'{{ csrf_token() }}');
+        }
+        function showTableBook(){
+            const url = `{{route('book.fetchDataTableBook')}}`;
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "JSON",
+                success: function (response) {
+                    $('#TableBook').html(response);
+                }
+            });
+        }
+        function showTableBookNew(){
+            const url = `{{route('book.fetchDataTableBookNew')}}`;
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "JSON",
+                success: function (response) {
+                    $('#TableBookNew').html(response);
+                }
+            });
         }
     </script>
 @endsection()

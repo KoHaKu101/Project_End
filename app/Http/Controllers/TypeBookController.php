@@ -7,37 +7,55 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
 
 class TypeBookController extends Controller
 {
     //
-    public function index(){
+    public function index()
+    {
         $data = TypeBook::orderby('created_at')->get();
-        return view('type_book.list',compact('data'));
+        return view('type_book.list', compact('data'));
     }
-    public function create(Request $request){
-            $request->validate([
-                'name' => 'required|string'
-            ]);
-            $id =TypeBook::generateID();
-            TypeBook::create([
-                'type_book_id' => $id,
-                'name' => $request->name
-            ]);
-            Alert::success('บันทึกสำเร็จ');
+    public function create(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required'
+        ]);
+        if ($validator->fails()) {
+            Alert::error('เกิดข้อผิดพลาด', 'กรอกข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        if (TypeBook::where('name', $request->name)->count() > 0) {
+            Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $id = TypeBook::generateID();
+        TypeBook::create([
+            'type_book_id' => $id,
+            'name' => $request->name
+        ]);
 
-        return redirect()->back();
-    }
-
-    public function update(Request $request,$id){
-        $data = TypeBook::find($id);
-        $data->name = $request->name;
-        $data->save();
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
 
-    public function delete($id){
+    public function update(Request $request, $id)
+    {
+        $dataExists = TypeBook::where('name', $request->name)->where('type_book_id', '!=', $id)->exists();
+        if (!$dataExists) {
+            $data = TypeBook::find($id);
+            $data->name = $request->name;
+            $data->save();
+            Alert::success('บันทึกสำเร็จ');
+            return redirect()->back();
+        }
+        Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
+        return redirect()->back();
+    }
+
+    public function delete($id)
+    {
         try {
             DB::beginTransaction();
             $data = TypeBook::find($id);
@@ -59,7 +77,8 @@ class TypeBookController extends Controller
         }
     }
 
-    public function fetchData(Request $request){
+    public function fetchData(Request $request)
+    {
         $id = $request->input('id');
         $data = TypeBook::find($id);
         return response()->json($data);

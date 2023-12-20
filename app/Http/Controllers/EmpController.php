@@ -38,6 +38,18 @@ class EmpController extends Controller
                 Alert::error('เกิดข้อผิดพลาด', 'กรอกข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน');
                 return redirect()->back()->withErrors($validator)->withInput();
             }
+            if (Emp::whereIn('username', [$request->username])->orWhereIn('id_card', [$request->id_card])->exists()) {
+                $errorMessages = [];
+                if (Emp::where('username', $request->username)->exists()) {
+                    $errorMessages[] = 'มี username นี้อยู๋แล้ว';
+                }
+                if (Emp::where('id_card', $request->id_card)->exists()) {
+                    $errorMessages[] = 'มี รหัสประจำตัวประชาชน นี้อยู๋แล้ว';
+                }
+                Alert::error('เกิดข้อผิดพลาด', implode(' ', $errorMessages));
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
             $id = Emp::generateID();
             Emp::create([
                 'emp_id' => $id,
@@ -60,21 +72,25 @@ class EmpController extends Controller
 
     public function update(Request $request,$id){
         $data = Emp::find($id);
-            if(is_Null($request->password)){
-                    $data->f_name = $request->f_name;
-                    $data->l_name = $request->l_name;
-                    $data->gender = $request->gender;
-                    $data->birthday = $request->birthday;
-                    $data->age = $request->age;
-                    $data->id_card = $request->id_card;
-                    $data->tel = $request->tel;
-                    $data->status = $request->status;
-                    $data->address= $request->address;
-                $data->save();
-            }else{
-                $data->update($request->all());
-            }
-        Alert::success('บันทึกสำเร็จ');
+        $idCardExists = Emp::where('id_card', $request->id_card)->where('emp_id', '!=', $id)->exists();
+        if (!$idCardExists) {
+            // Update the data
+            $data->f_name = $request->f_name;
+            $data->l_name = $request->l_name;
+            $data->gender = $request->gender;
+            $data->birthday = $request->birthday;
+            $data->age = $request->age;
+            $data->id_card = $request->id_card;
+            $data->tel = $request->tel;
+            $data->status = $request->status;
+            $data->address = $request->address;
+            $data->save();
+
+            Alert::success('บันทึกสำเร็จ');
+        } else {
+            Alert::error('เกิดข้อผิดพลาด', 'มี รหัสประจำตัวประชาชน นี้อยู่แล้วในระบบ');
+        }
+
         return redirect()->back();
     }
     public function delete($id){

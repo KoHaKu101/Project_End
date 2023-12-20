@@ -43,13 +43,14 @@ Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(functio
 
     Route::get('dashboard', [HomeController::class, 'index'])->name('dashboard_pd');
     //เจ้าหน้าที่
-    Route::get('emp/list', [EmpController::class, 'index'])->name('emp_list');
+
+    Route::get('emp/list', [EmpController::class, 'index'])->name('emp.list');
     Route::post('emp/create', [EmpController::class, 'create'])->name('emp.create');
     Route::get('emp/fetchData', [EmpController::class, 'fetchData'])->name('emp.fetchData');
     Route::post('emp/update/{id}', [EmpController::class, 'update'])->name('emp.update');
     Route::delete('emp/delete/{id}', [EmpController::class, 'delete'])->name('emp.delete');
     //สื่อ
-    Route::get('media/list', [MediaController::class, 'index'])->name('media_list');
+    Route::get('media/list', [MediaController::class, 'index'])->name('media.list');
     Route::post('media/create', [MediaController::class, 'create'])->name('media.create');
     Route::post('media/update/{id}', [MediaController::class, 'update'])->name('media.update');
     Route::delete('media/delete/{id}', [MediaController::class, 'delete'])->name('media.delete');
@@ -61,29 +62,34 @@ Route::middleware(['custom.auth','check.status:1'])->prefix('pd')->group(functio
     Route::get('media/fetchDataConfirmOrder', [MediaController::class,'fetchDataConfirmOrder'] )->name('media.fetchDataConfirmOrder');
     Route::get('media/fetchDataTable/{status}', [MediaController::class,'fetchDataTable'] )->name('media.fetchDataTable');
     //หนังสือ
-    Route::get('book/list', [BookController::class, 'index'])->name('book_list');
+    Route::get('book/list', [BookController::class, 'index'])->name('book.list');
     Route::post('book/create', [BookController::class, 'create'])->name('book.create');
     Route::post('book/createBookNew/{id}', [BookController::class, 'createBookNew'])->name('bookNew.create');
     Route::get('book/fetchData', [BookController::class, 'fetchData'])->name('book.fetchData');
+    Route::get('book/fetchDataTableBook', [BookController::class, 'fetchDataTableBook'])->name('book.fetchDataTableBook');
+    Route::get('book/fetchDataTableBookNew', [BookController::class, 'fetchDataTableBookNew'])->name('book.fetchDataTableBookNew');
+
+    Route::get('book/fetchData', [BookController::class, 'fetchData'])->name('book.fetchData');
+
     Route::post('book/update/{id}', [BookController::class, 'update'])->name('book.update');
     Route::delete('book/delete/{id}', [BookController::class, 'delete'])->name('book.delete');
 
     //ประเภทสื่อ
-    Route::get('media/type/list', [TypeMediaController::class, 'index'])->name('media_type_list');
+    Route::get('media/type/list', [TypeMediaController::class, 'index'])->name('media_type.list');
     Route::get('media/type/list/fetchData', [TypeMediaController::class, 'fetchData'])->name('media_type.fetchData');
     Route::post('media/type/list/create', [TypeMediaController::class, 'create'])->name('media_type.create');
     Route::post('media/type/list/update/{id}', [TypeMediaController::class, 'update'])->name('media_type.update');
     Route::delete('media/type/list/delete/{id}', [TypeMediaController::class, 'delete'])->name('media_type.delete');
 
     //หมวดหมู่หนังสือ
-    Route::get('book/type/list', [TypeBookController::class, 'index'])->name('book_type_list');
+    Route::get('book/type/list', [TypeBookController::class, 'index'])->name('book_type.list');
     Route::get('book/type/list/fetchData', [TypeBookController::class, 'fetchData'])->name('book_type.fetchData');
     Route::post('book/type/list/create', [TypeBookController::class, 'create'])->name('book_type.create');
     Route::post('book/type/list/update/{id}', [TypeBookController::class, 'update'])->name('book_type.update');
     Route::delete('book/type/list/delete/{id}', [TypeBookController::class, 'delete'])->name('book_type.delete');
 
     //สำเนาหนังสือ
-    Route::get('book/copy/list', [CopyBookController::class, 'index'])->name('book_copy_list');
+    Route::get('book/copy/list', [CopyBookController::class, 'index'])->name('book_copy.list');
     Route::post('book/copy/update/{id}/{math}', [CopyBookController::class, 'update'])->name('book_copy.update');
     //จ่ายสำเนาหนังสือ
     Route::get('book/copy/out/list', [CopyBookOutController::class, 'index'])->name('book_copy_out.list');
@@ -121,7 +127,7 @@ Route::post('requestMedia/update/{id}', [RequestMediaController::class,'update']
 Route::get('requestMedia/delete/{id}', [RequestMediaController::class,'delete'] )->name('requestMedia.delete');
 Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::class,'fetchDataTable'] )->name('requestMedia.fetchDataTable');
 
-Route::get('media/out/list', [MediaOutController::class,'index'] )->name('mediaOut_list');
+Route::get('media/out/list', [MediaOutController::class,'index'] )->name('mediaOut.list');
 //สั่งผลิตสื่อ
 Route::get('order/list', [OrderController::class,'index'] )->name('order.list');
 Route::get('order/tableData', [OrderController::class,'tableData'] )->name('order.tableData');

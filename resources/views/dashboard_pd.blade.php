@@ -48,13 +48,13 @@
                                                 <th scope="row" class="text-center">1</th>
                                                 <td><p>หนังสือนิยาย</p><i>ผู้หมอบหมาย พิชิตชัย ธรรมชัย</i></td>
                                                 <td>รอรับงาน</td>
-                                                <td><a href="{{ route('media_list') }}" class="btn btn-success ms-1">รับงาน</a></td>
+                                                <td><a href="{{ route('media.list') }}" class="btn btn-success ms-1">รับงาน</a></td>
                                             </tr>
                                             <tr>
                                                 <th scope="row" class="text-center">2</th>
                                                 <td><p>หนังสือนิยาย</p><i>ผู้หมอบหมาย พิชิตชัย ธรรมชัย</i></td>
                                                 <td>รอรับงาน</td>
-                                                <td><a href="{{ route('media_list') }}" class="btn btn-success ms-1">รับงาน</a></td>
+                                                <td><a href="{{ route('media.list') }}" class="btn btn-success ms-1">รับงาน</a></td>
 
                                             </tr>
                                         </tbody>
