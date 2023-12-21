@@ -13,11 +13,16 @@ use Illuminate\Support\Facades\Validator;
 class RequestUserController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         $data = RequestUser::orderby('f_name')->get();
+        $search = '';
+        if(!is_null($request->search)){
+            $search = $request->search;
+            $data = RequestUser::where('f_name','like','%'.$search.'%')->orWhere('l_name','like','%'.$search.'%')->orderby('f_name')->get();
+        }
         $dataRequestMedia = RequestMedia::select('requesters_id', 'status')->get();
-        return view('request_user.list', compact('data', 'dataRequestMedia'));
+        return view('request_user.list', compact('data', 'dataRequestMedia','search'));
     }
     public function create(Request $request)
     {

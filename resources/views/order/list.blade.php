@@ -17,7 +17,7 @@
                                 <form action="#">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายการจ่ายสื่อ" aria-label="Username" aria-describedby="basic-addon1" >
+                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายการสั่งผลิตสื่อ" aria-label="Username" aria-describedby="basic-addon1" >
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>

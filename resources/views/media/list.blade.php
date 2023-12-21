@@ -16,7 +16,7 @@
                             <form action="#">
                                 <div class="input-group">
                                     <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                    <input type="text" class="form-control form-control-sm" placeholder="ค้นหาหนังสือ" aria-label="ค้นหาหนังสือ" aria-describedby="basic-addon1">
+                                    <input type="text" class="form-control form-control-sm" placeholder="ค้นหาสื่อสำหรับผู้พิการทางสายตา" aria-label="ค้นหาหนังสือ" aria-describedby="basic-addon1">
                                     <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                 </div>
                             </form>
@@ -170,8 +170,8 @@
                 }
             });
             modalSelect_order.modal('show');
-
         }
+        // function
         //End
         function setModal_Media(title, url) {
             formSubmit.attr('action', url);

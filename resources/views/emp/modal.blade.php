@@ -29,8 +29,12 @@
                             </div>
                             <div class="col-lg-2">
                                 <label class="control-label">อายุ</label>
-                                <input type="text" class="form-control form-control-sm" id="age" name="age"
+                                <div class="input-group input-group-sm ">
+                                    <input type="text" class="form-control form-control-sm" id="age" name="age"
                                     maxlength="3"required oninput="InputOnlyNumber(this)">
+                                    <span class="input-group-text">ปี</span>
+                                  </div>
+
                             </div>
                             <div class="col-lg-3">
                                 <label class="control-label">เพศ</label>

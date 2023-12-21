@@ -10,10 +10,10 @@
                     <div class="row">
                         <div class="form-group row">
                             <div class="col-lg-11">
-                                <form action="#">
+                                <form action="{{route('requestUser.list')}}" method="GET">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายชื่อผู้มาขอรับสื่อ" aria-label="Username" aria-describedby="basic-addon1" >
+                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายชื่อผู้มาขอรับสื่อ"name="search" value="{{$search}}">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>

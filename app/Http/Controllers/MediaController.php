@@ -176,7 +176,7 @@ class MediaController extends Controller
                         <td>{$emp}</td>
                         <td>
                             <button type='button' class='btn btn-sm btn-primary' onclick='show_ConfirmDataOrder(`{$datalist->order_id}`)'><i class='fas fa-eye me-1'></i>ตรวจสอบรายการสั่งผลิต</button>
-                        </td>
+                            </td>
                     </tr>";
         }
         return response()->json($html);
