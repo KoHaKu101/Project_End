@@ -12,20 +12,18 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                        <div class="col-lg-11 col-md-8 col-sm-12">
-                            <form action="#">
-                                <div class="input-group">
-                                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                    <input type="text" class="form-control form-control-sm" placeholder="ค้นหาสื่อสำหรับผู้พิการทางสายตา" aria-label="ค้นหาหนังสือ" aria-describedby="basic-addon1">
-                                    <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-1 col-md-4 col-sm-12">
-                            <button class="btn btn-sm btn-success" onclick="createmodal_media()">
-                                <i class="fas fa-plus"></i> เพิ่มข้อมูล
-                            </button>
-                        </div>
+                        <form action="#" class="col-md-11">
+                            <div class="input-group">
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control form-control-sm"
+                                    placeholder="ค้นหาสื่อสำหรับผู้พิการทางสายตา" aria-label="ค้นหาหนังสือ"
+                                    aria-describedby="basic-addon1">
+                                <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
+                            </div>
+                        </form>
+                        <button class="btn btn-sm btn-success col-md-1" onclick="createmodal_media()">
+                            <i class="fas fa-plus"></i> เพิ่มข้อมูล
+                        </button>
                     </div>
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -35,9 +33,10 @@
                                     onclick="tabsShowOrder()" aria-selected="true">รายการสั่งผลิตสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#process_order"
-                                    onclick="tabShowMedia('process_order')" type="button" role="tab"
-                                    aria-controls="wait_order" aria-selected="false">รายการสื่อกำลังผลิต</button>
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#process_order" onclick="tabShowMedia('process_order')" type="button"
+                                    role="tab" aria-controls="wait_order"
+                                    aria-selected="false">รายการสื่อกำลังผลิต</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
@@ -49,17 +48,18 @@
                     </div>
                     <div class="row">
                         <div class="tab-content" id="ex1-content">
-                            <div class="tab-pane fade show active" id="new_order" role="tabpanel" aria-labelledby="ex1-tab-1">
+                            <div class="tab-pane fade show active" id="new_order" role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
                                     <table class="table table-bordered border-black">
                                         <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col" >ชื่อหนังสือ</th>
+                                                <th scope="col">ชื่อหนังสือ</th>
                                                 <th scope="col" style="width: 8%">ประเภทสื่อ</th>
                                                 <th scope="col" style="width: 10%">วันที่สั่งสื่อ</th>
                                                 <th scope="col" style="width: 20%">เจ้าหน้าที่</th>
-                                                <th scope="col" style="width: 20%"></th>
+                                                <th scope="col" style="width: 16%"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableDataRequestMedia">
@@ -69,15 +69,15 @@
                             </div>
                             <div class="tab-pane fade show" id="process_order" role="tabpanel" aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table table-bordered border-black" >
+                                    <table class="table table-bordered border-black">
                                         <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                                 <th scope="col">ชื่อหนังสือ</th>
-                                                <th scope="col" style="width: 15%">หมวดหมู่หนังสือ</th>
-                                                <th scope="col" style="width: 15%">ประเภทสื่อ</th>
-                                                <th scope="col" style="width: 15%">สถานะการผลิต</th>
-                                                <th scope="col" style="width: 20%"></th>
+                                                <th scope="col" style="width: 11%">หมวดหมู่หนังสือ</th>
+                                                <th scope="col" style="width: 8%">ประเภทสื่อ</th>
+                                                <th scope="col" style="width: 10%">สถานะการผลิต</th>
+                                                <th scope="col" style="width: 15%"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableDataMedia">
@@ -120,6 +120,7 @@
             Select2_book();
             modal_media.modal('show');
         }
+
         function editmodal_media(id) {
             let urlUpdate = "{{ route('media.update', ['id' => ':id']) }}".replace(':id', id);
             const urlFetch = "{{ route('media.fetchData') }}";
@@ -158,12 +159,15 @@
             });
 
         }
-        function show_ConfirmDataOrder(id){
+
+        function show_ConfirmDataOrder(id) {
             const url = `{{ route('media.fetchDataConfirmOrder') }}`;
             $.ajax({
                 type: "GET",
                 url,
-                data: {id:id},
+                data: {
+                    id: id
+                },
                 dataType: "JSON",
                 success: function(response) {
                     $('#confirm_oder_modal_body').html(response);
@@ -178,6 +182,7 @@
             formSubmit[0].reset();
             modal_title.text(title);
         }
+
         function changeInput(html, status) {
             const input_book = $('#book_id');
             input_book.replaceWith(html);
@@ -203,7 +208,7 @@
             });
         }
         //start funtion table
-        function tabsShowOrder(){
+        function tabsShowOrder() {
             const url = `{{ route('media.fetchDataTableOrder') }}`;
             $.ajax({
                 type: "GET",
@@ -212,13 +217,14 @@
                 success: (response) => $('#tableDataRequestMedia').html(response)
             });
         }
-        function tabShowMedia(tabName){
+
+        function tabShowMedia(tabName) {
             const statusMapping = {
                 'process_order': 1,
                 'success_order': 2,
             };
             const status = statusMapping[tabName];
-            let url = "{{ route('media.fetchDataTable', ['status' => ':status']) }}".replace(':status',status);
+            let url = "{{ route('media.fetchDataTable', ['status' => ':status']) }}".replace(':status', status);
             $.ajax({
                 type: "GET",
                 url,
@@ -261,9 +267,9 @@
             });
         }
         //End
-        function confirm_delete(id){
-            let url = `{{route('media.delete',['id'=>':id'])}}`.replace(':id',id); ;
-            alertConfirmDelete(url,'{{ csrf_token() }}');
+        function confirm_delete(id) {
+            let url = `{{ route('media.delete', ['id' => ':id']) }}`.replace(':id', id);;
+            alertConfirmDelete(url, '{{ csrf_token() }}');
         }
     </script>
 @endsection()

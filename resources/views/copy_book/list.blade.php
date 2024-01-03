@@ -45,9 +45,9 @@
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                        <th scope="col" style="width: 50%">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 8%" class="text-center ">จำนวนคงเหลือ</th>
-                                        <th scope="col" style="width: 8%"></th>
+                                        <th scope="col" >ชื่อหนังสือ</th>
+                                        <th scope="col" style="width: 10%" class="text-center ">จำนวนคงเหลือ</th>
+                                        <th scope="col" style="width: 7%"></th>
 
                                     </tr>
                                 </thead>

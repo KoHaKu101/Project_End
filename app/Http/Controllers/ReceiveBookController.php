@@ -11,6 +11,7 @@ use App\Models\ReceiveBookDesc;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator;
 
 class ReceiveBookController extends Controller
 {
@@ -20,6 +21,17 @@ class ReceiveBookController extends Controller
         return view('receive_book.list',compact('data'));
     }
     public function create(Request $request){
+        $validator = Validator::make($request->all(), [
+            'book_name' => 'required',
+            'desc' => 'required',
+            'add_type' => 'required',
+
+        ]);
+        if ($validator->fails()) {
+            Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $book = Book::where('book_id',$request->book_name)->first();
         if(is_null($book)){
             $book_name = $request->book_name;

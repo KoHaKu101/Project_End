@@ -11,10 +11,8 @@
                     <h3>รายการ รับคำขอสื่อ</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="form-group row">
-                            <div class="col-lg-11">
-                                <form action="#">
+                    <div class="row mb-2">
+                                <form action="#" class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i
                                                 class="fas fa-search"></i></span>
@@ -24,15 +22,10 @@
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-
-                                <button type="button" class="btn btn-sm btn-success" onclick="createModal_requestMedia()">
+                                <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="createModal_requestMedia()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
                                 </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -65,13 +58,13 @@
                                     <thead class="bg-grayCustom">
                                         <tr>
                                             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                            <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
+                                            <th scope="col" >ชื่อหนังสือ</th>
                                             <th scope="col" style="width: 8%">ประเภทสื่อ</th>
                                             <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
-                                            <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
-                                            <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
-                                            <th scope="col">สถานะ</th>
-                                            <th scope="col"></th>
+                                            <th scope="col" >เจ้าหน้าที่</th>
+                                            <th scope="col" >ผู้ขอรับสื่อ</th>
+                                            <th scope="col" style="width: 8%">สถานะ</th>
+                                            <th scope="col" style="width: 13%"></th>
                                         </tr>
                                     </thead>
                                     <tbody id="tableData">

@@ -7,25 +7,18 @@
                     <h3>รายชื่อผู้มาขอรับสื่อ</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="form-group row">
-                            <div class="col-lg-11">
-                                <form action="{{route('requestUser.list')}}" method="GET">
+                    <div class="row mb-2">
+                                <form action="{{route('requestUser.list')}}" method="GET" class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
                                         <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายชื่อผู้มาขอรับสื่อ"name="search" value="{{$search}}">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-
-                                <button type="button" class="btn btn-sm btn-success" onclick="createModal()" >
+                                <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="createModal()" >
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
                                 </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -33,13 +26,13 @@
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                        <th scope="col" style="width: 45%">ชื่อ - นามสกุล</th>
+                                        <th scope="col" >ชื่อ - นามสกุล</th>
                                         <th scope="col" style="width: 5%"   class="text-center">เพศ</th>
                                         <th scope="col" style="width: 5%"   class="text-center">อายุ</th>
                                         <th scope="col" style="width: 10%"  class="text-center">เบอร์โทรศัพท์</th>
-                                        <th scope="col" style="width: 12%"  class="text-center">รายการยังไม่สำเร็จ</th>
-                                        <th scope="col" style="width: 12%"  class="text-center">จำนวนที่ขอสื่อ</th>
-                                        <th scope="col" ></th>
+                                        <th scope="col" style="width: 14%"  class="text-center">รายการยังไม่สำเร็จ</th>
+                                        <th scope="col" style="width: 10%"  class="text-center">จำนวนที่ขอสื่อ</th>
+                                        <th scope="col" style="width: 8%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -83,6 +76,7 @@
         const form_user = $('#form_requestUser');
         function createModal(){
             const urlCreate = `{{route('requestUser.create')}}`;
+            $('#modal_requestUser').html('เพิ่มข้อมูลผู้มาขอรับสื่อ');
             form_user.attr('action',urlCreate);
             modal_user.modal('show');
         }
@@ -100,6 +94,7 @@
                         $('#' + field).val(response[field]);
                         }
                     });
+                    $('#modal_requestUser').html('แก้ไขข้อมูลผู้มาขอรับสื่อ');
                     form_user.attr('action',urlUpdate);
                     modal_user.modal('show');
                 }

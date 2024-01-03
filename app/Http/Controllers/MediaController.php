@@ -194,7 +194,7 @@ class MediaController extends Controller
                         <td>{$datalist->Book->name}</td>
                         <td>{$datalist->Book->TypeBook->name}</td>
                         <td>{$datalist->TypeMedia->name}</td>
-                        <td>{$statusBadge}</td>
+                        <td class='text-center'>{$statusBadge}</td>
                         <td>
                             <button type='button' class='btn btn-sm btn-warning' onclick='editmodal_media(`{$datalist->media_id}`)'><i class='fas fa-edit'></i></button>
                             <button type='button' class='btn btn-sm btn-danger' onclick='confirm_delete(`{$datalist->media_id}`)'><i class='fas fa-trash'></i></button>

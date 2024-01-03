@@ -70,16 +70,19 @@ class RequestUserController extends Controller
         $f_name = $request->f_name;
         $l_name = $request->l_name;
         $id_card = $request->id_card;
-        $idCardExists = RequestUser::where('id_card', $id_card)->where('requesters_id','!=',$id)->exists();
-        $requestUserExists = RequestUser::where('f_name', $f_name)->where('l_name', $l_name)->where('requesters_id','!=',$id)->exists();
-        if($idCardExists){
-            Alert::error('เกิดข้อผิดพลาด', 'รหัสบัตรประชาชนนี้มีอยู๋แล้ว');
-            return redirect()->back();
+        if(!is_null($id_card)){
+            $idCardExists = RequestUser::where('id_card', $id_card)->where('requesters_id','!=',$id)->exists();
+            $requestUserExists = RequestUser::where('f_name', $f_name)->where('l_name', $l_name)->where('requesters_id','!=',$id)->exists();
+            if($idCardExists){
+                Alert::error('เกิดข้อผิดพลาด', 'รหัสบัตรประชาชนนี้มีอยู๋แล้ว');
+                return redirect()->back();
+            }
+            if($requestUserExists){
+                Alert::error('เกิดข้อผิดพลาด', 'ชื่อ และนามสกุลซ้ำกัน');
+                return redirect()->back();
+            }
         }
-        if($requestUserExists){
-            Alert::error('เกิดข้อผิดพลาด', 'ชื่อ และนามสกุลซ้ำกัน');
-            return redirect()->back();
-        }
+
         $data = [
             'id_card' => $id_card,
             'f_name' => $f_name,
@@ -88,7 +91,6 @@ class RequestUserController extends Controller
             "age" => $request->age,
             "gender" => $request->gender,
             "tel" => $request->tel,
-
         ];
         RequestUser::find($id)->update($data);
         Alert::success('แก้ไขรายการสำเร็จ');

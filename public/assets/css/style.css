@@ -36,13 +36,13 @@ li {
 /* เริ่ม ส่วนของ sidebar */
 .sidebar {
     background-color: #A29BFE;
-    width: 26vh;
-    max-width: 25vh;
+    width: 32vh;
+    max-width: 32vh;
     transition: all 0.35s ease-in-out;
 
 }
 .sidebar.collapseCustom {
-    width: 7vh;
+    width: 10vh;
 }
 
 .sidebar.collapseCustom .sidebar-logo{

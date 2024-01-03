@@ -25,24 +25,18 @@
                     <h3>จ่ายสำเนาหนังสือ</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="form-group row ">
-                            <div class="col-lg-11">
-                                <form action="#">
+                    <div class="row mb-2">
+                                <form action="#" class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
                                         <input type="text" class="form-control form-control-sm" placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username" aria-describedby="basic-addon1" >
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-                                    <button type="button" class="btn btn-sm btn-success" onclick="OpenModal()">
+                                    <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="OpenModal()">
                                     <i class="fas fa-plus"></i>
                                     จ่ายสำเนา
                                 </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -50,11 +44,11 @@
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 3%" class="text-center">ลำดับ</th>
-                                        <th scope="col" style="width: 10%">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 30%" >เจ้าหน้าที่ ที่จ่ายสำเนา</th>
+                                        <th scope="col" style="width: 12%">ชื่อหนังสือ</th>
+                                        <th scope="col" >เจ้าหน้าที่ ที่จ่ายสำเนา</th>
                                         <th scope="col" style="width: 3%" class="text-center">จำนวน</th>
                                         <th scope="col" style="width: 5%" >สถานะ</th>
-                                        <th scope="col" style="width: 5%"></th>
+                                        <th scope="col" style="width: 12%"></th>
 
                                     </tr>
                                 </thead>
@@ -70,7 +64,7 @@
                                                 {{ $datalist->status === 1 ? 'รอรับคืน' : ($datalist->status === 2 ? 'รับคืนรียบร้อย' : 'ไม่มีการรับคืน') }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             @if($datalist->status === 1)
                                                 <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->copyout_id}}')"><i class="fa-solid fa-hand-holding fa-xl me-1"></i>รับคืน</button>
                                                 <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>

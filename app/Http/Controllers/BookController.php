@@ -109,6 +109,9 @@ class BookController extends Controller
             DB::beginTransaction();
             $book = Book::find($id);
             $copyBook = CopyBook::where('book_id',$id)->first();
+            if($copyBook->amount > 0){
+                return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
+            }
             // คำสั่งลบ
             $copyBook->delete();
             $book->delete();
@@ -149,11 +152,10 @@ class BookController extends Controller
                             <td>{$datalist->isbn}</td>
                             <td><span class='badge {$badge}'> {$textBadge} </span></td>
                             <td>
-                                <button type='button' class='btn btn-sm btn-warning'
-                                    onclick='editmodal(`{$datalist->getKey()}`)'>
+                                <button type='button' class='btn btn-sm btn-warning' onclick='editmodal(`{$datalist->getKey()}`)'>
                                     <i class='fas fa-edit'></i>
                                 </button>
-                                <button type='button' class='btn btn-sm btn-danger' onclick='confirm_delete(`{$datalist->getKey()}`)'>
+                                <button type='button' class='btn btn-sm btn-danger me-1' onclick='confirm_delete(`{$datalist->getKey()}`)'>
                                     <i class='fas fa-trash'></i>
                                 </button>";
                 if($amount == 0){

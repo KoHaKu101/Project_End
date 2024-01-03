@@ -7,10 +7,8 @@
                     <h3>หมวดหมู่หนังสือ</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="form-group row">
-                            <div class="col-lg-11">
-                                <form action="#">
+                    <div class="row mb-2">
+                                <form action="#"class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i
                                                 class="fas fa-search"></i></span>
@@ -20,14 +18,10 @@
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-                                <button type="button" class="btn btn-sm btn-success" onclick="createmodal()">
+                                <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="createmodal()">
                                     <i class="fas fa-plus"></i>
                                     เพิ่มข้อมูล
                                 </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">

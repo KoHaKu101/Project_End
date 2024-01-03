@@ -11,10 +11,8 @@
                     <h3>รายการ รับหนังสือ</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="form-group row">
-                            <div class="col-lg-11">
-                                <form action="#">
+                    <div class="row mb-2">
+                                <form action="#" class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i
                                                 class="fas fa-search"></i></span>
@@ -24,15 +22,10 @@
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="col-lg-1">
-
-                                <button type="button" class="btn btn-sm btn-success"onclick='openModal()'>
+                                <button type="button" class="btn btn-sm btn-success col-lg-1"onclick='openModal()'>
                                     <i class="fas fa-plus"></i>
                                     รับหนังสือ
                                 </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -41,11 +34,11 @@
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 15%">ประเภทการรับ</th>
-                                        <th scope="col" style="width: 15%">วันที่รับ</th>
+                                        <th scope="col" style="width: 10%">ประเภทการรับ</th>
+                                        <th scope="col" style="width: 8%">วันที่รับ</th>
                                         <th scope="col" style="width: 15%">เจ้าหน้าที่ที่รับ</th>
-                                        <th scope="col" style="width: 22%">รายละเอียดเพิ่มเติม</th>
-                                        <th scope="col" style="width: 8%"></th>
+                                        <th scope="col" >รายละเอียดเพิ่มเติม</th>
+                                        <th scope="col" style="width: 7%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -58,13 +58,13 @@
                                         <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col" style="width: 30%">ชื่อหนังสือ</th>
+                                                <th scope="col" >ชื่อหนังสือ</th>
                                                 <th scope="col" style="width: 8%">ประเภทสื่อ</th>
                                                 <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
-                                                <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
-                                                <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
-                                                <th scope="col">สถานะ</th>
-                                                <th scope="col"></th>
+                                                <th scope="col" >เจ้าหน้าที่</th>
+                                                <th scope="col" >ผู้ขอรับสื่อ</th>
+                                                <th scope="col" style="width: 6%">สถานะ</th>
+                                                <th scope="col" style="width: 12%"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableDataRequestMedia">
@@ -78,11 +78,11 @@
                                         <thead class="bg-grayCustom">
                                             <tr>
                                                 <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col" style="width: 35%">ชื่อหนังสือ</th>
+                                                <th scope="col" >ชื่อหนังสือ</th>
                                                 <th scope="col" style="width: 8%">ประเภทสื่อ</th>
                                                 <th scope="col" style="width: 10%">วันที่สั่งผลิต</th>
-                                                <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
-                                                <th scope="col" ></th>
+                                                <th scope="col" style="width: 20%">เจ้าหน้าที่</th>
+                                                <th scope="col" style="width: 4%"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableDataOrder">
