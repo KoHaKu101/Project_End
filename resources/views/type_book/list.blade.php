@@ -31,7 +31,6 @@
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col">ชื่อหมวดหมู่หนังสือ</th>
                                         <th scope="col" style="width: 8%"></th>
-
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -90,7 +89,6 @@
                     $('#modal-title').text('แก้ไขหมวดหมู่หนังสือ');
                     var button = $('#submitBTN');
                     button.html('<i class="fas fa-save me-2"></i>บันทึก');
-
                     $('#FormSubmit').attr('action',urlUpdate);
                 },
                 error: function() {

@@ -18,22 +18,27 @@ class TypeMediaController extends Controller
     }
     public function create(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'desc'=>'required'
+            'head_number_media' => 'required|unique:type_media',
+            'name' => 'required|unique:type_media',
+            'desc' => 'required',
+
+        ], [
+            'head_number_media.unique' => 'มีรายการ *'.$request->head_number_media.'* นี้อยู่แล้ว',
+            'name.unique' => 'มีรายการ *'.$request->name.'* นี้อยู่แล้ว',
+            'head_number_media.required' => 'กรอกข้อมูลไม่ครบ',
+            'name.required' => 'กรอกข้อมูลไม่ครบ',
+            'desc.required' => 'กรอกข้อมูลไม่ครบ',
         ]);
         if ($validator->fails()) {
-            Alert::error('เกิดข้อผิดพลาด', 'กรอกข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน');
+            Alert::error('เกิดข้อผิดพลาด', $validator->errors()->first());
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if(TypeMedia::where('name',$request->name)->count() > 0){
-            Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
-                return redirect()->back()->withErrors($validator)->withInput();
-        }
 
-        $id = TypeMedia::generateID();
         TypeMedia::create([
-            'type_media_id' => $id,
+            'type_media_id' => TypeMedia::generateID(),
+            'head_number_media' => $request->head_number_media,
             'name' => $request->name,
             'desc' => $request->desc
 
@@ -46,10 +51,11 @@ class TypeMediaController extends Controller
     {
         $dataExists = TypeMedia::where('name', $request->name)->where('type_media_id', '!=', $id)->exists();
         if(!$dataExists){
-            $data = TypeMedia::find($id);
-            $data->name = $request->name;
-            $data->desc = $request->desc;
-            $data->save();
+            TypeMedia::find($id)->update([
+                'name' => $request->name,
+                'desc' => $request->desc,
+                'head_number_media' => $request->head_number_media,
+            ]);
             Alert::success('บันทึกสำเร็จ');
             return redirect()->back();
         }

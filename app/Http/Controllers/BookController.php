@@ -11,16 +11,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class BookController extends Controller
 {
 
-    public function index()
-    {
-        $Book = Book::orderby('created_at')->get();
-        $ReceiveBookDesc = ReceiveBookDesc::where('book_id', null)->orderby('created_at')->get();
+    public function index(Request $request){
+        $perPage = 10; // จำนวนรายการต่อหน้า
+        $page = $request->input('page', 1);
+
+        $book = Book::orderby('created_at')->paginate($perPage, ['*'], 'bookPage');
+        $receiveBookDesc = ReceiveBookDesc::where('book_id', null)->orderby('created_at')->paginate($perPage, ['*'], 'bookNewPage');
+
         $type_book = TypeBook::all();
-        return view('book/list', compact('type_book', 'ReceiveBookDesc', 'Book'));
+        $active_book = isset($request->booksPage) ? 'active' : ( isset($request->bookNewPage) ? '' : 'active' ) ;
+        $active_bookNew = isset($request->bookNewPage) ? 'active' : '';
+
+        return view('book/list', compact('type_book', 'book','receiveBookDesc','active_book','active_bookNew'));
     }
     private function validateBookRequest($request){
         return Validator::make($request->all(), [
@@ -47,6 +56,10 @@ class BookController extends Controller
             'original_page' => $request->original_page,
             'isbn' => $request->isbn,
             'level' => $request->level,
+            'language' => $request->language,
+            'abstract'=> $request->abstract,
+            'synopsis'=>$request->synopsis,
+            'img_book'=>$request->img_book_location,
         ]);
         $copy_id = CopyBook::generateID();
         CopyBook::create([
@@ -63,21 +76,37 @@ class BookController extends Controller
             Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if(Book::where('isbn',$request->isbn)->count() > 0 ){
+        if (Book::where('isbn', $request->isbn)->count() > 0) {
             Alert::error('Error', 'เลข isbn ซ้ำ');
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        $newFileName = '';
+        if ($request->hasFile('img_book')) {
+            $file = $request->file('img_book');
+            $extension = $file->getClientOriginalExtension();
+            $path = public_path('assets/images/book');
+            $newFileName = hexdec(uniqid()) . '.' . $extension;
+            $newFilePath = $path . '/' . $newFileName;
+            if (!File::isDirectory($path)) {
+                File::makeDirectory($path, 0777, true, true);
+            }
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+            $image->resize(1280, 1800)->save($newFilePath);
+        }
+        $request->merge(['img_book_location'=>$newFileName]);
         $this->createFunction($request);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
-    public function createBookNew($id, Request $request){
+    public function createBookNew($id, Request $request)
+    {
         $validator = $this->validateBookRequest($request);
         if ($validator->fails()) {
             Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if(Book::where('isbn',$request->isbn)->count() > 0 ){
+        if (Book::where('isbn', $request->isbn)->count() > 0) {
             Alert::error('Error', 'เลข isbn ซ้ำ');
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -87,20 +116,53 @@ class BookController extends Controller
         return redirect()->back();
     }
 
-    public function update($id,Request $request){
+    public function update($id, Request $request)
+    {
         $validator = $this->validateBookRequest($request);
         if ($validator->fails()) {
             Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $dataExits = Book::where('isbn',$request->isbn)->where('book_id','!=',$id)->exists();
-        if($dataExits){
+        $dataExits = Book::where('isbn', $request->isbn)->where('book_id', '!=', $id)->exists();
+        if ($dataExits) {
             Alert::error('Error', 'เลข isbn ซ้ำ');
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
+        $newFileName = Book::where('book_id',$id)->first()->img_book;
+        if ($request->hasFile('img_book')) {
+            $file = $request->file('img_book');
+            $extension = $file->getClientOriginalExtension();
+            $path = public_path('assets/images/book');
+            if(is_null($newFileName)){
+                $newFileName = hexdec(uniqid()) . '.' . $extension;
+            }
+            $newFilePath = $path . '/' . $newFileName;
+            if (!File::isDirectory($path)) {
+                File::makeDirectory($path, 0777, true, true);
+            }
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file);
+            $image->resize(1280, 1800)->save($newFilePath);
+        }
+
+        $request->merge(['img_book_location'=>$newFileName]);
         $data = Book::find($id);
-        $data->update($request->all());
-        $data->update(['updated_at' => now()]);
+        $data->update([
+            'type_book_id' => $request->type_book_id,
+            'name' => $request->name,
+            'author' => $request->author,
+            'publisher' => $request->publisher,
+            'edition' => $request->edition,
+            'year' => $request->year,
+            'original_page' => $request->original_page,
+            'isbn' => $request->isbn,
+            'level' => $request->level,
+            'language' => $request->language,
+            'abstract'=> $request->abstract,
+            'synopsis'=>$request->synopsis,
+            'img_book'=>$request->img_book_location,
+        ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
@@ -108,8 +170,8 @@ class BookController extends Controller
         try {
             DB::beginTransaction();
             $book = Book::find($id);
-            $copyBook = CopyBook::where('book_id',$id)->first();
-            if($copyBook->amount > 0){
+            $copyBook = CopyBook::where('book_id', $id)->first();
+            if ($copyBook->amount > 0) {
                 return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
             }
             // คำสั่งลบ
@@ -130,60 +192,12 @@ class BookController extends Controller
             return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
         }
     }
-    public function fetchData(Request $request){
+    public function fetchData(Request $request)
+    {
         $id = $request->input('id');
         $data = Book::find($id);
         return response()->json($data);
     }
-    public function fetchDataTableBook(Request $request){
-        $html = '';
-        $Book = Book::orderby('created_at')->get();
-        foreach($Book as $index => $datalist){
-                $type_book_name = optional($datalist->TypeBook)->name ?? '';
-                $amount = optional($datalist->CopyBook)->amount ?? 0;
-                $copy_id = optional($datalist->CopyBook)->copy_id ?? '';
-                $badge = is_null($datalist->updated_at) ? 'bg-danger' : ($amount > 0 ? 'bg-success' : 'bg-warning text-dark');
-                $textBadge = is_null($datalist->updated_at) ? 'ไม่มีข้อมูล' : ($amount > 0 ? 'มีสำเนา' : 'ยังไม่มีสำเนา');
-                $number = $index + 1;
-                $html.= "<tr>
-                            <td class='text-center'>{$number}</td>
-                            <td>{$datalist->name}</td>
-                            <td>{$type_book_name}</td>
-                            <td>{$datalist->isbn}</td>
-                            <td><span class='badge {$badge}'> {$textBadge} </span></td>
-                            <td>
-                                <button type='button' class='btn btn-sm btn-warning' onclick='editmodal(`{$datalist->getKey()}`)'>
-                                    <i class='fas fa-edit'></i>
-                                </button>
-                                <button type='button' class='btn btn-sm btn-danger me-1' onclick='confirm_delete(`{$datalist->getKey()}`)'>
-                                    <i class='fas fa-trash'></i>
-                                </button>";
-                if($amount == 0){
-                    $html.= "<button type='button' class='btn btn-sm btn-primary'
-                                onclick='openModalCopy(`plus`, `{$copy_id}`, `{$datalist->name}`)'>
-                                <i class='fas fa-copy'></i>
-                                เพิ่มสำเนา
-                            </button>";
-                }
-                $html.="</td>
-                        </tr>";
-        }
-        return response()->json($html);
-    }
-    public function fetchDataTableBookNew(Request $request){
-        $html = '';
-        $ReceiveBookDesc = ReceiveBookDesc::where('book_id', null)->orderby('created_at')->get();
-        foreach($ReceiveBookDesc as $index => $datalist){
-            $number = $index + 1;
-            $html.= "<tr>
-                    <td class='text-center'>{$number}</td>
-                    <td>{$datalist->ReceiveBook->book_name}</td>
-                    <td>
-                        <button type='button' class='btn btn-success btn-sm' onclick='OpenModalBookNew(`{$datalist->recd_id}`,`{$datalist->ReceiveBook->book_name}`)'>
-                        <i class='fas fa-plus me-1'></i>เพิ่มข้อมูล</button>
-                    </td>
-                </tr>";
-        }
-        return response()->json($html);
-    }
+
+
 }

@@ -27,6 +27,7 @@ class TypeMedia extends Model
 
     protected $fillable = [
         'type_media_id',
+        'head_number_media',
         'name',
         'desc',
     ];

@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Media;
+use App\Models\TypeBook;
 use App\Models\TypeMedia;
 use App\Models\OrderMedia;
 use App\Models\RequestMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-
-use function Laravel\Prompts\error;
 
 class MediaController extends Controller
 {
@@ -21,7 +22,8 @@ class MediaController extends Controller
     {
         $dataMediaType = TypeMedia::orderby('created_at')->get();
         $dataMedia = Media::orderby('created_at')->get();
-        return view('media/list', compact('dataMediaType', 'dataMedia'));
+        $type_book = TypeBook::all();
+        return view('media/list', compact('dataMediaType', 'dataMedia','type_book'));
     }
     public function create(Request $request){
         $validator = Validator::make($request->all(), [
@@ -32,28 +34,104 @@ class MediaController extends Controller
             Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
         $book_id = $request->book_id;
         $type_media_id = $request->type_media_id;
+
         $media_id = Media::generateID();
-        $dataMedia = Media::where('book_id', $book_id)->where('type_media_id', $type_media_id)->first();
-        if (!is_null($dataMedia)) {
-            Alert::error('Error', 'รายการนี้มีแล้ว');
-            return redirect()->back()->withErrors($validator)->withInput();
+        $books = Book::find($book_id);
+        if (Media::where('book_id', $books->id)->where('type_media_id', $type_media_id)->exists()) {
+            return redirect()->back()->withErrors(['รายการนี้มีแล้ว'])->withInput();
         }
-        $number = Media::generateNumber($book_id,$type_media_id);
+
+        $select_type_file = $request->select_type_file;
+        $file_desc = '';
+        $file_location = '';
+        if($select_type_file == 'text'){
+            $file_desc = $request->input_text ;
+        }elseif($select_type_file == 'file'){
+            $file_location = '';
+            if ($request->hasFile('input_file')) {
+                $file = $request->file('input_file');
+                $newFileName = uniqid() . '_' . $file->getClientOriginalName();
+                $path = public_path('assets/fileMedia');
+
+                if (!File::isDirectory($path)) {
+                    File::makeDirectory($path, 0777, true, true);
+                }
+
+                $file->move($path, $newFileName);
+                $newFilePath = $path . '/' . $newFileName;
+                $file_location = $newFilePath;
+            }
+
+        }else{
+            $file_desc = $request->input_textarea ;
+        }
+
         Media::create([
             'media_id' => $media_id,
             'book_id' => $book_id,
+            'type_book_id'=> $books->typeBook->type_book_id,
             'type_media_id' => $type_media_id,
-            'number' => $number,
+            'number' => $this->generateNumberMedia($type_media_id),
             'amount_end' => $request->amount_end,
             'braille_page' => $request->braille_page,
             'status' => 1,
             'translator' => $request->translator,
             'sound_sys' => $request->sound_sys,
-            'source' => $request->source
+            'source' => $request->source,
+            'file_type_select'=>$select_type_file,
+            'file_desc' => $file_desc,
+            'file_location' => $file_location
         ]);
 
+        Alert::success('บันทึกสำเร็จ');
+        return redirect()->back();
+    }
+    public function update(Request $request, $id){
+        $mediaData = Media::find($id);
+        $select_type_file = $request->select_type_file;
+        $file_location = null;
+        $file_desc = '';
+        if($select_type_file == 'text'){
+            $file_desc = is_null($request->input_text) ? '' : $request->input_text ;
+        }elseif($select_type_file == 'file'){
+            if ($request->hasFile('input_file')) {
+                $file = $request->file('input_file');
+                $path = public_path('assets/fileMedia');
+                if(is_null($mediaData->file_location)){
+                    $newFileName = uniqid() . '_' . $file->getClientOriginalName();
+                }else{
+                    $old_file = $mediaData->file_location;
+                    $newFileName = str_replace($path, "", $old_file);
+
+                }
+
+                if (!File::isDirectory($path)) {
+                    File::makeDirectory($path, 0777, true, true);
+                }
+
+                $file->move($path, $newFileName);
+                $newFilePath = $path . '/' . $newFileName;
+                $file_location = $newFilePath;
+            }
+        }else{
+            $file_desc = is_null($request->input_textarea) ? '' : $request->input_textarea;
+        }
+        if($select_type_file != 'file'){
+            File::delete($mediaData->file_location);
+        }
+        $mediaData->update([
+            'amount_end' => $request->amount_end,
+            'braille_page' => $request->braille_page,
+            'translator' => $request->translator,
+            'sound_sys' => $request->sound_sys,
+            'source' => $request->source,
+            'file_type_select'=>$select_type_file,
+            'file_desc' => $file_desc,
+            'file_location' => $file_location
+        ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
@@ -68,12 +146,7 @@ class MediaController extends Controller
         ];
         return response()->json($data);
     }
-    public function update(Request $request, $id){
-        $mediaData = Media::find($id);
-        $mediaData->update($request->all());
-        Alert::success('บันทึกสำเร็จ');
-        return redirect()->back();
-    }
+
     public function confirmOrder($id){
         $orderMedia = OrderMedia::find($id);
         $dataRequestMedia = RequestMedia::where('book_id',$orderMedia->RequestMedia->book->book_id)->where('type_media_id',$orderMedia->RequestMedia->TypeMedia->type_media_id)->get();
@@ -103,24 +176,20 @@ class MediaController extends Controller
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
-    public function fetchDataBook(Request $request)
-    {
+    public function fetchDataBook(Request $request){
         $term = $request->term;
         $books = Book::where('name', 'like', '%' . $term . '%')
             ->select('book_id', 'name')
             ->get();
         return response()->json($books);
     }
-    public function fetchDataInput(Request $request)
-    {
-        $book_id = $request->book_id;
-        $typeBook = '-----';
-        if (!is_null($book_id)) {
-            $books = Book::where('book_id', $book_id)->first();
-            $typeBook = $books->typeBook->name;
-        }
-        $number = Media::generateNumber($request->type_media_id);
-        $data = ['number' => $number, 'typeBook' => $typeBook];
+    public function fetchDataInput(Request $request){
+        $type_media_id = $request->type_media_id;
+        $books = Book::where('book_id', $request->book_id)->first();
+        $typeBook = $books->typeBook->name;
+        $number = $this->generateNumberMedia($type_media_id);
+        $img = $books->img_book;
+        $data = ['number' => $number, 'typeBook' => $typeBook,'img'=>$img];
         return response()->json($data);
     }
     public function fetchDataConfirmOrder(Request $request){
@@ -204,13 +273,10 @@ class MediaController extends Controller
                         </td>
                     </tr>";
         }
-        // @if ($statusNumber == 1)
-        //
-        //                     @endif
+
         return response()->json($html);
     }
     public function delete($id){
-
         try {
             DB::beginTransaction();
             $data = Media::find($id);
@@ -238,5 +304,15 @@ class MediaController extends Controller
             // หากเกิด error อื่นๆขึ้น
             return response()->json(['error' => 'An error occurred while deleting the record.'], 500);
         }
+    }
+
+    public function generateNumberMedia($type_media_id){
+        $typeMedia = TypeMedia::find($type_media_id);
+        $dataDB = Media::select('number','type_media_id')->where('type_media_id',$type_media_id)->latest()->first();
+        $number = '1';
+        if (!is_null($dataDB)) {
+            $number = $dataDB->number + 1;
+        }
+        return $typeMedia->head_number_media.'-'.$number;
     }
 }

@@ -9,6 +9,10 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-lg-12">
+                            <label>คำนำหน้า ทะเบียนสื่อ</label>
+                            <input type="text" class="form-control" id="head_number_media" name="head_number_media" placeholder="กรอกคำนำหน้า ทะเบียนสื่อ">
+                        </div>
+                        <div class="col-lg-12">
                             <label>ชื่อประเภทสื่อ</label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="กรอกชื่อประเภทสื่อ">
                         </div>

@@ -29,8 +29,7 @@ class AuthController extends Controller
         Session::put('Logged', 'true');
         Session::put('username', $dataEmp->username);
         Session::put('status', $dataEmp->status);
-        $route_name = $dataEmp->status == 1 ? 'dashboard_pd' : 'dashboard_ser';
-        return redirect()->route($route_name);
+        return redirect()->route('dashboard');
     }
     public function logout(){
         Session::flush();

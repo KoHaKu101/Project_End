@@ -41,6 +41,10 @@ class Book extends Model
         'original_page',
         'isbn',
         'level',
+        'language',
+        'abstract',
+        'synopsis',
+        'img_book',
         'updated_at'
     ];
 }

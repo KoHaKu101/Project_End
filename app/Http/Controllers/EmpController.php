@@ -67,7 +67,6 @@ class EmpController extends Controller
             ]);
             Alert::success('บันทึกสำเร็จ');
             return redirect()->back();
-
     }
 
     public function update(Request $request,$id){
@@ -90,7 +89,6 @@ class EmpController extends Controller
         } else {
             Alert::error('เกิดข้อผิดพลาด', 'มี รหัสประจำตัวประชาชน นี้อยู่แล้วในระบบ');
         }
-
         return redirect()->back();
     }
     public function delete($id){

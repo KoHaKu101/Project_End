@@ -9,7 +9,7 @@
                 <div class="modal-body">
                     @csrf
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 py-2">
                             <label>ชื่อหมวดหมู่หนังสือ</label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="กรอกชื่อหมวดหมู่หนังสือ">

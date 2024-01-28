@@ -95,6 +95,8 @@
     @include('media.status')
     @include('media.modal')
     @include('media.modalConfirm')
+    @include('book.modal')
+
 
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script>
@@ -110,15 +112,20 @@
                 keyboard: false
             })
             tabsShowOrder();
+
         });
         //Start function modal
         function createmodal_media() {
             const url = "{{ route('media.create') }}";
             const input_change = '<select id="book_id" name="book_id" ></select>';
             changeInput(input_change, false);
-            setModal_Media('เพิ่มสื่อ', url);
+            setModal_Media('เพิ่มข้อมูลสื่อ', url);
+            $('#input_book').removeClass( "col-lg-8" ).addClass( "col-lg-6" );
+            $('#add_book,#div_add_book').css('display', '');
             Select2_book();
             modal_media.modal('show');
+            showInput('textarea');
+
         }
 
         function editmodal_media(id) {
@@ -133,6 +140,9 @@
                 dataType: 'json',
                 success: function(data) {
                     //ตั้งค่าต่างๆ
+                    $('#download_file').attr('hidden',true);
+                    $('#input_book').removeClass( "col-lg-6" ).addClass( "col-lg-8" );
+                    $('#add_book,#div_add_book').css('display', 'none');
                     setModal_Media('แก้ไขข้อมูลสื่อ', urlUpdate);
                     Select2_book();
                     $('#book_id').select2('destroy');
@@ -149,8 +159,22 @@
                             $('#' + field).val(data.media_data[field]);
                         }
                     });
+                    const file_type_select = data.media_data.file_type_select;
+                    const file_desc = data.media_data.file_desc;
+                    $('#select_type_file').val(file_type_select).trigger('change');
+                    if(file_type_select == 'textarea'){
+                        $('#input_textarea').val(file_desc);
+                    }else if(file_type_select == 'text'){
+                        $('#input_text').val(file_desc);
+                    }else{
+                        const file_location = data.media_data.file_location;
+                        $('#download_file').attr('hidden',false);
+                        $('#file_name').html(file_location);
+                        // $('#btn_download').attr('href',file_location);
+                    }
                     $('#book_type').val(data.book_type);
                     $('#book_id').val(data.book_name);
+
                     modal_media.modal('show');
                 },
                 error: function() {
@@ -175,6 +199,20 @@
             });
             modalSelect_order.modal('show');
         }
+
+        function OpenModalBook() {
+            var url = "{{ route('book.create') }}";
+            var formSubmit = $('#FormSubmitBook');
+            $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+            formSubmit.attr('action', url);
+            formSubmit[0].reset();
+            $('#modal_Book_insert').modal('show');
+            $('#modal_media').modal('hide');
+        }
+        $('#modal_Book_insert').on('hidden.bs.modal', function () {
+            modal_media.modal('show');
+
+        })
         // function
         //End
         function setModal_Media(title, url) {
@@ -189,23 +227,48 @@
             input_type_media_id.attr('disabled', status);
         }
         $(document).on('change', '#book_id, #type_media_id', fetchDataInput);
-
+        $('#select_type_file').on('change',function(){
+            const type_file = $('#select_type_file').val();
+            showInput(type_file);
+        });
+        function showInput(type_file){
+            if(type_file == 'text'){
+                $('#input_textarea').attr('hidden',true);
+                $('#input_text').attr('hidden',false);
+                $('#input_file').attr('hidden',true);
+            }else if(type_file == 'file'){
+                $('#input_textarea').attr('hidden',true);
+                $('#input_text').attr('hidden',true);
+                $('#input_file').attr('hidden',false);
+            }else{
+                $('#input_textarea').attr('hidden',false);
+                $('#input_text').attr('hidden',true);
+                $('#input_file').attr('hidden',true);
+            }
+        }
         function fetchDataInput() {
             const [book_id, type_media_id] = [$('#book_id').val(), $('#type_media_id').val()];
-            const url = `{{ route('media.fetchDataInput') }}`;
-            $.ajax({
-                type: "GET",
-                url: url,
-                data: {
-                    book_id,
-                    type_media_id
-                },
-                dataType: "JSON",
-                success: function(data) {
-                    $('#book_type').val(data.typeBook)
-                    $('#number').val(data.number)
-                }
-            });
+            if(book_id != null && type_media_id != null){
+                const url = `{{ route('media.fetchDataInput') }}`;
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        book_id,
+                        type_media_id
+                    },
+                    dataType: "JSON",
+                    success: function(data) {
+                        $('#book_type').val(data.typeBook)
+                        $('#number').val(data.number)
+                        if(data.img != null){
+                        $('#img_show').attr('src',"{{asset('assets/images/book')}}"+'/'+data.img);
+                        }else{
+                            $('#img_show').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+                        }
+                    }
+                });
+            }
         }
         //start funtion table
         function tabsShowOrder() {
@@ -271,5 +334,25 @@
             let url = `{{ route('media.delete', ['id' => ':id']) }}`.replace(':id', id);;
             alertConfirmDelete(url, '{{ csrf_token() }}');
         }
+        $('#img_book').on('change', function(e) {
+            var input = e.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    var img = $('<img>').attr('src', e.target.result);
+
+                    img.on('load', function() {
+                        $('#img_display').css({
+                            width: '66%',
+                            height: 'auto'
+                        });
+
+                        $('#img_display').attr('src', e.target.result);
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        });
     </script>
 @endsection()

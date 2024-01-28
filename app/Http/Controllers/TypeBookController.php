@@ -20,20 +20,18 @@ class TypeBookController extends Controller
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required'
+            'name' => 'required|unique:type_books'
+        ], [
+            'name.unique' => 'มีรายการนี้อยู่แล้ว'
         ]);
+
         if ($validator->fails()) {
-            Alert::error('เกิดข้อผิดพลาด', 'กรอกข้อมูลไม่ครบ กรุณากรอกข้อมูลให้ครบถ้วน');
+            Alert::error('เกิดข้อผิดพลาด', $validator->errors()->first());
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if (TypeBook::where('name', $request->name)->count() > 0) {
-            Alert::error('เกิดข้อผิดพลาด', 'มีรายการนี้อยู่แล้ว');
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-        $id = TypeBook::generateID();
         TypeBook::create([
-            'type_book_id' => $id,
-            'name' => $request->name
+            'type_book_id' => TypeBook::generateID(),
+            'name' => $request->name,
         ]);
 
         Alert::success('บันทึกสำเร็จ');

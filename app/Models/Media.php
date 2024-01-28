@@ -23,15 +23,7 @@ class Media extends Model
         }
         return $id;
     }
-    public static function generateNumber($type_media_id)
-    {
-        $dataDB = self::select('number','type_media_id')->where('type_media_id',$type_media_id)->latest()->first();
-        $number = '1';
-        if (!is_null($dataDB)) {
-            $number = $dataDB->number + 1;;
-        }
-        return $number;
-    }
+
     public function Book()
     {
         return $this->belongsTo(Book::class, 'book_id');
@@ -43,6 +35,7 @@ class Media extends Model
     protected $fillable = [
         'media_id',
         'book_id',
+        'type_book_id',
         'type_media_id',
         'number',
         'amount_end',
@@ -51,8 +44,10 @@ class Media extends Model
         'check_date',
         'translator',
         'sound_sys',
+        'source',
+        'file_type_select',
+        'file_desc',
         'file_location',
-        'source'
     ];
 
 }

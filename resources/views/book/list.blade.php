@@ -16,83 +16,61 @@
                                 <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                             </div>
                         </form>
-                    <button class="btn btn-sm btn-success col-md-1" onclick="OpenModal()">
-                        <i class="fas fa-plus"></i>
-                        เพิ่มข้อมูล
-                    </button>
-                </div>
-                <div class="row">
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#tab_book"
-                                type="button" role="tab" aria-controls="tab_book" onclick="showTableBook()"
-                                aria-selected="true">หนังสือทั่วไป</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab_newBook"
-                                type="button" role="tab" aria-controls="tab_newBook" onclick="showTableBookNew()"
-                                aria-selected="false">หนังสือใหม่</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade show active" id="tab_book"role="tabpanel" aria-labelledby="ex1-tab-1">
-                            <div class="col-lg-12">
-                                <table class="table table-bordered border-black">
-                                    <thead class="bg-grayCustom">
-                                        <tr>
-                                            <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                            <th scope="col">ชื่อหนังสือ</th>
-                                            <th scope="col" style="width: 11%">หมวดหมู่หนังสือ</th>
-                                            <th scope="col" style="width: 11%">เลข ISBN</th>
-                                            <th scope="col" style="width: 10%">สถานะสำเนา</th>
-                                            <th scope="col" style="width: 15%"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="TableBook">
-                                    </tbody>
-                                </table>
+                        <button class="btn btn-sm btn-success col-md-1" onclick="OpenModal()">
+                            <i class="fas fa-plus"></i>
+                            เพิ่มข้อมูล
+                        </button>
+                    </div>
+                    <div class="row">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $active_book }}" data-bs-toggle="tab" data-bs-target="#tab_book"
+                                    type="button" role="tab" aria-controls="tab_book"
+                                    aria-selected="false">หนังสือทั่วไป</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {{ $active_bookNew }}" data-bs-toggle="tab"
+                                    data-bs-target="#tab_newBook" type="button" role="tab" aria-controls="tab_newBook"
+                                    aria-selected="true">หนังสือใหม่</button>
+                            </li>
+                        </ul>
+                        @php
+                            $show_book = $active_book == 'active' ? 'show active' : '';
+                            $show_bookNes = $active_bookNew == 'active' ? 'show active' : '';
+                        @endphp
+                        <div class="tab-content">
+                            <div class="tab-pane fade {{ $show_book }} " id="tab_book"role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12" id="book-table">
+                                    @include('book.list_ajax')
+                                </div>
+                                {{ $book->links('pagination::bootstrap-4', ['booksPage']) }}
+
                             </div>
-                        </div>
-                        <div class="tab-pane fade " id="tab_newBook" role="tabpanel" aria-labelledby="ex1-tab-1">
-                            <table class="table table-bordered border-black">
-                                <thead class="bg-grayCustom">
-                                    <tr>
-                                        <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                        <th scope="col">ชื่อหนังสือ</th>
-                                        <th scope="col" style="width: 10%"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="TableBookNew">
-                                    {{-- @foreach ($ReceiveBookDesc as $datalist)
-                                        <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
-                                            <td>{{ $datalist->ReceiveBook->book_name }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-primary btn-sm" onclick="OpenModalBookNew('{{$datalist->recd_id}}','{{$datalist->ReceiveBook->book_name}}')"><i class="fas fa-plus"></i>เพิ่มข้อมูล</button>
-                                            </td>
-                                        </tr>
-                                    @endforeach --}}
-                            </table>
+                            <div class="tab-pane fade  {{ $show_bookNes }}" id="tab_newBook" role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12" id="bookNew-table">
+                                    @include('book.listNew_ajax')
+                                </div>
+                                {{ $receiveBookDesc->links('pagination::bootstrap-4', ['bookNewPage']) }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
     @include('copy_book.insert')
     @include('book.modal')
     @include('book.modalBookNew')
 
     <script>
-        $(document).ready(function() {
-            showTableBook();
-        });
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
             var url = "{{ route('book.create') }}";
             var formSubmit = $('#FormSubmitBook');
             $('#modal-titleBook').text('เพิ่มหนังสือ');
+            $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
             formSubmit.attr('action', url);
             formSubmit[0].reset();
             $('#modal_Book_insert').modal('show');
@@ -119,7 +97,7 @@
                 dataType: 'json',
                 success: function(data) {
                     var fields = ['name', 'type_book_id', 'author', 'publisher', 'edition', 'year',
-                        'original_page', 'isbn', 'level'
+                        'original_page', 'isbn', 'level','language','abstract','synopsis'
                     ];
                     fields.forEach(function(field) {
                         if (data[field]) {
@@ -127,6 +105,11 @@
                         }
                     });
                     urlUpdate = urlUpdate.replace(':id', id);
+                    if(data['img_book'] != null){
+                        $('#img_display').attr('src',"{{asset('assets/images/book')}}"+'/'+data['img_book']);
+                    }else{
+                        $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+                    }
                     $('#FormSubmitBook').attr('action', urlUpdate);
                     $('#modal_Book_insert').modal('show');
                     $('#modal-titleBook').text('แก้ไขข้อมูลหนังสือ');
@@ -185,29 +168,25 @@
             let url = `{{ route('book.delete', ['id' => ':id']) }}`.replace(':id', id);;
             alertConfirmDelete(url, '{{ csrf_token() }}');
         }
+        $('#img_book').on('change', function(e) {
+            var input = e.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
-        function showTableBook() {
-            const url = `{{ route('book.fetchDataTableBook') }}`;
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "JSON",
-                success: function(response) {
-                    $('#TableBook').html(response);
-                }
-            });
-        }
+                reader.onload = function(e) {
+                    var img = $('<img>').attr('src', e.target.result);
 
-        function showTableBookNew() {
-            const url = `{{ route('book.fetchDataTableBookNew') }}`;
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "JSON",
-                success: function(response) {
-                    $('#TableBookNew').html(response);
-                }
-            });
-        }
+                    img.on('load', function() {
+                        $('#img_display').css({
+                            width: '66%',
+                            height: 'auto'
+                        });
+
+                        $('#img_display').attr('src', e.target.result);
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        });
     </script>
 @endsection()

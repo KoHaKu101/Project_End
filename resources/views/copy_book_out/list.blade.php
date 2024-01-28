@@ -44,11 +44,11 @@
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 3%" class="text-center">ลำดับ</th>
-                                        <th scope="col" style="width: 12%">ชื่อหนังสือ</th>
+                                        <th scope="col" >ชื่อหนังสือ</th>
                                         <th scope="col" >เจ้าหน้าที่ ที่จ่ายสำเนา</th>
                                         <th scope="col" style="width: 3%" class="text-center">จำนวน</th>
                                         <th scope="col" style="width: 5%" >สถานะ</th>
-                                        <th scope="col" style="width: 12%"></th>
+                                        <th scope="col" style="width: 8%"></th>
 
                                     </tr>
                                 </thead>
@@ -67,7 +67,6 @@
                                         <td class="text-center">
                                             @if($datalist->status === 1)
                                                 <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->copyout_id}}')"><i class="fa-solid fa-hand-holding fa-xl me-1"></i>รับคืน</button>
-                                                <button type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                             @endif
                                         </td>
                                     </tr>
@@ -84,12 +83,10 @@
     <script>
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
-            // สร้างช่องใส่ bookid
             let input_book_id = $(`<select id="book_id" name="book_id" ></select>`);
             $('#book_id').replaceWith(input_book_id);
             createSelect2();
             btnAdd();
-            //modal
             $('#modal-title-CopyBookOut').text('จ่ายสำเนา');
             var formSubmit = $('#FormSubmit');
             var url = "{{ route('book_copy_out.create') }}";

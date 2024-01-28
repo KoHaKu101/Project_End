@@ -26,19 +26,19 @@
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 3%" class="text-center">ลำดับ</th>
+                                        <th scope="col" style="width: 12%" >คำนำหน้า ทะเบียนสื่อ</th>
                                         <th scope="col" style="width: 12%">ชื่อประเภทสื่อ</th>
                                         <th scope="col" >คำอธิบาย</th>
                                         <th scope="col" style="width: 7%"></th>
-
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $datalist )
                                         <tr>
                                             <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td>{{$datalist->head_number_media}}</td>
                                             <td>{{$datalist->name}}</td>
                                             <td>{{$datalist->desc}}</td>
-
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-warning" onclick="editmodal('{{$datalist->getKey()}}')">
                                                     <i class="fas fa-edit"></i>
@@ -72,9 +72,8 @@
         function createmodal(){
             let urlcreate = "{{route('media_type.create')}}";
             $('#modal-title').text('เพิ่มประเภทสื่อ');
-            $('#name').val('');
-            $('#desc').val('');
             $('#FormSubmit').attr('action',urlcreate);
+            $('#FormSubmit')[0].reset();
             $('#modal_TypeMedia_insert').modal('show');
         }
         //ปุ่มแสดง modal สำหรับเพิ่มแก้ไข
@@ -89,6 +88,8 @@
                 success: function(data) {
                     $('#name').val(data.name);
                     $('#desc').val(data.desc);
+                    $('#head_number_media').val(data.head_number_media);
+
                     urlUpdate = urlUpdate.replace(':id', id);
                     $('#FormSubmit').attr('action',urlUpdate);
                     $('#modal-title').text('แก้ไขประเภทสื่อ');
