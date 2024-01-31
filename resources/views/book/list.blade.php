@@ -42,15 +42,14 @@
                             <div class="tab-pane fade {{ $show_book }} " id="tab_book"role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12" id="book-table">
-                                    @include('book.list_ajax')
+                                    @include('book.tableBook')
                                 </div>
                                 {{ $book->links('pagination::bootstrap-4', ['booksPage']) }}
-
                             </div>
                             <div class="tab-pane fade  {{ $show_bookNes }}" id="tab_newBook" role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12" id="bookNew-table">
-                                    @include('book.listNew_ajax')
+                                    @include('book.tableNewBook')
                                 </div>
                                 {{ $receiveBookDesc->links('pagination::bootstrap-4', ['bookNewPage']) }}
                             </div>

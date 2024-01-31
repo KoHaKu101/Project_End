@@ -30,7 +30,7 @@
                             <li class="nav-item " role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
                                     data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
-                                    onclick="tabsShowOrder()" aria-selected="true">รายการสั่งผลิตสื่อ</button>
+                                     aria-selected="true">รายการสั่งผลิตสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
@@ -51,21 +51,10 @@
                             <div class="tab-pane fade show active" id="new_order" role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table table-bordered border-black">
-                                        <thead class="bg-grayCustom">
-                                            <tr>
-                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col">ชื่อหนังสือ</th>
-                                                <th scope="col" style="width: 8%">ประเภทสื่อ</th>
-                                                <th scope="col" style="width: 10%">วันที่สั่งสื่อ</th>
-                                                <th scope="col" style="width: 20%">เจ้าหน้าที่</th>
-                                                <th scope="col" style="width: 16%"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tableDataRequestMedia">
-                                        </tbody>
-                                    </table>
+                                    @include('media.tableOrderMedia')
                                 </div>
+                                {{ $dataOrderMedia->links('pagination::bootstrap-4', ['orderMedia']) }}
+
                             </div>
                             <div class="tab-pane fade show" id="process_order" role="tabpanel" aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
@@ -111,8 +100,6 @@
                 backdrop: 'static',
                 keyboard: false
             })
-            tabsShowOrder();
-
         });
         //Start function modal
         function createmodal_media() {
@@ -271,15 +258,7 @@
             }
         }
         //start funtion table
-        function tabsShowOrder() {
-            const url = `{{ route('media.fetchDataTableOrder') }}`;
-            $.ajax({
-                type: "GET",
-                url,
-                dataType: "JSON",
-                success: (response) => $('#tableDataRequestMedia').html(response)
-            });
-        }
+
 
         function tabShowMedia(tabName) {
             const statusMapping = {

@@ -109,14 +109,8 @@ Route::middleware(['custom.auth'])->prefix('pd')->group(function () {
     Route::get('receive/fetchData', [ReceiveBookController::class, 'fetchData'])->name('receive.fetchData');
     Route::delete('receive/delete/{id}', [ReceiveBookController::class, 'delete'])->name('receive.delete');
     //รับคำขอสื่อ
-    Route::get('requestMedia/list', [RequestMediaController::class, 'index'])->name('requestMedia.list');
-    Route::get('requestMedia/fetchStatus', [RequestMediaController::class, 'fetchStatus'])->name('requestMedia.fetchStatus');
-    Route::get('requestMedia/fetchUser', [RequestMediaController::class, 'fetchUser'])->name('requestMedia.fetchUser');
-    Route::get('requestMedia/fetchUserLastName', [RequestMediaController::class, 'fetchUserLastName'])->name('requestMedia.fetchUserLastName');
-    Route::get('requestMedia/fetchDataEdit', [RequestMediaController::class, 'fetchDataEdit'])->name('requestMedia.fetchDataEdit');
 
-    Route::post('requestMedia/create', [RequestMediaController::class, 'create'])->name('requestMedia.create');
-    Route::post('requestMedia/update/{id}', [RequestMediaController::class, 'update'])->name('requestMedia.update');
+    Route::get('requestMedia/list', [RequestMediaController::class, 'index'])->name('requestMedia.list');
     Route::get('requestMedia/delete/{id}', [RequestMediaController::class, 'delete'])->name('requestMedia.delete');
     Route::get('requestMedia/fetchDataTable/{status}', [RequestMediaController::class, 'fetchDataTable'])->name('requestMedia.fetchDataTable');
 

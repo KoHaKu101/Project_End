@@ -20,25 +20,31 @@ class OrderController extends Controller
     }
     public function create($id)
     {
-        $RequestMedia = RequestMedia::find($id);
-        $order_id = OrderMedia::generateID();
+        $requestMedia = RequestMedia::find($id);
         $emp = Emp::where('username', session()->get('username'))->first();
-        $emp_id = $emp->emp_id;
-        OrderMedia::create([
-            'order_id' => $order_id,
-            'emp_id' => $emp_id,
-            'request_id' => $id,
-            'order_date' => Carbon::now()->format('Y-m-d'),
-            'status' => 1,
-        ]);
-        $RequestMedia->update([
-            'status' => 3
-        ]);
-        Alert::success('บันทึกสำเร็จ');
+        $loop_data = RequestMedia::where('book_id',$requestMedia->book_id)->where('type_media_id',$requestMedia->type_media_id)->where('status',1)->get();
+        if($loop_data->count() > 0){
+            foreach($loop_data as $datalist){
+                $request_id = $datalist->request_id ;
+                OrderMedia::create([
+                    'order_id' => OrderMedia::generateID(),
+                    'emp_id' => $emp->emp_id,
+                    'request_id' => $request_id,
+                    'order_date' => Carbon::now()->format('Y-m-d'),
+                    'status' => 1,
+                ]);
+                RequestMedia::where('request_id',$request_id)->update(['status' => 3]);
+
+            }
+            Alert::success('บันทึกสำเร็จ');
+            return redirect()->back();
+        }
+        Alert::error('ไม่พบข้อมูล');
         return redirect()->back();
+
     }
-    public function fetchRequestMedia(Request $request)
-    {
+    public function fetchRequestMedia(Request $request){
+
         $RequestMedia = RequestMedia::where('request_id', $request->id)->first();
         $text = [1 => 'สั่งผลิต', 2 => 'พร้อมจ่ายสื่อ', 3 => 'รอผลิต', 4 => 'จ่ายสื่อเรียบร้อย'];
         $url = route('order.create', $request->id);
