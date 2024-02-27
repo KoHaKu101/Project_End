@@ -12,12 +12,11 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                        <form action="#" class="col-md-11">
+                        <form action="{{route('media.list')}}" class="col-md-11">
                             <div class="input-group">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
                                 <input type="text" class="form-control form-control-sm"
-                                    placeholder="ค้นหาสื่อสำหรับผู้พิการทางสายตา" aria-label="ค้นหาหนังสือ"
-                                    aria-describedby="basic-addon1">
+                                    placeholder="ค้นหาสื่อสำหรับผู้พิการทางสายตา" id="search_data" name="search_data" value="{{$search_data}}">
                                 <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                             </div>
                         </form>
@@ -25,53 +24,47 @@
                             <i class="fas fa-plus"></i> เพิ่มข้อมูล
                         </button>
                     </div>
+
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item " role="presentation">
-                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+                                <button class="nav-link {{ isActive($active,'0') }}" id="home-tab" data-bs-toggle="tab"
                                     data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
-                                     aria-selected="true">รายการสั่งผลิตสื่อ</button>
+                                    aria-selected="true">รายการสั่งผลิตสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
-                                    data-bs-target="#process_order" onclick="tabShowMedia('process_order')" type="button"
-                                    role="tab" aria-controls="wait_order"
+                                <button class="nav-link {{ isActive($active,'1') }}" id="profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#media_process" type="button" role="tab" aria-controls="media_process"
                                     aria-selected="false">รายการสื่อกำลังผลิต</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
-                                    data-bs-target="#process_order"onclick="tabShowMedia('success_order')" type="button"
-                                    role="tab" aria-controls="process_order"
-                                    aria-selected="false">รายการสื่อผลิตเสร็จ</button>
+                                <button class="nav-link {{ isActive($active,'2') }}" id="profile-tab" data-bs-toggle="tab"
+                                    data-bs-target="#media_success" type="button" role="tab"
+                                    aria-controls="media_success" aria-selected="false">รายการสื่อผลิตเสร็จ</button>
                             </li>
                         </ul>
                     </div>
+
                     <div class="row">
                         <div class="tab-content" id="ex1-content">
-                            <div class="tab-pane fade show active" id="new_order" role="tabpanel"
+                            <div class="tab-pane fade {{isActiveShow($active,'0')}}" id="new_order" role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
                                     @include('media.tableOrderMedia')
                                 </div>
                                 {{ $dataOrderMedia->links('pagination::bootstrap-4', ['orderMedia']) }}
-
                             </div>
-                            <div class="tab-pane fade show" id="process_order" role="tabpanel" aria-labelledby="ex1-tab-1">
+                            <div class="tab-pane fade {{isActiveShow($active,'1')}}" id="media_process" role="tabpanel" aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12">
-                                    <table class="table table-bordered border-black">
-                                        <thead class="bg-grayCustom">
-                                            <tr>
-                                                <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                                <th scope="col">ชื่อหนังสือ</th>
-                                                <th scope="col" style="width: 11%">หมวดหมู่หนังสือ</th>
-                                                <th scope="col" style="width: 8%">ประเภทสื่อ</th>
-                                                <th scope="col" style="width: 10%">สถานะการผลิต</th>
-                                                <th scope="col" style="width: 15%"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tableDataMedia">
-                                    </table>
+                                    @include('media.tableMediaProcess')
                                 </div>
+                                {{ $dataMediaProcess->links('pagination::bootstrap-4', ['mediaProcess']) }}
+                            </div>
+                            <div class="tab-pane fade {{isActiveShow($active,'2')}}" id="media_success" role="tabpanel" aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12">
+                                    @include('media.tableMediaSuccess')
+                                </div>
+                                {{ $dataMediaSuccess->links('pagination::bootstrap-4', ['mediaSuccess']) }}
                             </div>
                         </div>
                     </div>
@@ -81,42 +74,53 @@
     </div>
 
 
-    @include('media.status')
-    @include('media.modal')
-    @include('media.modalConfirm')
+    @include('media.modalStatus')
+    @include('media.modalCreateAndEdit')
     @include('book.modal')
+    @include('order.modal')
 
 
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script>
-        const formSubmit = $('#FormSubmit');
+        const formSubmit = $('#form_media');
         const modal_title = $('#modal-title');
         const modal_media = $('#modal_media');
+        const modal_status = $('#medai_status');
         const input_type_media_id = $('#type_media_id');
-        const modalSelect_order = $('#confirm_oder_modal');
+        const order_modal = $('#order_modal');
 
-        $(document).ready(function() {
-            modal_media.modal({
-                backdrop: 'static',
-                keyboard: false
-            })
-        });
+        function openmodal_status(id) {
+            let url = "{{ route('media.fetchDataStatusMedia') }}";
+            let urlform = "{{ route('media.updateStatus', ['id' => ':id']) }}".replace(':id', id);
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {
+                    id: id
+                },
+                dataType: "JSON",
+                success: function(response) {
+                    $('#body_status').html(response);
+                    $('#form_modal_status').attr('action', urlform)
+                    modal_status.modal('show');
+                }
+            });
+        }
         //Start function modal
         function createmodal_media() {
             const url = "{{ route('media.create') }}";
             const input_change = '<select id="book_id" name="book_id" ></select>';
             changeInput(input_change, false);
             setModal_Media('เพิ่มข้อมูลสื่อ', url);
-            $('#input_book').removeClass( "col-lg-8" ).addClass( "col-lg-6" );
+            $('#input_book').removeClass("col-lg-8").addClass("col-lg-6");
             $('#add_book,#div_add_book').css('display', '');
             Select2_book();
+            $('#img_show').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
             modal_media.modal('show');
             showInput('textarea');
 
         }
-
-        function editmodal_media(id) {
-            let urlUpdate = "{{ route('media.update', ['id' => ':id']) }}".replace(':id', id);
+        async function editmodal_media(id) {
             const urlFetch = "{{ route('media.fetchData') }}";
             $.ajax({
                 url: urlFetch,
@@ -126,9 +130,10 @@
                 },
                 dataType: 'json',
                 success: function(data) {
+                    let urlUpdate = "{{ route('media.update', ['id' => ':id']) }}".replace(':id', id);
                     //ตั้งค่าต่างๆ
-                    $('#download_file').attr('hidden',true);
-                    $('#input_book').removeClass( "col-lg-6" ).addClass( "col-lg-8" );
+                    $('#download_file').attr('hidden', true);
+                    $('#input_book').removeClass("col-lg-6").addClass("col-lg-8");
                     $('#add_book,#div_add_book').css('display', 'none');
                     setModal_Media('แก้ไขข้อมูลสื่อ', urlUpdate);
                     Select2_book();
@@ -139,7 +144,7 @@
                     changeInput(input_change, true);
                     //เริ่มกรอกข้อมูล
                     var fields = ['number', 'type_media_id', 'sound_sys', 'braille_page', 'amount_end',
-                        'source', 'translator'
+                        'source', 'translator', 'time_hour', 'time_minute'
                     ];
                     fields.forEach(function(field) {
                         if (data.media_data[field]) {
@@ -149,19 +154,16 @@
                     const file_type_select = data.media_data.file_type_select;
                     const file_desc = data.media_data.file_desc;
                     $('#select_type_file').val(file_type_select).trigger('change');
-                    if(file_type_select == 'textarea'){
+                    if (file_type_select == 'textarea') {
                         $('#input_textarea').val(file_desc);
-                    }else if(file_type_select == 'text'){
+                    } else if (file_type_select == 'text') {
                         $('#input_text').val(file_desc);
-                    }else{
-                        const file_location = data.media_data.file_location;
+                    } else if(file_type_select == 'file') {
                         $('#download_file').attr('hidden',false);
-                        $('#file_name').html(file_location);
-                        // $('#btn_download').attr('href',file_location);
+                        $('#file_location').val(file_desc);
                     }
                     $('#book_type').val(data.book_type);
                     $('#book_id').val(data.book_name);
-
                     modal_media.modal('show');
                 },
                 error: function() {
@@ -170,36 +172,93 @@
             });
 
         }
-
         function show_ConfirmDataOrder(id) {
-            const url = `{{ route('media.fetchDataConfirmOrder') }}`;
+            let url = `{{route('order.fetchRequestMedia')}}`;
             $.ajax({
                 type: "GET",
-                url,
+                url: url,
                 data: {
-                    id: id
+                    id:id
                 },
                 dataType: "JSON",
-                success: function(response) {
-                    $('#confirm_oder_modal_body').html(response);
+                success: function (data) {
+                    let urlAction = `{{route('media.confirmOrder',['id' => ':id'])}}`.replace(':id',id);
+                    $('#ISBN').val(data.book.isbn);
+                    $('#book_name').val(data.book.name);
+                    $('#type_book').val(data.typeBook.name);
+                    $('#type_media').val(data.TypeMedia.name);
+                    $('#form_order').attr('action',urlAction);
+                    $('#btn_close').hide();
+                    $('#submit_order').html('รับรายการสั่งผลิต');
+                    $('#modal_title_order').html('รายละเอียดการสั่งผลิตสื่อ');
+                    order_modal.modal('show');
                 }
             });
-            modalSelect_order.modal('show');
         }
-
         function OpenModalBook() {
             var url = "{{ route('book.create') }}";
             var formSubmit = $('#FormSubmitBook');
-            $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+            const type_book_id = $('#type_book_id');
+            $('#img_display').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
             formSubmit.attr('action', url);
             formSubmit[0].reset();
+            type_book_id.select2({
+                theme: 'bootstrap-5',
+                dropdownParent: '#modal_Book_insert',
+            });
             $('#modal_Book_insert').modal('show');
             $('#modal_media').modal('hide');
         }
-        $('#modal_Book_insert').on('hidden.bs.modal', function () {
-            modal_media.modal('show');
 
-        })
+        function close_MedaiModal(id){
+            edit_statusMedia('ต้องการหยุดเผยแพร่สื่อหรือไม่',id);
+        }
+        function open_MediaModal(id){
+            edit_statusMedia('ต้องการเผยแพร่สื่อนี้หรือไม่',id);
+        }
+        function edit_statusMedia(title,id){
+            Swal.fire({
+                icon:'warning',
+                title: title,
+                showCancelButton: true,
+                confirmButtonText: 'ใช่',
+                cancelButtonText: 'ไม่',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#bb2d3b',
+                showLoaderOnConfirm: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                let url = `{{route('media.editStatus',['id'=>':id'])}}`.replace(':id',id);
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "JSON",
+                    success: function (response) {
+                        if(response){
+                            Swal.fire({
+                                icon:'success',
+                                title: 'อัพเดทรายการสำเร็จ',
+                                confirmButtonText: 'ตกลง',
+                                confirmButtonColor: '#198754',
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        }else{
+                            Swal.fire({
+                                icon:'error',
+                                title: 'อัพเดทรายการไม่สำเร็จ',
+                                text: 'เนื่องจากไม่พบรายการ',
+                                confirmButtonText: 'ตกลง',
+                                confirmButtonColor: '#198754',
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+              }
+            })
+        }
         // function
         //End
         function setModal_Media(title, url) {
@@ -207,35 +266,29 @@
             formSubmit[0].reset();
             modal_title.text(title);
         }
-
         function changeInput(html, status) {
             const input_book = $('#book_id');
             input_book.replaceWith(html);
             input_type_media_id.attr('disabled', status);
         }
-        $(document).on('change', '#book_id, #type_media_id', fetchDataInput);
-        $('#select_type_file').on('change',function(){
-            const type_file = $('#select_type_file').val();
-            showInput(type_file);
-        });
-        function showInput(type_file){
-            if(type_file == 'text'){
-                $('#input_textarea').attr('hidden',true);
-                $('#input_text').attr('hidden',false);
-                $('#input_file').attr('hidden',true);
-            }else if(type_file == 'file'){
-                $('#input_textarea').attr('hidden',true);
-                $('#input_text').attr('hidden',true);
-                $('#input_file').attr('hidden',false);
-            }else{
-                $('#input_textarea').attr('hidden',false);
-                $('#input_text').attr('hidden',true);
-                $('#input_file').attr('hidden',true);
+        function showInput(type_file) {
+            if (type_file == 'text') {
+                $('#input_textarea').attr('hidden', true);
+                $('#input_text').attr('hidden', false);
+                $('#input_file').attr('hidden', true);
+            } else if (type_file == 'file') {
+                $('#input_textarea').attr('hidden', true);
+                $('#input_text').attr('hidden', true);
+                $('#input_file').attr('hidden', false);
+            } else {
+                $('#input_textarea').attr('hidden', false);
+                $('#input_text').attr('hidden', true);
+                $('#input_file').attr('hidden', true);
             }
         }
         function fetchDataInput() {
             const [book_id, type_media_id] = [$('#book_id').val(), $('#type_media_id').val()];
-            if(book_id != null && type_media_id != null){
+            if (book_id != null && type_media_id != null) {
                 const url = `{{ route('media.fetchDataInput') }}`;
                 $.ajax({
                     type: "GET",
@@ -248,31 +301,14 @@
                     success: function(data) {
                         $('#book_type').val(data.typeBook)
                         $('#number').val(data.number)
-                        if(data.img != null){
-                        $('#img_show').attr('src',"{{asset('assets/images/book')}}"+'/'+data.img);
-                        }else{
-                            $('#img_show').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+                        if (data.img != null) {
+                            $('#img_show').attr('src', "{{ asset('assets/images/book') }}" + '/' + data.img);
+                        } else {
+                            $('#img_show').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
                         }
                     }
                 });
             }
-        }
-        //start funtion table
-
-
-        function tabShowMedia(tabName) {
-            const statusMapping = {
-                'process_order': 1,
-                'success_order': 2,
-            };
-            const status = statusMapping[tabName];
-            let url = "{{ route('media.fetchDataTable', ['status' => ':status']) }}".replace(':status', status);
-            $.ajax({
-                type: "GET",
-                url,
-                dataType: "JSON",
-                success: (response) => $('#tableDataMedia').html(response)
-            });
         }
         //start function select2
         function Select2_book() {
@@ -313,6 +349,14 @@
             let url = `{{ route('media.delete', ['id' => ':id']) }}`.replace(':id', id);;
             alertConfirmDelete(url, '{{ csrf_token() }}');
         }
+        $(document).on('change', '#book_id, #type_media_id', fetchDataInput);
+        $('#modal_Book_insert').on('hidden.bs.modal', function() {
+            modal_media.modal('show');
+        })
+        $('#select_type_file').on('change', function() {
+            const type_file = $('#select_type_file').val();
+            showInput(type_file);
+        });
         $('#img_book').on('change', function(e) {
             var input = e.target;
             if (input.files && input.files[0]) {

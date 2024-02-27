@@ -93,12 +93,12 @@
                         <span class="text-sideBar">รับหนังสือ</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a href="{{ route('requestMedia.list') }}" class="sidebar-link @active('requestMedia.list') ">
+                 {{-- <li class="sidebar-item">
+                    <a href="route('requestMedia.list') }}" class="sidebar-link  ">
                         <i class="fa-solid fa-clipboard-list pe-2"></i>
                         <span class="text-sideBar">รับคำขอสื่อ</span>
                     </a>
-                </li>
+                </li> --}}
                 <li class="sidebar-item">
                     <a href="{{ route('mediaOut.list') }}" class="sidebar-link @active('mediaOut.list') ">
                         <i class="fa-solid fa-file-export pe-2"></i>
@@ -118,7 +118,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="{{ route('report_pd') }}" class="sidebar-link @active('report_pd')">
+                    <a href="{{ route('report') }}" class="sidebar-link @active('report')">
                         <i class="fa-regular fa-file-lines pe-2"></i>
                         <span class="text-sideBar">รายงาน</span>
                     </a>

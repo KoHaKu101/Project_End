@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TypeBook extends Model
 {
     use HasFactory;
+protected $dateFormat = 'Y-m-d';
     protected $primaryKey = 'type_book_id';
     public $incrementing = false;
 

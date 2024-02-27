@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class RequestUser extends Model
 {
     use HasFactory;
+protected $dateFormat = 'Y-m-d';
     protected $primaryKey = 'requesters_id';
     public $incrementing = false;
     public static function generateID()
     {
-        $dataDB = self::select('requesters_id')->latest()->first();
+        $dataDB = self::select('requesters_id')->orderBy('requesters_id','DESC')->latest()->first();
         $id = 'user_00001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->requesters_id, 5);

@@ -9,9 +9,10 @@ use App\Models\TypeMedia;
 use App\Models\OrderMedia;
 use App\Models\RequestMedia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
@@ -22,20 +23,27 @@ class MediaController extends Controller
     {
         $perPage = 10;
         $page = $request->input('page', 1);
+        $search_data = $request->search_data != '' ? $request->search_data : '';
+        $searchQuery = function ($query) use ($search_data) {$query->where('name', 'like', '%' . $search_data . '%');};
+        $searchQueryOrderMedia = function ($query) use ($search_data) {
+            $query->whereHas('book', function ($query) use ($search_data) {
+                $query->where('name', 'like', '%' . $search_data . '%');
+            });
+        };
         $dataMediaType = TypeMedia::orderby('created_at')->get();
-        $dataMedia = Media::orderby('created_at')->get();
-        $dataOrderMedia = OrderMedia::where('status', 1)->orderby('created_at')->paginate($perPage, ['*'], 'orderMedia');
+        $dataOrderMedia = OrderMedia::WhereHas('requestMedia', $searchQueryOrderMedia)->where('status', 1)->orderby('created_at')->paginate($perPage, ['*'], 'orderMedia');
+        $dataMediaProcess = Media::WhereHas('book', $searchQuery)->where('status',1)->orderby('created_at')->paginate($perPage, ['*'], 'mediaProcess');
+        $dataMediaSuccess = Media::WhereHas('book', $searchQuery)->where('status',2)->orWhere('status',3)->orderby('created_at')->paginate($perPage, ['*'], 'mediaSuccess');
+        $active = isset($request->orderMedia) ? '0' : ( isset($request->mediaProcess) ? '1' : (isset($request->mediaSuccess) ? '2' : '0' ));
         $type_book = TypeBook::all();
-        return view('media/list', compact('dataMediaType', 'dataMedia', 'type_book', 'dataOrderMedia'));
+        return view('media/list', compact('dataMediaType',  'type_book', 'dataOrderMedia','dataMediaProcess','dataMediaSuccess','active','search_data'));
     }
-    private function createData($request, $select_type_file, $file_desc, $file_location)
-    {
+    private function createData($request, $select_type_file,$file_desc){
         $type_media_id = $request->type_media_id;
         $books = Book::find($request->book_id);
         Media::create([
             'media_id' => Media::generateID(),
             'book_id' => $books->book_id,
-            'type_book_id' => $books->typeBook->type_book_id,
             'type_media_id' => $type_media_id,
             'number' => $this->generateNumberMedia($type_media_id),
             'amount_end' => $request->amount_end,
@@ -44,35 +52,35 @@ class MediaController extends Controller
             'translator' => $request->translator,
             'sound_sys' => $request->sound_sys,
             'source' => $request->source,
+            'time_hour' => $request->time_hour,
+            'time_minute' => $request->time_minute,
             'file_type_select' => $select_type_file,
-            'file_desc' => $file_desc,
-            'file_location' => $file_location
+            'file_desc' => $file_desc
         ]);
         return true;
     }
-    public function create(Request $request)
-    {
+    public function create(Request $request){
         $validator = Validator::make($request->all(), [
             'book_id' => 'required',
             'type_media_id' => 'required',
         ]);
         if ($validator->fails()) {
             Alert::error('เกิดข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back();
         }
         if (Media::where('book_id', $request->book_id)->where('type_media_id', $request->type_media_id)->exists()) {
-            return redirect()->back()->withErrors(['รายการนี้มีแล้ว'])->withInput();
+            Alert::error('เกิดข้อผิดพลาด', 'รายการนี้มีแล้ว');
+            return redirect()->back();
         }
         $select_type_file = $request->select_type_file;
         $file_desc = '';
-        $file_location = '';
-        if ($select_type_file == 'text') {
-            $file_desc = $request->input_text;
+        if ($select_type_file == 'text' || $select_type_file == 'textarea') {
+            $value_text= ['textarea'=>$request->input_textarea,'text'=>$request->input_text];
+            $file_desc = $value_text[$select_type_file];
         } elseif ($select_type_file == 'file') {
-            $file_location = '';
             if ($request->hasFile('input_file')) {
                 $file = $request->file('input_file');
-                $newFileName = uniqid() . '_' . $file->getClientOriginalName();
+                $newFileName = Media::generateID().'.'.$file->getClientOriginalExtension();
                 $path = public_path('assets/fileMedia');
 
                 if (!File::isDirectory($path)) {
@@ -81,63 +89,96 @@ class MediaController extends Controller
 
                 $file->move($path, $newFileName);
                 $newFilePath = $path . '/' . $newFileName;
-                $file_location = $newFilePath;
+                $file_desc = $newFilePath;
             }
-        } else {
-            $file_desc = $request->input_textarea;
         }
-        $this->createData($request, $select_type_file, $file_desc, $file_location);
+        $this->createData($request, $select_type_file, $file_desc);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         $mediaData = Media::find($id);
         $select_type_file = $request->select_type_file;
-        $file_location = null;
-        $file_desc = '';
-        if ($select_type_file == 'text') {
-            $file_desc = is_null($request->input_text) ? '' : $request->input_text;
+        $file_desc = $request->input_text;
+        if ($select_type_file == 'text' || $select_type_file == 'textarea') {
+            $value_text= ['textarea'=>$request->input_textarea,'text'=>$request->input_text];
+            $file_desc = $value_text[$select_type_file];
         } elseif ($select_type_file == 'file') {
             if ($request->hasFile('input_file')) {
                 $file = $request->file('input_file');
                 $path = public_path('assets/fileMedia');
-                if (is_null($mediaData->file_location)) {
-                    $newFileName = uniqid() . '_' . $file->getClientOriginalName();
-                } else {
-                    $old_file = $mediaData->file_location;
-                    $newFileName = str_replace($path, "", $old_file);
-                }
-
+                $newFileName = $mediaData->media_id.'.'.$file->getClientOriginalExtension();
                 if (!File::isDirectory($path)) {
                     File::makeDirectory($path, 0777, true, true);
                 }
-
                 $file->move($path, $newFileName);
                 $newFilePath = $path . '/' . $newFileName;
-                $file_location = $newFilePath;
+                $file_desc = $newFilePath;
+            }else{
+                $newFilePath = $mediaData->file_desc;
+                if(File::exists($newFilePath)){
+                    $file_desc = $mediaData->file_desc;
+                }else{
+                    $file_desc = '';
+                }
+
             }
-        } else {
-            $file_desc = is_null($request->input_textarea) ? '' : $request->input_textarea;
         }
         if ($select_type_file != 'file') {
-            File::delete($mediaData->file_location);
+            File::delete($mediaData->file_desc);
         }
         $mediaData->update([
             'amount_end' => $request->amount_end,
             'braille_page' => $request->braille_page,
             'translator' => $request->translator,
             'sound_sys' => $request->sound_sys,
+            'time_hour' => $request->time_hour,
+            'time_minute' => $request->time_minute,
             'source' => $request->source,
             'file_type_select' => $select_type_file,
-            'file_desc' => $file_desc,
-            'file_location' => $file_location
+            'file_desc' => $file_desc
         ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
     }
-    public function fetchData(Request $request)
-    {
+    public function updateStatus(Request $request,$id){
+        $check_date = $request->check_date;
+        $dataMedia = Media::find($id);
+        $requestMedia = RequestMedia::where('book_id',$dataMedia->book_id)->where('type_media_id',$dataMedia->type_media_id)->get();
+        $dataMedia->check_date = $check_date;
+
+        $dataMedia->status = 2;
+        foreach($requestMedia as $datalist){
+            $request_id = $datalist->request_id;
+            RequestMedia::find($request_id)->update([
+                'status' => 2
+            ]);
+            OrderMedia::where('request_id',$request_id)->update([
+                'end_date' => $check_date,
+                'status' => 3
+            ]);
+        }
+        $dataMedia->save();
+        Alert::success('บันทึกสำเร็จ');
+        return redirect()->back();
+    }
+    public function editStatus($id){
+        $dataMedia = Media::find($id);
+        if(is_null($dataMedia)){
+            return response()->json(false);
+        }
+        if($dataMedia->status == 2){
+            $dataMedia->update([
+                'status' => 3
+            ]);
+        }elseif($dataMedia->status == 3){
+            $dataMedia->update([
+                'status' => 2
+            ]);
+        }
+        return  response()->json(true);
+    }
+    public function fetchData(Request $request){
         $mediaData = Media::find($request->id);
         $bookType = $mediaData->Book->TypeBook->name;
         $book_name = $mediaData->book->name;
@@ -149,25 +190,20 @@ class MediaController extends Controller
         return response()->json($data);
     }
 
-    public function confirmOrder($id, Request $request)
-    {
-        $orderMedia = OrderMedia::find($id);
-        $book_id = $orderMedia->RequestMedia->book->book_id;
-        $type_media_id = $orderMedia->RequestMedia->TypeMedia->type_media_id;
-        $requestMedia = RequestMedia::where('book_id', $book_id)->where('type_media_id', $type_media_id)->get();
-        $book = Book::where('book_id', $book_id)->first();
+    public function confirmOrder($id, Request $request){
+        $requestMedia = RequestMedia::find($id);
+        $book_id = $requestMedia->book_id;
+        $type_media_id = $requestMedia->type_media_id;
         Media::create([
             'media_id' => Media::generateID(),
-            'book_id' => $book->book_id,
-            'type_book_id' => $book->typeBook->type_book_id,
+            'book_id' => $book_id,
             'type_media_id' => $type_media_id,
             'number' => $this->generateNumberMedia($type_media_id),
             'status' => 1,
             'file_type_select' => 'textarea',
-            'file_desc' => '',
-
         ]);
-        foreach ($requestMedia as $datalist) {
+        $dataMedia = RequestMedia::where('book_id', $book_id)->where('type_media_id', $type_media_id)->get();
+        foreach ($dataMedia as $datalist) {
             OrderMedia::where('request_id', $datalist->request_id)->where('status', 1)->update([
                 'status' => 2
             ]);
@@ -176,16 +212,14 @@ class MediaController extends Controller
         return redirect()->back();
 
     }
-    public function fetchDataBook(Request $request)
-    {
+    public function fetchDataBook(Request $request){
         $term = $request->term;
         $books = Book::where('name', 'like', '%' . $term . '%')
             ->select('book_id', 'name')
-            ->get();
+            ->take(10)->get();
         return response()->json($books);
     }
-    public function fetchDataInput(Request $request)
-    {
+    public function fetchDataInput(Request $request){
         $type_media_id = $request->type_media_id;
         $books = Book::where('book_id', $request->book_id)->first();
         $typeBook = $books->typeBook->name;
@@ -194,86 +228,94 @@ class MediaController extends Controller
         $data = ['number' => $number, 'typeBook' => $typeBook, 'img' => $img];
         return response()->json($data);
     }
-    public function fetchDataConfirmOrder(Request $request)
-    {
-        $orderMedia = OrderMedia::find($request->id);
-        $text = [1 => 'สั่งผลิต', 2 => 'พร้อมจ่ายสื่อ', 3 => 'รอผลิต', 4 => 'จ่ายสื่อเรียบร้อย'];
-        $url = route('media.confirmOrder', $request->id);
-        $status = $orderMedia->RequestMedia->status;
-        $html = "<form action='{$url}' method='POST' id='form_confirmOrder'>
-                    " . csrf_field() . "
-                    <div class='row'>
-                        <div class='col-lg-12'>
-                            <label>ชื่อหนังสือ</label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->book->name}'disabled>
+
+    public function fetchDataStatusMedia(Request $request){
+        $html = "";
+        $dataMedia = Media::find($request->id);
+        $selectTypeFile = [''=>'','textarea'=>'ข้อความ','text'=>'google','file'=>'อัปโหลด'];
+        $img = $dataMedia->Book->img_book != "" ? 'book/'.$dataMedia->Book->img_book : 'book_not_found.jpg';
+        $img = asset('assets/images/'.$img);
+        $html.= "
+                <div class='row'>
+                <div class='col-md-4 '>
+                    <div class='text-center'>
+                        <img src=".$img." width='85%' >
+                    </div>
+                </div>
+                <div class='col-md-8'>
+                    <div class='form-group row'>
+                        <div class='col-lg-4'>
+                            <label class='control-label'>ทะเบียนสื่อ</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->number}'>
                         </div>
-                        <div class='col-lg-8'>
-                            <label>ประเภทสื่อ</label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->TypeMedia->name}' disabled>
+                        <div class='col-lg-8' >
+                            <label class='control-label'>หนังสือ</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->Book->name}'>
                         </div>
                         <div class='col-lg-4'>
-                            <label>สถานะ</label>
-                            <input type='text' class='form-control' value='{$text[$status]}' disabled>
+                            <label class='control-label'>หมวดหมู่</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->Book->TypeBook->name}'>
                         </div>
-                        <div class='col-lg-6'>
-                            <label>ชื่อ</label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->RequestUser->f_name}' disabled>
+                        <div class='col-lg-8'>
+                            <label class='control-label'>ประเภทสื่อ</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->TypeMedia->name}'>
                         </div>
-                        <div class='col-lg-6'>
-                            <label>นามสกุล</label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->RequestUser->l_name}' disabled>
+                        <div class='col-lg-4'>
+                            <label class='control-label'>ระบบเสียง</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->sound_sys}'>
+                        </div>
+                        <div class='col-lg-8' style='padding-bottom: calc(var(--bs-gutter-x) * .1) !important;'>
+                            <label class='control-label'> เวลา ของไฟล์สื่อ</label>
+                            <div class='form-group row' >
+                                <div class='col-md-6'>
+                                    <div class='input-group input-group-sm '>
+                                        <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->time_hour}'>
+                                        <span class='input-group-text'>ชั่วโมง</span>
+                                    </div>
+                                </div>
+                                <div class='col-md-6'>
+                                <div class='input-group input-group-sm col-md-6'>
+                                    <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->time_minute}'>
+                                    <span class='input-group-text'>นาที</span>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='col-lg-4'>
+                            <label class='control-label'>จำนวนหน้าอักษรเบลล์</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->braille_page}'>
+                        </div>
+                        <div class='col-lg-4'>
+                            <label class='control-label'>จำนวนเล่มจบ</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->amount_end}'>
+                        </div>
+                        <div class='col-lg-4'>
+                            <label class='control-label'>แหล่งที่มา</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->source}'>
                         </div>
                         <div class='col-lg-12'>
-                            <label>เบอร์โทรศัพท์</label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->RequestUser->tel}' disabled>
+                            <label class='control-label'>ผู้ที่แปลสื่อหรือพากย์เสียง</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->translator}'>
                         </div>
                         <div class='col-lg-12'>
-                            <label>เจ้าหน้าที่ </label>
-                            <input type='text' class='form-control' value='{$orderMedia->RequestMedia->emp->f_name} {$orderMedia->RequestMedia->emp->l_name}' disabled>
-                        </div>
-                    </div>
-                </form>";
-        return response()->json($html);
-    }
-    public function fetchDataTableOrder()
-    {
-        $dataOrder = OrderMedia::where('status', 1)->orderby('created_at')->get();
-        $html = "";
-        foreach ($dataOrder as $index => $datalist) {
-            $emp = $datalist->emp->f_name . " " . $datalist->emp->l_name;
-            $html .= "";
-        }
-        return response()->json($html);
-    }
-    public function fetchDataTable($status)
-    {
-        $dataMedia = Media::where('status', $status)->orderby('created_at')->get();
-        $html = '';
-        $statusArray = [1 => 'กำลังผลิต', 2 => 'ตรวจเช็คเรียบร้อย'];
-        $color_status = [1 => 'bg-warning', 2 => 'bg-success'];
-        foreach ($dataMedia as $index => $datalist) {
-            $statusNumber = $datalist->status;
-            $statusBadge = "<span class='badge {$color_status[$statusNumber]} text-dark' >$statusArray[$statusNumber]</span>";
-            $html .= "<tr>
-                        <td class='text-center'>" . ($index + 1) . "</td>
-                        <td>{$datalist->Book->name}</td>
-                        <td>{$datalist->Book->TypeBook->name}</td>
-                        <td>{$datalist->TypeMedia->name}</td>
-                        <td class='text-center'>{$statusBadge}</td>
-                        <td>
-                            <button type='button' class='btn btn-sm btn-warning' onclick='editmodal_media(`{$datalist->media_id}`)'><i class='fas fa-edit'></i></button>
-                            <button type='button' class='btn btn-sm btn-danger' onclick='confirm_delete(`{$datalist->media_id}`)'><i class='fas fa-trash'></i></button>
-                                    <button type='button'
-                                   class='btn btn-sm btn-primary'data-bs-toggle='modal'
-                                    data-bs-target='#status_insert'>อัพเดพสถานะ</button>
-                        </td>
-                    </tr>";
+                            <label class='control-label'>เลือกวิธีจัดเก็บไฟล์</label>
+                            <input type='text' class='form-control form-control-sm' disabled value='{$selectTypeFile[$dataMedia->file_type_select]}'>
+                            <label class='control-label'>ตำแหน่งไฟล์</label>";
+        if($dataMedia->file_type_select== 'textarea'){
+            $html.="<textarea class='form-control form-control-sm' disabled placeholder='ใส่คำอธิบาย เก็บไว้ที่ไหน' rows='3'>{$dataMedia->file_desc}</textarea>";
+
+        }else if($dataMedia->file_type_select== 'text'){
+            $html.="<input type='text' class='form-control form-control-sm' disabled placeholder='ลิงค์ google drive' value='{$dataMedia->file_desc}'>";
+
+        }else if($dataMedia->file_type_select== 'file'){
+            $html.="<input type='file' class='form-control form-control-sm' disabled placeholder='อัปโหลดไฟล์'>";
+            $html.="<input type='text' class='form-control form-control-sm' disabled value='{$dataMedia->file_desc}'>";
+
         }
 
         return response()->json($html);
     }
-    public function delete($id)
-    {
+    public function delete($id){
         try {
             DB::beginTransaction();
             $data = Media::find($id);
@@ -284,7 +326,6 @@ class MediaController extends Controller
                     return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
                 }
             }
-
             $data->delete();
             //
             DB::commit();
@@ -307,7 +348,6 @@ class MediaController extends Controller
         $typeMedia = TypeMedia::find($type_media_id);
         $dataMedia = Media::select('number', 'type_media_id')->where('type_media_id', $type_media_id)->latest()->first();
         $number = '1';
-
         if (!is_null($dataMedia)) {
             $dashPosition = strpos($dataMedia->number, "-");
             $lastNumber = (int)substr($dataMedia->number, $dashPosition + 1);

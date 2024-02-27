@@ -11,10 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class TypeMediaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = TypeMedia::orderby('created_at')->get();
-        return view('type_media.list',compact('data'));
+        $search_data = $request->search_data != '' ? $request->search_data : '';
+        $data = TypeMedia::where('name', 'like', "%$search_data%")
+                          ->orWhere('head_number_media', 'like', "%$search_data%")
+                          ->orderby('created_at')->paginate(10
+                        );
+        return view('type_media.list',compact('data','search_data'));
     }
     public function create(Request $request)
     {
@@ -41,7 +45,6 @@ class TypeMediaController extends Controller
             'head_number_media' => $request->head_number_media,
             'name' => $request->name,
             'desc' => $request->desc
-
         ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();

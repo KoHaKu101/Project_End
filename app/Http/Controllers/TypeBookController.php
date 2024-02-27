@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Validator;
 class TypeBookController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $data = TypeBook::orderby('created_at')->get();
-        return view('type_book.list', compact('data'));
+        $search_data = $request->search_data != '' ? $request->search_data : '';
+        $data = TypeBook::where('name', 'like', "%$search_data%")->orderby('name','ASC')->paginate(10);
+        return view('type_book.list', compact('data','search_data'));
     }
     public function create(Request $request)
     {

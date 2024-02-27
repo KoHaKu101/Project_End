@@ -8,11 +8,11 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                        <form action="#" class="col-lg-11">
+                        <form action="{{route('emp.list')}}" method="GET" class="col-lg-11">
+                            @csrf
                             <div class="input-group ">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control form-control-sm" placeholder="ค้นหาเจ้าหน้าที่"
-                                    aria-label="Username" aria-describedby="basic-addon1">
+                                <input type="text" class="form-control form-control-sm" id="search_data" name="search_data" value="{{$search_data}}" placeholder="ค้นหาเจ้าหน้าที่">
                                 <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                             </div>
                         </form>
@@ -37,7 +37,7 @@
                                 <tbody>
                                     @foreach ($data as $datalist)
                                         <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                                             <td>{{ $datalist->getKey() }}</td>
                                             <td>{{ $datalist->f_name . ' ' . $datalist->l_name }}</td>
                                             <td>{{ $statusArray[$datalist->status] }}</td>
@@ -56,6 +56,7 @@
                                         </tr>
                                     @endforeach
                             </table>
+                            {{ $data->withQueryString()->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -69,8 +70,6 @@
         const username = $('#username');
         const password = $('#password');
         const formSubmit = $('#FormSubmit');
-
-
         //funtion open modal
         function createmodal() {
             const url = "{{ route('emp.create') }}";
@@ -82,8 +81,6 @@
         function editmodal(id) {
             const urlFetch = "{{ route('emp.fetchData') }}";
             let urlUpdate = "{{ route('emp.update', ['id' => ':id']) }}".replace(':id', id);
-
-
             $.ajax({
                 url: urlFetch,
                 method: 'GET',

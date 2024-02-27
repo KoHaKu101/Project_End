@@ -19,17 +19,21 @@ class BookController extends Controller
 {
 
     public function index(Request $request){
-        $perPage = 10; // จำนวนรายการต่อหน้า
+        $perPage = 10;
+        $search_data = $request->search_data != '' ? $request->search_data : '';
         $page = $request->input('page', 1);
-
-        $book = Book::orderby('created_at')->paginate($perPage, ['*'], 'bookPage');
-        $receiveBookDesc = ReceiveBookDesc::where('book_id', null)->orderby('created_at')->paginate($perPage, ['*'], 'bookNewPage');
-
-        $type_book = TypeBook::all();
-        $active_book = isset($request->booksPage) ? 'active' : ( isset($request->bookNewPage) ? '' : 'active' ) ;
-        $active_bookNew = isset($request->bookNewPage) ? 'active' : '';
-
-        return view('book/list', compact('type_book', 'book','receiveBookDesc','active_book','active_bookNew'));
+        $book = Book::where('name', 'like', "%$search_data%")
+                    ->orderby('created_at')
+                    ->paginate($perPage, ['*'], 'bookPage');
+        $receiveBookDesc = ReceiveBookDesc::where('book_id', null)
+                                          ->WhereHas('ReceiveBook', function ($query) use ($search_data) {
+                                                $query->where('book_name', 'like', '%' . $search_data . '%');
+                                            })
+                                          ->orderby('created_at')
+                                          ->paginate($perPage, ['*'], 'bookNewPage');
+        $type_book = TypeBook::orderBy('name','ASC')->get();
+        $active = isset($request->bookPage) ? '0' : ( isset($request->bookNewPage) ? '1' : '0');
+        return view('book/list', compact('type_book', 'book','receiveBookDesc','active','search_data'));
     }
     private function validateBookRequest($request){
         return Validator::make($request->all(), [
@@ -175,6 +179,10 @@ class BookController extends Controller
                 return response()->json(['error' => 'รายการถูกใช้งานอยู่ไม่สามารถลบได้'], 422);
             }
             // คำสั่งลบ
+            $image_path = public_path('assets/images/book/'.$book->img_book);
+            if(File::exists($image_path)) {
+                File::delete($image_path);
+            }
             $copyBook->delete();
             $book->delete();
             DB::commit();

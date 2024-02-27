@@ -15,21 +15,27 @@
                     <div class="row">
                         <div class="col-lg-8">
                             <label>ชื่อหนังสือ</label>
-                            <select id="book_id" name="book_id"></select>
+                            <select id="book_id" name="book_id" required></select>
+                            <p id="error_book_id" class="text-danger" hidden>กรุณาเลือกชื่อหนังสือ</p>
                         </div>
                         <div class="col-lg-4">
                             <label>จำนวนสำเนา</label>
-                            <input type="number" class="form-control" id="amount" name="amount">
+                            <input type="number" class="form-control" id="amount" name="amount" required>
+                            <p id="error_amount" class="text-danger" hidden>กรุณาใส่จำนวนสำเนา</p>
                         </div>
                         <div class="col-lg-12">
                             <label>เจ้าหน้าที่</label>
-                            <input type="text" class="form-control" id="emp_name" value="{{$fullname}}" disabled>
+                            <input type="text" class="form-control" id="emp_name" value="{{ $fullname }}"
+                                disabled>
+
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="submitBTN" onclick="SubmitForm('FormSubmit')"></button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fas fa-xmark me-2"></i>ยกเลิก</button>
+                    <button type="button" class="btn btn-success" id="submitBTN"
+                        onclick="SubmitForm('submitBTN','FormSubmit')"></button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i
+                            class="fas fa-xmark me-2"></i>ยกเลิก</button>
                 </div>
             </form>
         </div>

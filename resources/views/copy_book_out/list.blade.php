@@ -26,10 +26,10 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                                <form action="#" class="col-lg-11">
+                                <form action="{{route('book_copy_out.list')}}" class="col-lg-11">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username" aria-describedby="basic-addon1" >
+                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหาจ่ายสำเนาหนังสือ" id="search_data" name="search_data" value="{{$search_data}}">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
@@ -55,13 +55,13 @@
                                 <tbody>
                                     @foreach ($data as $datalist )
                                     <tr>
-                                        <td class="text-center">{{ $loop->index + 1 }}</td>
+                                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                                         <td>{{ $datalist->CopyBook->Book->name }}</td>
                                         <td>{{ $datalist->Emp->f_name.' '.$datalist->Emp->l_name }}</td>
                                         <td class="text-center">{{ $datalist->amount }}</td>
                                         <td>
                                             <span class="badge bg-{{ $datalist->status === 1 ? 'danger' : ($datalist->status === 2 ? 'success' : 'secondary') }}" style="font-size:14px">
-                                                {{ $datalist->status === 1 ? 'รอรับคืน' : ($datalist->status === 2 ? 'รับคืนรียบร้อย' : 'ไม่มีการรับคืน') }}
+                                                {{ $datalist->status === 1 ? 'รอรับคืน' : ($datalist->status === 2 ? 'รับคืนเรียบร้อย' : 'ไม่มีการรับคืน') }}
                                             </span>
                                         </td>
                                         <td class="text-center">
@@ -72,6 +72,7 @@
                                     </tr>
                                     @endforeach
                             </table>
+                            {{ $data->withQueryString()->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -120,8 +121,7 @@
                     $('#book_id').replaceWith(input_book_id);
                     $('#book_id').val(data.Book.name);
                     $('#modal_CopyBookOut').modal('show');
-                    $('#modal-title-CopyBookOut').text('แก้ไขข้อมูลจ่ายสำเนา');
-
+                    $('#modal-title-CopyBookOut').text('รับคืนสำเนาหนังสือ');
                 },
                 error: function() {
                     console.error('Error fetching data');
@@ -130,12 +130,13 @@
         }
         function btnRecive(){
             let btn = $('#submitBTN');
-            btn.addClass('btn-warning').text('รับคืน');
+            btn.addClass('btn-warning').html('<i class="fa-solid fa-hand-holding fa-xl me-1"></i>รับคืน');
+
         }
         function btnAdd(){
             let btn = $('#submitBTN');
             btn.removeClass('btn-warning');
-            btn.html('<i class="fas fa-plus me-2"></i>เพิ่มรายการ');
+            btn.html('<i class="fas fa-plus me-2"></i>จ่ายสำเนา');
 
         }
         function createSelect2() {
@@ -167,7 +168,7 @@
                     cache: true
                 },
                 placeholder: 'ค้นหาหนังสือ',
-                minimumInputLength: 1,
+                minimumInputLength: 0,
                 dropdownParent: '#modal_CopyBookOut',
             });
         }

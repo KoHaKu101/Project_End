@@ -3,7 +3,7 @@
         <tr>
             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
             <th scope="col">ชื่อหนังสือ</th>
-            <th scope="col" style="width: 8%">ประเภทสื่อ</th>
+            <th scope="col" style="width: 15%">ประเภทสื่อ</th>
             <th scope="col" style="width: 10%">วันที่สั่งสื่อ</th>
             <th scope="col" style="width: 20%">เจ้าหน้าที่</th>
             <th scope="col" style="width: 16%"></th>
@@ -21,7 +21,7 @@
                 <td>{{$orderMedia->order_date}}</td>
                 <td>{{$emp}}</td>
                 <td>
-                    <button type='button' class='btn btn-sm btn-primary' onclick='show_ConfirmDataOrder(`{{$orderMedia->order_id}}`)'><i class='fas fa-eye me-1'></i>ตรวจสอบรายการสั่งผลิต</button>
+                    <button type='button' class='btn btn-sm btn-primary' onclick='show_ConfirmDataOrder(`{{$orderMedia->request_id}}`)'><i class='fas fa-eye me-1'></i>ตรวจสอบรายการสั่งผลิต</button>
                     </td>
             </tr>
         @endforeach

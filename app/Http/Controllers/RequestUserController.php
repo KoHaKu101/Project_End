@@ -15,14 +15,10 @@ class RequestUserController extends Controller
     //
     public function index(Request $request)
     {
-        $data = RequestUser::orderby('f_name')->get();
-        $search = '';
-        if(!is_null($request->search)){
-            $search = $request->search;
-            $data = RequestUser::where('f_name','like','%'.$search.'%')->orWhere('l_name','like','%'.$search.'%')->orderby('f_name')->get();
-        }
+        $search_data = $request->search_data != '' ? $request->search_data : '';
+        $data = RequestUser::where('f_name','like','%'.$search_data.'%')->orWhere('l_name','like','%'.$search_data.'%')->orderby('f_name')->paginate(10);
         $dataRequestMedia = RequestMedia::select('requesters_id', 'status')->get();
-        return view('request_user.list', compact('data', 'dataRequestMedia','search'));
+        return view('request_user.list', compact('data', 'dataRequestMedia','search_data'));
     }
     public function create(Request $request)
     {

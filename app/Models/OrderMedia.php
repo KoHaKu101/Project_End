@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class OrderMedia extends Model
 {
     use HasFactory;
+protected $dateFormat = 'Y-m-d';
 
     protected $primaryKey = 'order_id';
     public $incrementing = false;
 
     public static function generateID()
     {
-        $dataDB = self::select('order_id')->latest()->first();
+        $dataDB = self::select('order_id')->orderBy('order_id','DESC')->latest()->first();
+
         $id = 'or_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->order_id, 3);

@@ -16,9 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class ReceiveBookController extends Controller
 {
     //
-    public function index(){
-        $data = ReceiveBookDesc::orderBy("created_at")->paginate(10);
-        return view('receive_book.list',compact('data'));
+    public function index(Request $request){
+        $search_data = $request->search_data != '' ? $request->search_data : '';
+        $data = ReceiveBookDesc::WhereHas('ReceiveBook', function ($query) use ($search_data) {
+            $query->where('book_name', 'like', '%' . $search_data . '%');
+        })->orderBy("created_at")->paginate(10);
+        return view('receive_book.list',compact('data','search_data'));
     }
     public function create(Request $request){
         $validator = Validator::make($request->all(), [

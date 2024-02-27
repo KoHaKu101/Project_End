@@ -1,4 +1,8 @@
 @extends('main_template/body')
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/select2-bootstrap-5-theme.css') }}">
+@endsection
 @section('body')
     <div class="row">
         <div class="col-lg-12">
@@ -8,11 +12,11 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                        <form action="#" class="col-md-11">
+                        <form action="{{ route('book.list') }}" class="col-md-11">
                             <div class="input-group ">
                                 <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control form-control-sm" placeholder="ค้นหาหนังสือ"
-                                    aria-label="Username" aria-describedby="basic-addon1">
+                                <input type="text" class="form-control form-control-sm" id="search_data"
+                                    name="search_data" value="{{ $search_data }}" placeholder="ค้นหาหนังสือ">
                                 <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                             </div>
                         </form>
@@ -24,29 +28,26 @@
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link {{ $active_book }}" data-bs-toggle="tab" data-bs-target="#tab_book"
-                                    type="button" role="tab" aria-controls="tab_book"
+                                <button class="nav-link {{ isActive($active, '0') }}" data-bs-toggle="tab"
+                                    data-bs-target="#tab_book" type="button" role="tab" aria-controls="tab_book"
                                     aria-selected="false">หนังสือทั่วไป</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link {{ $active_bookNew }}" data-bs-toggle="tab"
+                                <button class="nav-link {{ isActive($active, '1') }}" data-bs-toggle="tab"
                                     data-bs-target="#tab_newBook" type="button" role="tab" aria-controls="tab_newBook"
                                     aria-selected="true">หนังสือใหม่</button>
                             </li>
                         </ul>
-                        @php
-                            $show_book = $active_book == 'active' ? 'show active' : '';
-                            $show_bookNes = $active_bookNew == 'active' ? 'show active' : '';
-                        @endphp
+
                         <div class="tab-content">
-                            <div class="tab-pane fade {{ $show_book }} " id="tab_book"role="tabpanel"
+                            <div class="tab-pane fade {{ isActiveShow($active, '0') }} " id="tab_book"role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12" id="book-table">
                                     @include('book.tableBook')
                                 </div>
                                 {{ $book->links('pagination::bootstrap-4', ['booksPage']) }}
                             </div>
-                            <div class="tab-pane fade  {{ $show_bookNes }}" id="tab_newBook" role="tabpanel"
+                            <div class="tab-pane fade  {{ isActiveShow($active, '1') }}" id="tab_newBook" role="tabpanel"
                                 aria-labelledby="ex1-tab-1">
                                 <div class="col-lg-12" id="bookNew-table">
                                     @include('book.tableNewBook')
@@ -62,26 +63,38 @@
     @include('copy_book.insert')
     @include('book.modal')
     @include('book.modalBookNew')
-
+    <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
     <script>
+        const type_book_id = $('#type_book_id');
         //ปุ่มแสดง modal สำหรับเพิ่มรายการ
         function OpenModal() {
             var url = "{{ route('book.create') }}";
             var formSubmit = $('#FormSubmitBook');
             $('#modal-titleBook').text('เพิ่มหนังสือ');
-            $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+            $('#img_display').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
             formSubmit.attr('action', url);
             formSubmit[0].reset();
+            type_book_id.select2({
+                theme: 'bootstrap-5',
+                dropdownParent: '#modal_Book_insert',
+            });
             $('#modal_Book_insert').modal('show');
         }
 
         function OpenModalBookNew(id, name) {
-            let urlcreate = "{{ route('bookNew.create', ['id' => ':id']) }}";
-            urlcreate = urlcreate.replace(':id', id);
-            let formSubmit = $('#FormNewBook');
+            let urlcreate = "{{ route('bookNew.create', ['id' => ':id']) }}".replace(':id', id);
+            var formSubmit = $('#FormSubmitBook');
+            $('#modal-titleBook').text('เพิ่มหนังสือ');
+            $('#img_display').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
             formSubmit.attr('action', urlcreate);
-            $('#FormNewBook').find('input#name').val(name);
-            $('#modal_BookNew_insert').modal('show');
+            formSubmit[0].reset();
+            type_book_id.select2({
+                theme: 'bootstrap-5',
+                dropdownParent: '#modal_Book_insert',
+            });
+            $('#name').val(name);
+            $('#modal_Book_insert').modal('show');
+
         }
 
         function editmodal(id) {
@@ -95,8 +108,8 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    var fields = ['name', 'type_book_id', 'author', 'publisher', 'edition', 'year',
-                        'original_page', 'isbn', 'level','language','abstract','synopsis'
+                    var fields = ['name', 'author', 'publisher', 'edition', 'year',
+                        'original_page', 'isbn', 'level', 'language', 'abstract', 'synopsis'
                     ];
                     fields.forEach(function(field) {
                         if (data[field]) {
@@ -104,13 +117,21 @@
                         }
                     });
                     urlUpdate = urlUpdate.replace(':id', id);
-                    if(data['img_book'] != null){
-                        $('#img_display').attr('src',"{{asset('assets/images/book')}}"+'/'+data['img_book']);
-                    }else{
-                        $('#img_display').attr('src',"{{asset('assets/images/book_not_found.jpg')}}");
+                    if (data['img_book'] != null) {
+                        $('#img_display').attr('src', "{{ asset('assets/images/book') }}" + '/' + data[
+                            'img_book']);
+                    } else {
+                        $('#img_display').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
                     }
                     $('#FormSubmitBook').attr('action', urlUpdate);
                     $('#modal_Book_insert').modal('show');
+                    type_book_id.select2({
+                        theme: 'bootstrap-5',
+                        dropdownParent: '#modal_Book_insert',
+                    });
+                    type_book_id.val(data.type_book_id);
+                    type_book_id.trigger('change');
+
                     $('#modal-titleBook').text('แก้ไขข้อมูลหนังสือ');
                 },
                 error: function() {
@@ -119,39 +140,27 @@
             });
         }
 
-        function plusMinusBTN() {
-            $('#increaseBtn').click(function() {
-                var currentValue = parseInt($('#amount').val());
-                $('#amount').val(currentValue + 1);
-            });
-            $('#decreaseBtn').click(function() {
-                var currentValue = parseInt($('#amount').val());
-                if (currentValue > 0) {
-                    $('#amount').val(currentValue - 1);
-                }
-            });
-        }
+        $('#increaseBtn').click(function() {
+            let currentValue = parseInt($('#amount').val());
+            console.log(currentValue);
+            $('#amount').val(currentValue + 1);
+        });
+        $('#decreaseBtn').click(function() {
+            let currentValue = parseInt($('#amount').val());
+            console.log(currentValue);
+            if (currentValue > 1) {
+                $('#amount').val(currentValue - 1);
+            }
+        });
 
         function openModalCopy(type, id, name) {
-            plusMinusBTN();
-            // url สำหรับอัพเดทข้อมูลตาม id
             let urlcreate = "{{ route('book_copy.update', ['id' => ':id', 'math' => ':math']) }}";
             urlcreate = urlcreate.replace(':id', id).replace(':math', type);
-            //ตัวแปรของ form
             let formSubmit = $('#FormSubmit');
-            //เปลี่ยนคำบนหัว modal
-            if (type === 'minus') {
-                $('#modal-title').text('ลบสำเนา');
-            } else {
-                $('#modal-title').text('เพิ่มสำเนา');
-            }
-            // ลบค่าที่เคยกรอกไว้ทั้งหมด
+            $('#modal-title').text('เพิ่มสำเนา');
             formSubmit[0].reset();
-            //เอาชื่อหนังสือมาใส่ลงใน input
             $('#Book_name').val(name);
-            //แก้ไข id ใน url modal
             formSubmit.attr('action', urlcreate);
-            // เปิด Modal ขึ้นมา
             $('#copy_BookCopy_insert').modal('show');
         }
 

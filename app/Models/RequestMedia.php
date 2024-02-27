@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class RequestMedia extends Model
 {
     use HasFactory;
+protected $dateFormat = 'Y-m-d';
     protected $primaryKey = 'request_id';
     public $incrementing = false;
     public static function generateID()
     {
-        $dataDB = self::select('request_id')->latest()->first();
+        $dataDB = self::select('request_id')->orderBy('request_id','DESC')->latest()->first();
         $id = 'req_000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->request_id, 4);
@@ -49,5 +50,8 @@ class RequestMedia extends Model
         'book_id',
         'request_date',
         'status',
+        'desc',
+        'cancel_desc',
+        'media_out_date'
     ];
 }

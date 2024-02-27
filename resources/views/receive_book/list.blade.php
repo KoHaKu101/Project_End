@@ -12,24 +12,23 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                                <form action="#" class="col-lg-11">
-                                    <div class="input-group ">
-                                        <span class="input-group-text" id="basic-addon1"><i
-                                                class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm"
-                                            placeholder="ค้นหารายการรับหนังสือ" aria-label="Username"
-                                            aria-describedby="basic-addon1">
-                                        <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
-                                    </div>
-                                </form>
-                                <button type="button" class="btn btn-sm btn-success col-lg-1"onclick='openModal()'>
-                                    <i class="fas fa-plus"></i>
-                                    รับหนังสือ
-                                </button>
+                        <form action="{{ route('receive.list') }}" class="col-lg-11">
+                            <div class="input-group ">
+                                <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control form-control-sm"
+                                    placeholder="ค้นหารายการรับหนังสือ" id="search_data" name="search_data"
+                                    value="{{ $search_data }}">
+                                <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
+                            </div>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-success col-lg-1"onclick='openModal()'>
+                            <i class="fas fa-plus"></i>
+                            รับหนังสือ
+                        </button>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <table class="table table-bordered border-black" >
+                            <table class="table table-bordered border-black">
                                 <thead class="bg-grayCustom">
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
@@ -37,14 +36,14 @@
                                         <th scope="col" style="width: 10%">ประเภทการรับ</th>
                                         <th scope="col" style="width: 8%">วันที่รับ</th>
                                         <th scope="col" style="width: 15%">เจ้าหน้าที่ที่รับ</th>
-                                        <th scope="col" >รายละเอียดเพิ่มเติม</th>
+                                        <th scope="col">รายละเอียดเพิ่มเติม</th>
                                         <th scope="col" style="width: 7%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($data as $datalist)
                                         <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                                             <td>{{ $datalist->ReceiveBook->book_name }}</td>
                                             @php
                                                 $add_type = [1 => 'บริจาค', 2 => 'ซื้อ', 3 => 'กระทรวงศึกษา'];
@@ -71,6 +70,8 @@
                                         </tr>
                                     @endforeach
                             </table>
+                            {{ $data->withQueryString()->links('pagination::bootstrap-4') }}
+
                         </div>
                     </div>
                 </div>
@@ -98,6 +99,7 @@
             $('#modal_receive').modal('show');
 
         }
+
         function editmodal(id) {
             var url = `{{ route('receive.fetchData') }}`;
             $.ajax({
@@ -110,10 +112,12 @@
                 success: function(data) {
                     createSelect2();
                     $('#book_name').select2('destroy');
-                    let input_book_name = $(`<input type="text" class="form-control form-control-sm" id="book_name" name="book_name" disabled>`);
+                    let input_book_name = $(
+                        `<input type="text" class="form-control form-control-sm" id="book_name" name="book_name" disabled>`
+                        );
                     $('#book_name').replaceWith(input_book_name);
 
-                    var fields = ['book_name','add_date', 'add_type'];
+                    var fields = ['book_name', 'add_date', 'add_type'];
 
                     fields.forEach(function(field) {
                         if (data.receive[field]) {
@@ -133,10 +137,11 @@
             });
         }
 
-        function confirm_delete(id){
-            let url = `{{route('receive.delete',['id'=>':id'])}}`.replace(':id',id); ;
-            alertConfirmDelete(url,'{{ csrf_token() }}');
+        function confirm_delete(id) {
+            let url = `{{ route('receive.delete', ['id' => ':id']) }}`.replace(':id', id);;
+            alertConfirmDelete(url, '{{ csrf_token() }}');
         }
+
         function createSelect2() {
             let url = `{{ route('media.fetchData.book') }}`;
             $('#book_name').select2({

@@ -20,13 +20,14 @@ class AuthController extends Controller
         ]);
         $username = $request->username;
         $password = $request->password;
-        $dataEmp = Emp::select('username','password','status')->where('username',$username)->first();
+        $dataEmp = Emp::select('emp_id','username','password','status')->where('username',$username)->first();
 
         if(is_Null($dataEmp) || !Hash::check($password,$dataEmp->password)){
-            Alert::error('username หรือ Password ไม่ถูกต้อง');
+            Alert::error('เข้าสู่ระบบไม่สำเร็จ','username หรือ Password ไม่ถูกต้อง');
             return redirect()->back();
         }
         Session::put('Logged', 'true');
+        Session::put('emp',$dataEmp->emp_id);
         Session::put('username', $dataEmp->username);
         Session::put('status', $dataEmp->status);
         return redirect()->route('dashboard');

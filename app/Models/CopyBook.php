@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class CopyBook extends Model
 {
     use HasFactory;
+    protected $dateFormat = 'Y-m-d';
     public static function generateID()
     {
-        $dataDB = self::select('copy_id')->latest()->first();
+        $dataDB = self::select('copy_id')->orderBy('copy_id','DESC')->latest()->first();
         $id = 'cb_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->copy_id, 3);
@@ -30,7 +31,4 @@ class CopyBook extends Model
         'book_id',
         'amount',
     ];
-    
-
-
 }

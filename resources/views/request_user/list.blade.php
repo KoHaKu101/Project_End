@@ -8,17 +8,17 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
-                                <form action="{{route('requestUser.list')}}" method="GET" class="col-lg-11">
+                                <form action="{{route('requestUser.list')}}" method="GET" class="col-lg-12">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายชื่อผู้มาขอรับสื่อ"name="search" value="{{$search}}">
+                                        <input type="text" class="form-control form-control-sm" placeholder="ค้นหารายชื่อผู้มาขอรับสื่อ" id="search_data" name="search_data" value="{{ $search_data }}">
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
-                                <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="createModal()" >
+                                {{-- <button type="button" class="btn btn-sm btn-success col-lg-1" onclick="createModal()" >
                                     <i class="fas fa-plus"></i>
                                     เพิ่มรายการ
-                                </button>
+                                </button> --}}
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -27,12 +27,12 @@
                                     <tr>
                                         <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
                                         <th scope="col" >ชื่อ - นามสกุล</th>
-                                        <th scope="col" style="width: 5%"   class="text-center">เพศ</th>
-                                        <th scope="col" style="width: 5%"   class="text-center">อายุ</th>
+                                        {{-- <th scope="col" style="width: 5%"   class="text-center">เพศ</th> --}}
+                                        {{-- <th scope="col" style="width: 5%"   class="text-center">อายุ</th> --}}
                                         <th scope="col" style="width: 10%"  class="text-center">เบอร์โทรศัพท์</th>
                                         <th scope="col" style="width: 14%"  class="text-center">รายการยังไม่สำเร็จ</th>
                                         <th scope="col" style="width: 10%"  class="text-center">จำนวนที่ขอสื่อ</th>
-                                        <th scope="col" style="width: 8%"></th>
+                                        <th scope="col" style="width: 5%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -44,17 +44,17 @@
 
                                     @endphp
                                     <tr>
-                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                                         <td>{{$datalist->f_name .' '. $datalist->l_name}} </td>
-                                        <td class="text-center">{{$gender}}</td>
-                                        <td class="text-center">{{$datalist->age}}</td>
+                                        {{-- <td class="text-center">{{$gender}}</td> --}}
+                                        {{-- <td class="text-center">{{$datalist->age}}</td> --}}
                                         <td class="text-center">{{$datalist->tel}}</td>
                                         <td class="text-center">{{$orderNumber}} รายการ</td>
                                         <td class="text-center">{{$successNumber}} รายการ</td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-warning" onclick="editModal('{{$datalist->requesters_id}}')">
+                                            {{-- <button type="button" class="btn btn-sm btn-warning" onclick="editModal('{{$datalist->requesters_id}}')">
                                                 <i class="fas fa-edit"></i>
-                                            </button>
+                                            </button> --}}
                                             <button type="button" class="btn btn-sm btn-danger" onclick="confirm_delete('{{$datalist->requesters_id}}')">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -64,6 +64,7 @@
                                     @endforeach
 
                             </table>
+                            {{ $data->withQueryString()->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>

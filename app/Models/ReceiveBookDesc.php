@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class ReceiveBookDesc extends Model
 {
     use HasFactory;
+protected $dateFormat = 'Y-m-d';
     protected $primaryKey = 'recd_id';
     public $incrementing = false;
     public static function generateID()
     {
-        $dataDB = self::select('recd_id')->latest()->first();
+        $dataDB = self::select('recd_id')->orderBy('recd_id','DESC')->latest()->first();
         $id = 'recd_00001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->recd_id, 5);
@@ -29,8 +30,8 @@ class ReceiveBookDesc extends Model
     {
         return $this->belongsTo(Book::class, 'book_id');
     }
-    
-    
+
+
     protected $fillable = [
         'recd_id',
         'recv_id',

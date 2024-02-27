@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Emp;
+use App\Models\Book;
+use App\Models\TypeBook;
 use App\Models\TypeMedia;
 use App\Models\OrderMedia;
 use App\Models\RequestMedia;
@@ -13,76 +15,58 @@ use RealRashid\SweetAlert\Facades\Alert;
 class OrderController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = 10;
+        $page = $request->input('page', 1);
+        $search_data = $request->search_data != '' ? $request->search_data : '';
         $dataSelect = TypeMedia::all();
-        return view('order.list', compact('dataSelect'));
+        $searchQuery = function ($query) use ($search_data) {
+            $query->whereHas('book', function ($query) use ($search_data) {
+                $query->where('name', 'like', '%' . $search_data . '%');
+            });
+        };
+
+        $dataRequestMedia = RequestMedia::WhereHas('book', function ($query) use ($search_data) {
+            $query->where('name', 'like', '%' . $search_data . '%');
+        })->where('status', 1)->paginate($perPage, ['*'], 'RequestMedia');
+
+        $dataOrderProcessWait = OrderMedia::WhereHas('requestMedia', $searchQuery)->where('status', 1)->paginate($perPage, ['*'], 'OrderProcessWait');
+        $dataOrderProcess = OrderMedia::WhereHas('requestMedia', $searchQuery)->where('status', 2)->paginate($perPage, ['*'], 'OrderProcess');
+        $dataOrderSuccess = OrderMedia::WhereHas('requestMedia', $searchQuery)->where('status', 3)->paginate($perPage, ['*'], 'OrderSuccess');
+
+        $active = isset($request->RequestMedia)  ? '0' : (isset($request->OrderProcessWait) ? '1' : (isset($request->OrderProcess) ? '2' : (isset($request->OrderSuccess) ? '3' : '0')));
+
+        return view('order.list', compact('dataSelect', 'dataRequestMedia', 'dataOrderProcessWait', 'dataOrderProcess', 'dataOrderSuccess', 'active', 'search_data'));
     }
     public function create($id)
     {
-        $requestMedia = RequestMedia::find($id);
-        $emp = Emp::where('username', session()->get('username'))->first();
-        $loop_data = RequestMedia::where('book_id',$requestMedia->book_id)->where('type_media_id',$requestMedia->type_media_id)->where('status',1)->get();
-        if($loop_data->count() > 0){
-            foreach($loop_data as $datalist){
-                $request_id = $datalist->request_id ;
+        $requestMedia = RequestMedia::select('book_id', 'type_media_id')->where('request_id', $id)->first();
+        $emp = session()->get('emp');
+        $loop_data = RequestMedia::where('book_id', $requestMedia->book_id)->where('type_media_id', $requestMedia->type_media_id)->where('status', 1)->get();
+        if ($loop_data->count() > 0) {
+            foreach ($loop_data as $datalist) {
+                $request_id = $datalist->request_id;
                 OrderMedia::create([
                     'order_id' => OrderMedia::generateID(),
-                    'emp_id' => $emp->emp_id,
+                    'emp_id' => $emp,
                     'request_id' => $request_id,
                     'order_date' => Carbon::now()->format('Y-m-d'),
                     'status' => 1,
                 ]);
-                RequestMedia::where('request_id',$request_id)->update(['status' => 3]);
-
+                RequestMedia::where('request_id', $request_id)->update(['status' => 3]);
             }
             Alert::success('บันทึกสำเร็จ');
             return redirect()->back();
         }
         Alert::error('ไม่พบข้อมูล');
         return redirect()->back();
-
     }
-    public function fetchRequestMedia(Request $request){
-
-        $RequestMedia = RequestMedia::where('request_id', $request->id)->first();
-        $text = [1 => 'สั่งผลิต', 2 => 'พร้อมจ่ายสื่อ', 3 => 'รอผลิต', 4 => 'จ่ายสื่อเรียบร้อย'];
-        $url = route('order.create', $request->id);
-        $status = $RequestMedia->status;
-        $html = "<form action='{$url}' method='POST' id='form_order'>
-                    " . csrf_field() . "
-                    <div class='row'>
-                        <div class='col-lg-12'>
-                            <label>ชื่อหนังสือ</label>
-                            <input type='text' class='form-control' value='{$RequestMedia->book->name}'disabled>
-                        </div>
-                        <div class='col-lg-8'>
-                            <label>ประเภทสื่อ</label>
-                            <input type='text' class='form-control' value='{$RequestMedia->TypeMedia->name}' disabled>
-                        </div>
-                        <div class='col-lg-4'>
-                            <label>สถานะ</label>
-                            <input type='text' class='form-control' value='{$text[$status]}' disabled>
-                        </div>
-                        <div class='col-lg-6'>
-                            <label>ชื่อ</label>
-                            <input type='text' class='form-control' value='{$RequestMedia->RequestUser->f_name}' disabled>
-                        </div>
-                        <div class='col-lg-6'>
-                            <label>นามสกุล</label>
-                            <input type='text' class='form-control' value='{$RequestMedia->RequestUser->l_name}' disabled>
-                        </div>
-                        <div class='col-lg-12'>
-                            <label>เบอร์โทรศัพท์</label>
-                            <input type='text' class='form-control' value='{$RequestMedia->RequestUser->tel}' disabled>
-                        </div>
-                        <div class='col-lg-12'>
-                            <label>เจ้าหน้าที่ </label>
-                            <input type='text' class='form-control' value='{$RequestMedia->emp->f_name} {$RequestMedia->emp->l_name}' disabled>
-                        </div>
-                    </div>
-                </form>";
-        $data = ['html' => $html, 'status' => $status];
+    public function fetchRequestMedia(Request $request)
+    {
+        $dataRequestMedia = RequestMedia::find($request->id);
+        $dataBook = Book::find($dataRequestMedia->book_id);
+        $data = ['book' => $dataBook, 'TypeMedia' => TypeMedia::find($dataRequestMedia->type_media_id), 'typeBook' => TypeBook::find($dataBook->type_book_id)];
         return response()->json($data);
     }
     public function tableData(Request $request)
@@ -105,5 +89,17 @@ class OrderController extends Controller
                 </tr>";
         }
         return response()->json($html);
+    }
+    public function cancelRequestMedia(Request $request,$id){
+        $requestMedia = RequestMedia::find($id);
+        if ($requestMedia->count() > 0) {
+            $requestMedia->update([
+                'status' => '5',
+                'cancel_desc' => $request->desc,
+                'media_out_date' => null
+            ]);
+            return response()->json(['status' => true]);
+        }
+        return response()->json(['status' => false]);
     }
 }

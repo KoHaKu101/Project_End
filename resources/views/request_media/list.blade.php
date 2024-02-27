@@ -26,46 +26,41 @@
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                                    data-bs-target="#new_order" type="button" role="tab" aria-controls="new_order"
-                                    onclick="tabsShow('new_order')" aria-selected="true">สั่งผลิตสื่อ</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#wait_order"
-                                    onclick="tabsShow('wait_order')" type="button" role="tab"
-                                    aria-controls="wait_order" aria-selected="false">รอผลิตสื่อ</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out"
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out"
                                     onclick="tabsShow('ready_out')" type="button" role="tab" aria-controls="ready_out"
-                                    aria-selected="false">พร้อมจ่าย</button>
+                                    aria-selected="false">พร้อมให้บริการสื่อ</button>
+                            </li><li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out"
+                                    onclick="tabsShow('ready_out')" type="button" role="tab" aria-controls="ready_out"
+                                    aria-selected="false">พร้อมให้บริการสื่อ</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#ready_out"
+                                    onclick="tabsShow('ready_out')" type="button" role="tab" aria-controls="ready_out"
+                                    aria-selected="false">พร้อมให้บริการสื่อ</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
                                     data-bs-target="#out_success"onclick="tabsShow('out_success')" type="button"
-                                    role="tab" aria-controls="out_success" aria-selected="false">จ่ายเรียบร้อย</button>
+                                    role="tab" aria-controls="out_success" aria-selected="false">ให้บริการสื่อเรียบร้อย</button>
                             </li>
                         </ul>
                     </div>
                     <div class="row">
-                        <div class="tab-content" id="ex1-content">
-                            <div class="col-lg-12">
-                                <table class="table table-bordered border-black" >
-                                    <thead class="bg-grayCustom">
-                                        <tr>
-                                            <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
-                                            <th scope="col" >ชื่อหนังสือ</th>
-                                            <th scope="col" style="width: 8%">ประเภทสื่อ</th>
-                                            <th scope="col" style="width: 10%">วันที่รับคำขอ</th>
-                                            <th scope="col" >เจ้าหน้าที่</th>
-                                            <th scope="col" >ผู้ขอรับสื่อ</th>
-                                            <th scope="col" style="width: 8%">สถานะ</th>
-                                            <th scope="col" style="width: 13%"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tableData">
-                                    </tbody>
-                                </table>
+                        <div class="tab-content">
+                            <div class="tab-pane fade {{ isActiveShow($active, '0') }} " id="tab_book"role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12" id="book-table">
+                                    @include('book.tableBook')
+                                </div>
+                                {{ $book->links('pagination::bootstrap-4', ['booksPage']) }}
+                            </div>
+                            <div class="tab-pane fade  {{ isActiveShow($active, '1') }}" id="tab_newBook" role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
+                                <div class="col-lg-12" id="bookNew-table">
+                                    @include('book.tableNewBook')
+                                </div>
+                                {{ $receiveBookDesc->links('pagination::bootstrap-4', ['bookNewPage']) }}
                             </div>
                         </div>
                     </div>
@@ -76,10 +71,9 @@
     </div>
     </div>
     @include('request_media.modal')
-    @include('media_out.insert')
+    @include('media_out.modalConfirm')
     @include('order.modal')
     <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
-
 
     <script>
         const modalSelect_order = $('#order_modal');
@@ -93,13 +87,11 @@
                 backdrop: 'static',
                 keyboard: false
             })
-            fetchDataTable(1);
+            // fetchDataTable(2);
         });
         function tabsShow(tabName) {
             const statusMapping = {
-                'new_order': 1,
                 'ready_out': 2,
-                'wait_order': 3,
                 'out_success': 4
             };
             fetchDataTable(statusMapping[tabName]);

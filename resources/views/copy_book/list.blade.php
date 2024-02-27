@@ -26,13 +26,11 @@
                     <div class="row">
                         <div class="form-group row ">
                             <div class="col-lg-12">
-                                <form action="#">
+                                <form action="{{route('book_copy.list')}}">
                                     <div class="input-group ">
                                         <span class="input-group-text" id="basic-addon1"><i
                                                 class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control form-control-sm"
-                                            placeholder="ค้นหาเจ้าหน้าที่" aria-label="Username"
-                                            aria-describedby="basic-addon1">
+                                        <input type="text" class="form-control form-control-sm" id="search_data" name="search_data" value="{{$search_data}}" placeholder="ค้นหาสำเนาหนังสือ" >
                                         <button type="submit" class="btn btn-sm btn-primary">ค้นหา</button>
                                     </div>
                                 </form>
@@ -54,7 +52,7 @@
                                 <tbody>
                                     @foreach ($data as $datalist)
                                         <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                                             <td>{{ $datalist->Book->name }}</td>
                                             <td class="text-center ">
                                                 @php
@@ -83,6 +81,7 @@
                                         </tr>
                                     @endforeach
                             </table>
+                            {{ $data->withQueryString()->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -98,7 +97,7 @@
             });
             $('#decreaseBtn').click(function() {
                 var currentValue = parseInt($('#amount').val());
-                if (currentValue > 0) {
+                if (currentValue > 1) {
                     $('#amount').val(currentValue - 1);
                 }
             });

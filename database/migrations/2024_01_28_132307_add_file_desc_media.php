@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('media', function (Blueprint $table) {
-            $table->text('file_desc')->after('source');
+            $table->text('file_desc')->after('source')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('type_media', function (Blueprint $table) {
+        Schema::table('media', function (Blueprint $table) {
             $table->dropColumn('file_desc');
         });
     }
