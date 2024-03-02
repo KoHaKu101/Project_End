@@ -164,6 +164,11 @@
                     }
                     $('#book_type').val(data.book_type);
                     $('#book_id').val(data.book_name);
+                    if (data.img != null) {
+                            $('#img_show').attr('src', "{{ asset('assets/images/book') }}" + '/' + data.img);
+                        } else {
+                            $('#img_show').attr('src', "{{ asset('assets/images/book_not_found.jpg') }}");
+                        }
                     modal_media.modal('show');
                 },
                 error: function() {

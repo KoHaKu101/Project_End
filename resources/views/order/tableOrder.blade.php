@@ -5,7 +5,7 @@
             <th scope="col" >ชื่อหนังสือ</th>
             <th scope="col" style="width: 15%">ประเภทสื่อ</th>
             <th scope="col" style="width: 10%">วันที่ส่งคำขอ</th>
-            <th scope="col" style="width: 10%"></th>
+            <th scope="col" style="width: 15%"></th>
         </tr>
     </thead>
     <tbody >

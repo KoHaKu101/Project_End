@@ -117,7 +117,8 @@
                         }
                     });
                     urlUpdate = urlUpdate.replace(':id', id);
-                    if (data['img_book'] != null) {
+                    console.log(data['img_book']);
+                    if (data['img_book'] != null && data['img_book'] != '') {
                         $('#img_display').attr('src', "{{ asset('assets/images/book') }}" + '/' + data[
                             'img_book']);
                     } else {

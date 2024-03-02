@@ -5,9 +5,11 @@
             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
             <th scope="col">ชื่อหนังสือ</th>
             <th scope="col" style="width: 11%">หมวดหมู่หนังสือ</th>
-            <th scope="col" style="width: 15%">ประเภทสื่อ</th>
+            <th scope="col" style="width: 20%">ประเภทสื่อ</th>
             <th scope="col" style="width: 10%">สถานะการผลิต</th>
-            <th scope="col" style="width: 15%"></th>
+            <th scope="col" style="width: 5%"></th>
+
+            {{-- <th scope="col" style="width: 15%"></th> --}}
         </tr>
     </thead>
     <tbody >

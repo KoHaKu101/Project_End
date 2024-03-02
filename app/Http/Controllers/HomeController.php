@@ -54,7 +54,7 @@ class HomeController extends Controller
         $dataTypeMedia = TypeMedia::find($request->typeMedia);
         $dataBook = Book::find($id);
         $dataMedia = Media::where('book_id', $id)->where('type_media_id', $dataTypeMedia->type_media_id)->first();
-
+        $bookFields = [];
         // $dataMedia = Media::find($id);
         $modalHeader = '';
         $tableBody = '';
@@ -100,9 +100,10 @@ class HomeController extends Controller
     }
     public function fetchNotification()
     {
-        $data = RequestMedia::where('status','!=',4)->where('status','!=',5)->orderBy('created_at', 'DESC')->take(3)->get();
+        $data = RequestMedia::where('status','!=',3)->where('status','!=',4)->where('status','!=',5)->orderBy('created_at', 'DESC')->take(3)->get();
         $html = '';
         $url = [1=>route('order.list'),2=>route('mediaOut.list'),3=>route('order.list')];
+        $status_lable = [1=>'สั่งผลิต',2=>'ให้บริการ',3=>'กำลังผลิต'];
         foreach ($data as $datalist) {
             $html .= "<div class='row' style='margin-bottom: -0.5rem!important;'>
                         <div class='col-md-8'>
@@ -110,7 +111,7 @@ class HomeController extends Controller
                             <p style='padding-left: 0.3cm;'>{$datalist->TypeMedia->name}</p>
                         </div>
                         <div class='col-md-4 text-end'>
-                            <a href='{$url[$datalist->status]}' class='btn btn-danger btn-sm' style='margin-right: 0.3cm;'>ตรวจสอบคำขอ</a>
+                            <a href='{$url[$datalist->status]}' class='btn btn-danger btn-sm' style='margin-right: 0.3cm;'>{$status_lable[$datalist->status]}</a>
                         </div>
                     </div>
                     <hr style='margin:0.5rem 0'>";
@@ -119,7 +120,7 @@ class HomeController extends Controller
     }
     public function fetchNotificationNumber()
     {
-        $data = RequestMedia::where('status','!=',4)->where('status','!=',5)->orderBy('created_at', 'DESC')->count();
+        $data = RequestMedia::where('status','!=',3)->where('status','!=',4)->where('status','!=',5)->orderBy('created_at', 'DESC')->count();
         return response()->json($data);
     }
 }

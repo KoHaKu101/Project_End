@@ -3,8 +3,8 @@
         <tr>
             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
             <th scope="col" >ชื่อหนังสือ</th>
-            <th scope="col" style="width: 8%">ประเภทสื่อ</th>
-            <th scope="col" style="width: 10%">วันที่รับคำขอสื่อ</th>
+            <th scope="col" style="width: 20%">ประเภทสื่อ</th>
+            <th scope="col" style="width: 12%">วันที่รับคำขอสื่อ</th>
             <th scope="col" style="width: 12%">เจ้าหน้าที่</th>
             <th scope="col" style="width: 12%">ผู้ขอรับสื่อ</th>
             <th scope="col" style="width: 8%"></th>

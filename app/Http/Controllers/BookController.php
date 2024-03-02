@@ -138,7 +138,7 @@ class BookController extends Controller
             $file = $request->file('img_book');
             $extension = $file->getClientOriginalExtension();
             $path = public_path('assets/images/book');
-            if(is_null($newFileName)){
+            if(is_null($newFileName) || $newFileName == ''){
                 $newFileName = hexdec(uniqid()) . '.' . $extension;
             }
             $newFilePath = $path . '/' . $newFileName;

@@ -3,7 +3,7 @@
         <tr>
             <th scope="col" style="width: 5%" class="text-center">ลำดับ</th>
             <th scope="col">ชื่อหนังสือ</th>
-            <th scope="col" style="width: 15%">ประเภทสื่อ</th>
+            <th scope="col" style="width: 20%">ประเภทสื่อ</th>
             <th scope="col" style="width: 10%">วันที่สั่งสื่อ</th>
             <th scope="col" style="width: 20%">เจ้าหน้าที่</th>
             <th scope="col" style="width: 16%"></th>

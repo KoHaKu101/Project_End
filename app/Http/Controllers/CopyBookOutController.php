@@ -61,6 +61,11 @@ class CopyBookOutController extends Controller
             return redirect()->back();
         }
         $copybookout = CopyBookOut::find($id);
+        if($request->amount > $copybookout->amount ){
+            Alert::error('จำนวนรับคืนเกินกว่าจ่าย');
+            return redirect()->back();
+        }
+
         $copybook = CopyBook::select('copy_id','amount')->where('copy_id',$copybookout->copy_id)->first();
         $amount  = $copybook->amount + $request->amount;
         $copybookout->update(['status'=> 2]);

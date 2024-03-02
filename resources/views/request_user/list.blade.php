@@ -39,7 +39,7 @@
                                     @foreach ($data as $index => $datalist)
                                     @php
                                         $successNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->count();
-                                        $orderNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->where('status','!=',4)->count();
+                                        $orderNumber = $dataRequestMedia->where('requesters_id',$datalist->requesters_id)->where('status','!=',4)->where('status','!=',5)->count();
                                         $gender = $datalist->gender == "M" ? 'ชาย' : ($datalist->gender == "F" ? 'หญิง' : '');
 
                                     @endphp

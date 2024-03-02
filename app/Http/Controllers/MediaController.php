@@ -182,10 +182,12 @@ class MediaController extends Controller
         $mediaData = Media::find($request->id);
         $bookType = $mediaData->Book->TypeBook->name;
         $book_name = $mediaData->book->name;
+        $img = $mediaData->book->img_book;
         $data = [
             'book_name' => $book_name,
             'media_data' => $mediaData,
             'book_type' => $bookType,
+            'img' => $img,
         ];
         return response()->json($data);
     }
