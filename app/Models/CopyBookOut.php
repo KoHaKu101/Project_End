@@ -21,7 +21,7 @@ class CopyBookOut extends Model
     }
     public static function generateID()
     {
-        $dataDB = self::select('copyout_id')->orderBy('copyout_id','DESC')->latest()->first();
+        $dataDB = self::select('copyout_id')->orderBy('copyout_id','DESC')->first();
         $id = 'cbo_000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->copyout_id, 4);

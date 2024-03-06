@@ -83,8 +83,8 @@
                                 <div class="col-lg-4">
                                     <label class="control-label">จำนวนเล่มจบ</label>
                                     <div class="input-group input-group-sm col-md-4">
-                                    <input type="number" class="form-control form-control-sm" id="amount_end"
-                                        name="amount_end" placeholder="จำนวนเล่มจบ(ตัวเลข)">
+                                        <input type="number" class="form-control form-control-sm" id="amount_end"
+                                            name="amount_end" placeholder="จำนวนเล่มจบ(ตัวเลข)">
                                         <span class="input-group-text">เล่ม</span>
                                     </div>
                                 </div>
@@ -110,10 +110,17 @@
                                     <label class="control-label">ตำแหน่งไฟล์</label>
                                     <textarea class="form-control form-control-sm" id="input_textarea" name="input_textarea"
                                         placeholder="ใส่คำอธิบาย เก็บไว้ที่ไหน" rows="3"></textarea>
-                                    <input type="text" class="form-control form-control-sm" id="input_text"
+                                    <input type="text" class="form-control form-control-sm " id="input_text"
                                         name="input_text" placeholder="ลิงค์ google drive" hidden>
                                     <input type="file" class="form-control form-control-sm" id="input_file"
                                         name="input_file" placeholder="อัปโหลดไฟล์" hidden>
+                                        <div class="form-check mt-2" id="div_mediaFile" hidden>
+                                            <input class="form-check-input" type="checkbox" id="mediaFile"
+                                                name="mediaFile">
+                                            <label class="form-check-label" for="mediaFile">
+                                                อนุญาติให้เล่นไฟล์เสียง
+                                            </label>
+                                        </div>
                                 </div>
                                 <div class="col-lg-12" id="download_file" hidden>
                                     <input type="text" class="form-control" disabled id="file_location">

@@ -15,7 +15,7 @@ class Book extends Model
     public static function generateID()
     {
 
-        $dataDB = self::select('book_id')->latest('book_id')->first();
+        $dataDB = self::select('book_id')->orderBy('book_id','DESC')->first();
         $number = '1';
         $id = 'bk_0000001';
         if (!is_null($dataDB)) {

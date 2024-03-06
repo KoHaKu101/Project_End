@@ -16,7 +16,7 @@ protected $dateFormat = 'Y-m-d';
 
     public static function generateID()
     {
-        $dataDB = self::select('type_media_id')->latest('type_media_id')->first();
+        $dataDB = self::select('type_media_id')->orderBy('type_media_id','DESC')->first();
         $id = 'tm_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->type_media_id, 3);

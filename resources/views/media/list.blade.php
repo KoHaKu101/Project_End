@@ -281,14 +281,19 @@
                 $('#input_textarea').attr('hidden', true);
                 $('#input_text').attr('hidden', false);
                 $('#input_file').attr('hidden', true);
+                $('#div_mediaFile').attr('hidden', true);
+
             } else if (type_file == 'file') {
                 $('#input_textarea').attr('hidden', true);
                 $('#input_text').attr('hidden', true);
                 $('#input_file').attr('hidden', false);
+                $('#div_mediaFile').attr('hidden', false);
             } else {
                 $('#input_textarea').attr('hidden', false);
                 $('#input_text').attr('hidden', true);
                 $('#input_file').attr('hidden', true);
+                $('#div_mediaFile').attr('hidden', true);
+
             }
         }
         function fetchDataInput() {

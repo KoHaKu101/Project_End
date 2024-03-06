@@ -15,7 +15,7 @@ protected $dateFormat = 'Y-m-d';
 
     public static function generateID()
     {
-        $dataDB = self::select('order_id')->orderBy('order_id','DESC')->latest()->first();
+        $dataDB = self::select('order_id')->orderBy('order_id','DESC')->first();
 
         $id = 'or_0000001';
         if (!is_null($dataDB)) {

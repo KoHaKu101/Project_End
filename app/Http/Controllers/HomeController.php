@@ -14,10 +14,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        Carbon::setLocale('th');
         if (session()->get('Logged') != 'true') {
             return redirect()->route('login');
         }
+
+        Carbon::setLocale('th');
         $monthNumberMedia = [];
         $monthNumberRequestMedia = [];
         for($i = 1; $i <= 12; $i++){
@@ -27,7 +28,7 @@ class HomeController extends Controller
         }
 
         $dataTypeMedia = TypeMedia::orderBy('name')->get();
-        $dataMedia = Media::whereMonth('created_at',Carbon::now()->month)->where('status','2')->get();
+        $dataMedia = Media::whereMonth('created_at',Carbon::now()->month)->get();
         $dataRequestMedia = RequestMedia::whereMonth('created_at',Carbon::now()->month)->get();
         return view('dashboard_pd',compact('monthNumberMedia','monthNumberRequestMedia','dataTypeMedia','dataMedia','dataRequestMedia'));
     }
@@ -96,6 +97,16 @@ class HomeController extends Controller
                 }
             }
         }
+
+        if($dataMedia->media_file_check == 1){
+            $path = $dataMedia->file_desc;
+            $newPath = str_replace("D:\\Project_End\\Project_End\\public\\assets/", "", $path);
+            $audioPath = asset('assets/'.$newPath);
+            $tableBody.="<br><audio controls>
+                <source src='{$audioPath}' type='audio/mpeg'>
+            </audio>";
+        }
+
         return response()->json(['status' => true, 'modalHeader' => $modalHeader, 'tableBody' => $tableBody]);
     }
     public function fetchNotification()

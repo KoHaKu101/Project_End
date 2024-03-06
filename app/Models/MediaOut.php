@@ -19,7 +19,7 @@ protected $dateFormat = 'Y-m-d';
     }
     public static function generateID()
     {
-        $dataDB = self::select('md_out_id')->orderBy('md_out_id','DESC')->latest()->first();
+        $dataDB = self::select('md_out_id')->orderBy('md_out_id','DESC')->first();
         $id = 'mo_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->md_out_id, 3);

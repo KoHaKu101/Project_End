@@ -11,7 +11,7 @@ class CopyBook extends Model
     protected $dateFormat = 'Y-m-d';
     public static function generateID()
     {
-        $dataDB = self::select('copy_id')->orderBy('copy_id','DESC')->latest()->first();
+        $dataDB = self::select('copy_id')->orderBy('copy_id','DESC')->first();
         $id = 'cb_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->copy_id, 3);

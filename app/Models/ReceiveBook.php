@@ -15,7 +15,7 @@ protected $dateFormat = 'Y-m-d';
 
     public static function generateID()
     {
-        $dataDB = self::select('recv_id')->orderBy('recv_id','DESC')->latest()->first();
+        $dataDB = self::select('recv_id')->orderBy('recv_id','DESC')->first();
         $id = 'recv_00001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->recv_id, 5);

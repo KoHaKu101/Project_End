@@ -166,6 +166,7 @@ class BookController extends Controller
             'abstract'=> $request->abstract,
             'synopsis'=>$request->synopsis,
             'img_book'=>$request->img_book_location,
+
         ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();

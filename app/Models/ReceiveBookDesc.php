@@ -13,7 +13,7 @@ protected $dateFormat = 'Y-m-d';
     public $incrementing = false;
     public static function generateID()
     {
-        $dataDB = self::select('recd_id')->orderBy('recd_id','DESC')->latest()->first();
+        $dataDB = self::select('recd_id')->orderBy('recd_id','DESC')->first();
         $id = 'recd_00001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->recd_id, 5);

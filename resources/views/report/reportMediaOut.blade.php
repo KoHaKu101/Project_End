@@ -91,6 +91,30 @@
             margin-top: 3.4cm;
 
         }
+
+        .page-final {
+            position: fixed;
+            flex-direction: column;
+            position: fixed;
+            bottom: 10;
+            width: 100%;
+        }
+
+        .page-final table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+
+        .page-final th,
+        .page-final td {
+            border: 1px solid #000;
+            text-align: left;
+        }
+
+        .page-final th {
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -112,6 +136,8 @@
             @foreach ($dataMediaOut->groupBy('created_at') as $dateGroup => $datalistHeader)
                 @php
                     $i += 2;
+                    $number_table = 1;
+                    $number_table_data = 1;
                     if ($i > 20) {
                         $i = 0;
                         echo "<div class='page_break'></div>";
@@ -129,12 +155,13 @@
                     <table>
                         <thead>
                             <tr style="background-color:rgba(94, 94, 94, 0.267)">
-                                <th colspan="5" style="text-align:left">วันที่
+                                <th colspan="6" style="text-align:left">วันที่
                                     {{ date('d/m/', strtotime($dateGroup)) . (date('Y', strtotime($dateGroup)) + 543) }}
                                 </th>
                             </tr>
                             <tr>
-                                <th style="width: 20%">เลขทะเบียนสื่อ</th>
+                                <th style="width: 8%">ลำดับ</th>
+                                <th style="width: 12%">ทะเบียนสื่อ</th>
                                 <th>ชื่อหนังสือ</th>
                                 <th style="width: 23%">ประเภทสื่อ</th>
                                 <th style="width: 15%">การให้บริการสื่อ</th>
@@ -143,13 +170,17 @@
                         </thead>
                         <tbody>
                             @foreach ($dataMediaOut->where('created_at', $dateGroup) as $datalistLoopBody)
-                                @foreach ($dataRequestMedia->where('request_id', $datalistLoopBody->request_id) as $datalistBody)
+                                @foreach ($dataRequestMedia->where('request_id', $datalistLoopBody->request_id) as $index => $datalistBody)
                                     @php
                                         $i += 1;
-                                        $number = $dataMedia->where('book_id',$datalistBody->book_id)->where('type_media_id',$datalistBody->type_media_id)->first()->number;
+                                        $number = $dataMedia
+                                            ->where('book_id', $datalistBody->book_id)
+                                            ->where('type_media_id', $datalistBody->type_media_id)
+                                            ->first()->number;
                                     @endphp
                                     <tr>
-                                        <td style="text-align: center">{{ $number  }}</td>
+                                        <td style="text-align: center">{{ $number_table_data++ }}</td>
+                                        <td style="text-align: center">{{ $number }}</td>
                                         <td style="padding-left: 0.3cm">{{ $datalistBody->Book->name }}</td>
                                         <td style="text-align: center">{{ $datalistBody->TypeMedia->name }}</td>
                                         <td style="text-align: center">{{ $status[$datalistLoopBody->status] }}</td>
@@ -158,18 +189,68 @@
                                     </tr>
                                 @endforeach
                             @endforeach
+                            <tr>
+                                <td colspan="4" style="text-align:center">รวม</td>
+                                <td style="width: 15%;text-align:center">
+                                    {{ $dataMediaOut->where('created_at', $dateGroup)->count() }} </td>
+                                <td style="width: 15%;text-align:center"> รายการ</td>
+                            </tr>
                         </tbody>
                     </table>
                 @endif
-
             @endforeach
 
-        @endif
-        @if($hasData == false)
-        <h1 style="text-align: center">ไม่พบข้อมูล</h1>
+            @if ($i > 17)
+                <div class='page_break'></div>
+            @else
+                <div class="page-final">
+            @endif
+            <table>
+
+                <thead >
+                    <tr style="background-color:rgba(94, 94, 94, 0.267)">
+                        <th style="width: 46%">ให้บริการ</th>
+                        <th style="width: 46%">ยกเลิกบริการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @php
+                        $numberSuccess =
+                            $dataMediaOut->where('status', 2)->count() == 0
+                                ? '-'
+                                : $dataMediaOut->where('status', 2)->count();
+                        $numberCancel =
+                            $dataMediaOut->where('status', 1)->count() == 0
+                                ? '-'
+                                : $dataMediaOut->where('status', 1)->count();
+                    @endphp
+                    <tr>
+                        <td style="text-align:center;">{{ $numberSuccess }}</td>
+                        <td style="text-align:center;">{{ $numberCancel }}</td>
+                    </tr>
+                </tbody>
+                <thead>
+                    <tr style="background-color:rgba(94, 94, 94, 0.267)">
+                        <th colspan="2" style="text-align:center">สรุปผลรวมทั้งหมด</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="2" style="width: 12%;text-align:center">{{ $dataMediaOut->count() }} </td>
+                    </tr>
+                </tbody>
+            </table>
+            @if ($i < 18)
+                </div>
+            @endif
 
         @endif
 
+        @if ($hasData == false)
+            <h1 style="text-align: center">ไม่พบข้อมูล</h1>
+        @endif
     </main>
     <footer>
         <h4 style='text-align: left'>วันที่ออกรายงาน : วันที่ {{ $dateReport }}</h4>

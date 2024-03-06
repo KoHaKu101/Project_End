@@ -18,7 +18,7 @@ protected $dateFormat = 'Y-m-d';
     }
     public static function generateID()
     {
-        $dataDB = self::select('type_book_id')->latest()->first();
+        $dataDB = self::select('type_book_id')->first();
         $id = 'tb_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->type_book_id, 3);

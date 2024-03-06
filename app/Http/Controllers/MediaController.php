@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
 
@@ -40,6 +41,7 @@ class MediaController extends Controller
     }
     private function createData($request, $select_type_file,$file_desc){
         $type_media_id = $request->type_media_id;
+        $media_file_check = $request->mediaFile == null ? 0 : 1;
         $books = Book::find($request->book_id);
         Media::create([
             'media_id' => Media::generateID(),
@@ -55,7 +57,8 @@ class MediaController extends Controller
             'time_hour' => $request->time_hour,
             'time_minute' => $request->time_minute,
             'file_type_select' => $select_type_file,
-            'file_desc' => $file_desc
+            'file_desc' => $file_desc,
+            'media_file_check' => $media_file_check,
         ]);
         return true;
     }
@@ -111,7 +114,10 @@ class MediaController extends Controller
                 if (!File::isDirectory($path)) {
                     File::makeDirectory($path, 0777, true, true);
                 }
+                // $destinationPath = 'FTP:\\192.168.1.7\fileMedia';
                 $file->move($path, $newFileName);
+                // Storage::disk('FTP')->put($destinationPath . '/' . $newFileName, $file);
+
                 $newFilePath = $path . '/' . $newFileName;
                 $file_desc = $newFilePath;
             }else{
@@ -127,6 +133,8 @@ class MediaController extends Controller
         if ($select_type_file != 'file') {
             File::delete($mediaData->file_desc);
         }
+        $media_file_check = $request->mediaFile == null ? 0 : 1;
+
         $mediaData->update([
             'amount_end' => $request->amount_end,
             'braille_page' => $request->braille_page,
@@ -136,7 +144,9 @@ class MediaController extends Controller
             'time_minute' => $request->time_minute,
             'source' => $request->source,
             'file_type_select' => $select_type_file,
-            'file_desc' => $file_desc
+            'file_desc' => $file_desc,
+            'media_file_check' => $media_file_check,
+
         ]);
         Alert::success('บันทึกสำเร็จ');
         return redirect()->back();
@@ -144,6 +154,10 @@ class MediaController extends Controller
     public function updateStatus(Request $request,$id){
         $check_date = $request->check_date;
         $dataMedia = Media::find($id);
+        if($dataMedia->status == 2){
+            Alert::error('เกิดข้อผิดพลาด', 'รายการนี้มีการอัพเดพสถานะแล้ว');
+            return redirect()->back();
+        }
         $requestMedia = RequestMedia::where('book_id',$dataMedia->book_id)->where('type_media_id',$dataMedia->type_media_id)->get();
         $dataMedia->check_date = $check_date;
 
@@ -348,7 +362,7 @@ class MediaController extends Controller
 
     public function generateNumberMedia($type_media_id){
         $typeMedia = TypeMedia::find($type_media_id);
-        $dataMedia = Media::select('number', 'type_media_id')->where('type_media_id', $type_media_id)->latest()->first();
+        $dataMedia = Media::select('number', 'type_media_id')->where('type_media_id', $type_media_id)->orderBy('number','DESC')->first();
         $number = '1';
         if (!is_null($dataMedia)) {
             $dashPosition = strpos($dataMedia->number, "-");

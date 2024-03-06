@@ -27,7 +27,8 @@
                                 <thead>
                                     <tr>
                                         <th>ประเภทสื่อ</th>
-                                        <th class="text-center">จำนวนที่ผลิตเสร็จ</th>
+                                        <th class="text-center">ผลิตเสร็จ</th>
+                                        <th class="text-center">กำลังผลิต</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -35,7 +36,10 @@
                                         <tr>
                                             <td>{{ $datalist->name }}</td>
                                             <td class="text-center">
-                                                {{ $dataMedia->where('type_media_id', $datalist->type_media_id)->count() }}
+                                                {{ $dataMedia->where('type_media_id', $datalist->type_media_id)->where('status',2)->count() }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $dataMedia->where('type_media_id', $datalist->type_media_id)->where('status',1)->count() }}
                                             </td>
                                         </tr>
                                     @endforeach

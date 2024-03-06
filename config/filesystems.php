@@ -59,6 +59,26 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+        'FTP' => [
+            'driver' => 'FTP',
+            'host' => '192.168.1.105',
+            'username' => 'your-ftp-username',
+            'password' => 'your-ftp-password',
+            'root' => 'D:\fileMedia',
+            // Optional FTP Settings...
+            'port' => 21,
+            // 'root' => '',
+            // 'passive' => true,
+            // 'ssl' => true,
+            // 'timeout' => 30,
+        ],
+        'smb' => [
+            'driver' => 'smb',
+            'host' => '192.168.1.7', // Replace with the hostname or IP address of the remote PC
+            'share' => 'fileMedia', // Replace with the name of the shared folder
+            'username' => 'username', // Optional: If authentication is required
+            'password' => 'password', // Optional: If authentication is required
+        ],
 
     ],
 

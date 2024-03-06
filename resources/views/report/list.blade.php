@@ -36,6 +36,31 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-lg-12" id="div_type_status">
+                                <h4>กรุณาระบุสถานะ</h4>
+                                <select class="form-select col-lg-6" id="type_status" name="type_status">
+                                    <option value="all">ทั้งหมด</option>
+                                    <option value="1">กำลังผลิต</option>
+                                    <option value="2">ผลิตเสร็จ</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-12" id="div_status" hidden>
+                                <h4>กรุณาระบุสถานะ</h4>
+                                <select class="form-select col-lg-6" id="status" name="status">
+                                    <option value="all">ทั้งหมด</option>
+                                    <option value="1">ให้บริการสำเร็จ</option>
+                                    <option value="2">ยกเลิกรายการ</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-12" id="div_request_status" hidden>
+                                <h4>กรุณาระบุสถานะคำขอ</h4>
+                                <select class="form-select col-lg-6" id="request_status" name="request_status">
+                                    <option value="all">ทั้งหมด</option>
+                                    <option value="1">คำขอที่สำเร็จ</option>
+                                    <option value="2">คำขอที่ยกเลิก</option>
+                                    <option value="3">คำขอที่ตกค้าง</option>
+                                </select>
+                            </div>
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -76,6 +101,11 @@
 
         const type_report = $('#type_report');
         const div_type_mediaOut = $('#div_type_mediaOut');
+        const div_type_status = $('#div_type_status');
+        const div_status = $('#div_status');
+        const div_request_status = $('#div_request_status');
+        const type_status = $('#type_status');
+        const status = $('#status');
         const type_mediaOut = $('#type_mediaOut');
         const dateStart = $('#dateStart');
         const dateEnd = $('#dateEnd');
@@ -90,16 +120,15 @@
         });
         type_report.on('change', function() {
             let get_value = type_report.val();
-            if (get_value == 'request_user' || arrayChart.indexOf(get_value) !== -1) {
-                div_type_mediaOut.attr('hidden', true);
-            } else {
-                div_type_mediaOut.attr('hidden', false);
-            }
-            if (arrayChart.indexOf(get_value) !== -1) {
+            div_type_mediaOut.attr('hidden', get_value == 'request_user' || arrayChart.includes(get_value));
+            div_type_status.attr('hidden', !(get_value == 'media' || get_value == 'media_summary'));
+            div_status.attr('hidden', !(get_value == 'mediaout' || get_value == 'mediaout_summary'));
+            div_request_status.attr('hidden', get_value != 'request_user');
+            if (arrayChart.includes(get_value)) {
                 createChartJs();
             }
         })
-        dateStart.add(dateEnd).add(type_mediaOut).on('change', function() {
+        dateStart.add(dateEnd).add(type_status).add(status).on('change', function() {
             if (arrayChart.indexOf(type_report.val()) !== -1) {
                 createChartJs();
             }
@@ -125,8 +154,11 @@
             let url = "{{ route('report.chart') }}";
             let data = {
                 type_report: type_report.val(),
+                type_status: type_status.val(),
+                status: status.val(),
                 startDate: dateStart.val(),
                 endDate: dateEnd.val(),
+
             }
             let chart = document.getElementById('chartImgData').getContext('2d');
             let button = $('#submit_report');
@@ -139,6 +171,7 @@
                 data: data,
                 dataType: "JSON",
                 success: function(response) {
+                    console.log(response);
                     for (var key in response.data) {
                         var value = response.data[key];
                         chart_labels.push(key);

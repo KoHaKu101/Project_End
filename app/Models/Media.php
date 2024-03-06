@@ -13,7 +13,7 @@ class Media extends Model
     public $incrementing = false;
 
     public static function generateID(){
-        $dataDB = self::select('media_id')->orderBy('media_id','DESC')->latest()->first();
+        $dataDB = self::select('media_id')->orderBy('media_id','DESC')->first();
         $id = 'md_0000001';
         if (!is_null($dataDB)) {
             $lastNumericPart = (int)substr($dataDB->media_id, 3);
@@ -48,6 +48,7 @@ class Media extends Model
         'source',
         'file_type_select',
         'file_desc',
+        'media_file_check',
     ];
 
 }
